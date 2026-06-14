@@ -119,11 +119,11 @@ The repository is the ONLY place that knows both Dexie rows and engine entities.
 
 ## Section H: Backup Foundation (manual, minimal)
 
-- [ ] RED first: write a failing test (fake-indexeddb) asserting export produces a JSON object containing all seven tables' data, and that import of that JSON into an empty DB restores every record. Then implement both to pass.
-- [ ] Create `app/src/data/backup/exportData.ts` that reads all tables and serializes them to a single JSON object, then triggers a browser download of a `.json` file. (Separate the pure serialize step from the browser download trigger so the serialize step is unit-testable without a DOM.)
-- [ ] Create `app/src/data/backup/importData.ts` that accepts a JSON file, validates it minimally, and writes the tables back (replacing or merging — for Phase 0, replace is fine). (Separate the parse/validate/write step from the file-reading step for testability.)
-- [ ] These do not need UI yet; expose them as functions callable from the console or a temporary button. Full backup UX is a later phase.
-- [ ] Note in a code comment: backup is mandatory for this app because iOS WebKit can evict IndexedDB after 7 days of inactivity. This foundation is built early on purpose.
+- [x] RED first: write a failing test (fake-indexeddb) asserting export produces a JSON object containing all seven tables' data, and that import of that JSON into an empty DB restores every record. Then implement both to pass.
+- [x] Create `app/src/data/backup/exportData.ts` that reads all tables and serializes them to a single JSON object, then triggers a browser download of a `.json` file. (Separate the pure serialize step from the browser download trigger so the serialize step is unit-testable without a DOM.)
+- [x] Create `app/src/data/backup/importData.ts` that accepts a JSON file, validates it minimally, and writes the tables back (replacing or merging — for Phase 0, replace is fine). (Separate the parse/validate/write step from the file-reading step for testability.)
+- [x] These do not need UI yet; expose them as functions callable from the console or a temporary button. Full backup UX is a later phase.
+- [x] Note in a code comment: backup is mandatory for this app because iOS WebKit can evict IndexedDB after 7 days of inactivity. This foundation is built early on purpose.
 
 ## Section I: Phase 0 Done When
 

@@ -356,3 +356,50 @@ Total: 42 tests
 ---
 
 *Next: Section H (backup foundation).*
+
+---
+
+### Section H: Backup Foundation (2026-06-14)
+
+**Status: Complete — all tests green**
+
+#### What was built
+
+| Path | Purpose |
+|------|---------|
+| `app/src/data/backup/exportData.ts` | `serializeDb()` — pure async; `BackupData` type; `downloadBackup()` browser wrapper |
+| `app/src/data/backup/importData.ts` | `deserializeAndRestore()` — clear + bulkPut; `importFromJson()` — parse + validate; `importFromFile()` browser wrapper |
+| `app/src/__tests__/backup.test.ts` | 10 tests: serialize shape, round-trip restore, replace semantics, JSON error paths |
+
+#### TDD notes
+
+RED: test file imported `serializeDb` from the not-yet-created `exportData.ts`. Vitest reported `Failed to load url ../data/backup/exportData.js` — expected module-not-found failure.
+
+GREEN: both files created; all 10 tests passed on the first run. No intermediate failures in the implementation phase.
+
+#### Key decisions
+
+- **`serializeDb` is the only testable surface for export**: `downloadBackup` is a thin browser-only wrapper (creates a `Blob`, triggers an `<a>` click, revokes the object URL). It is not unit-tested — DOM APIs require a browser environment. The separation means the data logic has full test coverage and the browser trigger is a one-liner with no logic to test.
+- **`BackupData.version: 1` (literal type)**: reserves a path for future migration. An importer can branch on version before calling restore. Version is in the shape so any serialised file carries its own schema version.
+- **`deserializeAndRestore` uses `clear()` then `bulkPut()`**: replace semantics — the restored state matches the backup exactly, with no leftover records from before the import. Atomic inside a single read-write transaction: if any write fails, no table is cleared.
+- **`bulkPut` guarded with length check**: skips the Dexie call for empty arrays to avoid a no-op transaction overhead. Preserves correct behaviour when empty tables are imported.
+- **`importFromJson` validates before delegating**: catches `JSON.parse` errors and checks for the `tables` key before calling `deserializeAndRestore`. Two distinct error paths produce distinct messages.
+- **`importFromFile` is browser-only**: uses `File.text()` which is a Web API. Separated from `importFromJson` so the parse/validate/write path can be tested without File objects. Not unit-tested.
+- **`Promise.all` for export reads**: all seven `toArray()` calls run concurrently; Dexie opens one transaction per call in read-only mode. Faster than sequential reads with no correctness risk.
+
+#### Test results
+
+```
+packages/engine — 3 test files, 14 tests  ✓ PASS
+app             — 5 test files, 38 tests  ✓ PASS
+Total: 52 tests
+```
+
+#### What is NOT done yet (intentional)
+
+- Section I: Phase 0 done criteria verification
+- Backup UI (button, file picker): deferred to a later phase
+
+---
+
+*Next: Section I (Phase 0 done-when criteria).*
