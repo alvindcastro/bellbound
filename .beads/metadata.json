@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "bellbound",
+  "project_id": "dd50f2ac-a13c-469a-9060-53da23d6ae2e"
+}
