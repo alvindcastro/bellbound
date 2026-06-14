@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import type { Block } from '@bellbound/engine';
+import type { Block, WorkoutLog } from '@bellbound/engine';
 import { resolveToday, resolveTierWorkout } from './services/todayService.js';
 import type { TodayResult, ResolvedWorkout } from './services/todayService.js';
 import { blockRepository } from './data/repositories/blockRepository.js';
 import { workoutTemplateRepository } from './data/repositories/workoutTemplateRepository.js';
+import { workoutLogRepository } from './data/repositories/workoutLogRepository.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
 import RecentLogs from './ui/log/RecentLogs.js';
+import WeeklyHistory from './ui/history/WeeklyHistory.js';
 
-type AppView = 'today' | 'log' | 'recent';
+type AppView = 'today' | 'log' | 'recent' | 'history';
 
 export default function App() {
   const today = new Date().toISOString().slice(0, 10);
@@ -16,18 +18,21 @@ export default function App() {
   const [todayResult, setTodayResult] = useState<TodayResult | null>(null);
   const [activeBlock, setActiveBlock] = useState<Block | null>(null);
   const [resolvedWorkout, setResolvedWorkout] = useState<ResolvedWorkout | null>(null);
+  const [todayLog, setTodayLog] = useState<WorkoutLog | null>(null);
 
   useEffect(() => {
     Promise.all([
       resolveToday(today),
       blockRepository.getActiveBlock(),
       workoutTemplateRepository.getById('dkbs'),
-    ]).then(([result, block, template]) => {
+      workoutLogRepository.getByDate(today),
+    ]).then(([result, block, template, log]) => {
       setTodayResult(result);
       setActiveBlock(block);
       if (block && template) {
         setResolvedWorkout(resolveTierWorkout(template, block.baselineTier));
       }
+      setTodayLog(log);
     });
   }, [today]);
 
@@ -47,6 +52,20 @@ export default function App() {
             onSave={() => setView('today')}
             onCancel={() => setView('today')}
           />
+        </main>
+      </div>
+    );
+  }
+
+  if (view === 'history') {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <span className="app-title">Bellbound</span>
+          <button onClick={() => setView('today')}>← Today</button>
+        </header>
+        <main>
+          <WeeklyHistory />
         </main>
       </div>
     );
@@ -72,11 +91,13 @@ export default function App() {
       <header className="app-header">
         <span className="app-title">Bellbound</span>
         <button onClick={() => setView('recent')}>Log History</button>
+        <button onClick={() => setView('history')}>Week</button>
       </header>
       <main>
         <TodayScreen
           date={today}
           todayResult={todayResult}
+          todayLog={todayLog}
           onLogWorkout={() => setView('log')}
         />
       </main>

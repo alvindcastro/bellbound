@@ -14,4 +14,13 @@ export const blockRepository = {
     const row = await db.blocks.filter((b) => b.status === 'active').first();
     return row ? fromRow(row) : null;
   },
+
+  async incrementCompletedPlannedKbSessions(blockId: string): Promise<void> {
+    await db.blocks
+      .where('id')
+      .equals(blockId)
+      .modify((row) => {
+        row.completedPlannedKbSessions += 1;
+      });
+  },
 };

@@ -3,7 +3,7 @@ import type { Difficulty, DayType } from '@bellbound/engine';
 import type { ResolvedWorkout } from '../../services/todayService.js';
 import type { WorkoutContext, LogFormInputs } from '../../services/buildWorkoutLog.js';
 import { buildWorkoutLog } from '../../services/buildWorkoutLog.js';
-import { workoutLogRepository } from '../../data/repositories/workoutLogRepository.js';
+import { saveLogAndUpdateCounter } from '../../services/sessionCounterService.js';
 
 interface Props {
   date: string;
@@ -55,7 +55,7 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
     setSaving(true);
     try {
       const log = buildWorkoutLog(inputs, context);
-      await workoutLogRepository.add(log);
+      await saveLogAndUpdateCounter(log);
       onSave();
     } finally {
       setSaving(false);

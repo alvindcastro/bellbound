@@ -1,8 +1,11 @@
 import type { TodayResult, ResolvedMovement } from '../../services/todayService.js';
+import type { WorkoutLog } from '@bellbound/engine';
+import { classifyDay } from '@bellbound/engine';
 
 interface Props {
   date: string;
   todayResult: TodayResult | null;
+  todayLog: WorkoutLog | null;
   onLogWorkout: () => void;
 }
 
@@ -32,26 +35,35 @@ const DAY_MESSAGE: Record<string, string> = {
   test: 'Test day — logging coming in a later phase.',
 };
 
-export default function TodayScreen({ date, todayResult, onLogWorkout }: Props) {
+export default function TodayScreen({ date, todayResult, todayLog, onLogWorkout }: Props) {
   if (todayResult === null) {
     return <p className="loading">Loading…</p>;
   }
 
   if (todayResult.dayType !== 'kb') {
+    const classification = classifyDay(todayResult.dayType, todayLog);
     return (
       <div>
         <p className="day-meta">{formatDate(date)} · {DAY_LABEL[todayResult.dayType]}</p>
         <p className="rest-message">{DAY_MESSAGE[todayResult.dayType]}</p>
+        {todayLog !== null && classification === 'trained_on_rest_day' && (
+          <p className="log-status extra">Extra session logged</p>
+        )}
         <button className="btn" onClick={onLogWorkout}>Log a workout anyway</button>
       </div>
     );
   }
 
   const { workout } = todayResult;
+  const classification = classifyDay('kb', todayLog);
+  const alreadyLogged = todayLog !== null && classification === 'trained_on_training_day';
 
   return (
     <div>
       <p className="day-meta">{formatDate(date)} · Kettlebell</p>
+      {alreadyLogged && (
+        <p className="log-status logged">Logged: {todayLog!.status} · {todayLog!.difficulty}</p>
+      )}
       <p className="zone-title">{workout.zoneName}</p>
       <table className="workout-table">
         <thead>
@@ -76,7 +88,11 @@ export default function TodayScreen({ date, todayResult, onLogWorkout }: Props) 
           </tr>
         </tbody>
       </table>
-      <button className="btn-primary" onClick={onLogWorkout}>Log this workout</button>
+      {alreadyLogged ? (
+        <button className="btn" onClick={onLogWorkout}>Edit log</button>
+      ) : (
+        <button className="btn-primary" onClick={onLogWorkout}>Log this workout</button>
+      )}
     </div>
   );
 }

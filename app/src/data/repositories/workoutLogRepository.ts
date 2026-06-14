@@ -22,4 +22,22 @@ export const workoutLogRepository = {
     const rows = await db.workoutLogs.orderBy('date').reverse().limit(n).toArray();
     return rows.map(fromRow);
   },
+
+  async getById(id: string): Promise<WorkoutLog | null> {
+    const row = await db.workoutLogs.get(id);
+    return row ? fromRow(row) : null;
+  },
+
+  async getByDate(date: string): Promise<WorkoutLog | null> {
+    const row = await db.workoutLogs.where('date').equals(date).first();
+    return row ? fromRow(row) : null;
+  },
+
+  async listByDateRange(startDate: string, endDate: string): Promise<WorkoutLog[]> {
+    const rows = await db.workoutLogs
+      .where('date')
+      .between(startDate, endDate, true, true)
+      .toArray();
+    return rows.map(fromRow);
+  },
 };
