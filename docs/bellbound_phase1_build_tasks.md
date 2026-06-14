@@ -84,22 +84,22 @@ Discipline: if you are about to write logic inside a component (a calculation, a
 
 ## Section F: Persistence and Reload
 
-- [ ] Confirm a logged workout persists across a full page reload (data is in IndexedDB, not memory).
-- [ ] Confirm the app loads and shows Today and Recent Logs while offline (dev tools offline mode), since the shell is cached and data is local.
-- [ ] Confirm logging works offline (no network calls in Phase 1 at all).
+- [x] Confirm a logged workout persists across a full page reload (data is in IndexedDB, not memory).
+- [x] Confirm the app loads and shows Today and Recent Logs while offline (dev tools offline mode), since the shell is cached and data is local.
+- [x] Confirm logging works offline (no network calls in Phase 1 at all).
 
 ## Section G: Phase 1 Done When
 
 - [x] The Today screen renders the seeded Double KB Strength workout, resolved from the active block's tier, with all movements, reps/duration, load, and rest visible.
 - [x] A workout can be logged with status, actual rounds, difficulty, and a note.
-- [ ] The log is written to IndexedDB and survives a page reload.
+- [x] The log is written to IndexedDB and survives a page reload.
 - [x] Recent logs are viewable, newest first.
-- [ ] The app is genuinely useful as a plain training log with no RPG mechanics.
-- [ ] Everything works offline.
+- [x] The app is genuinely useful as a plain training log with no RPG mechanics.
+- [x] Everything works offline.
 - [x] The engine package was not imported or called anywhere in Phase 1 (verify). Only `import type` statements — erased at compile time, no engine functions called.
 - [x] `todayService`, the tier-resolution function, and `buildWorkoutLog` were written test-first and have passing tests. No computation lives inside components; components call tested functions.
 - [x] No signal flags, no sleep/bodyweight/food, no stats captured.
-- [ ] Committed to git with a clear Phase 1 commit message.
+- [x] Committed to git with a clear Phase 1 commit message.
 
 ---
 
