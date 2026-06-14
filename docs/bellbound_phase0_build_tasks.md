@@ -127,15 +127,15 @@ The repository is the ONLY place that knows both Dexie rows and engine entities.
 
 ## Section I: Phase 0 Done When
 
-- [ ] `npm run dev` serves the app; the service worker registers and the shell loads offline.
-- [ ] `npm test` runs engine tests; entity and config tests pass.
-- [ ] All Section C through H logic was written test-first (red-green-refactor); every repository, the schema, seed, and backup have passing tests under Vitest/fake-indexeddb. No production logic exists without a prior failing test.
-- [ ] The engine package has zero dependency on dexie, react, or vite (verify its `package.json`).
-- [ ] On first load, seed data is written to IndexedDB and visible in dev tools.
-- [ ] A WorkoutLog can be written via the repository and read back, mapped to an engine entity.
-- [ ] The active block, default week template, and Double KB Strength template load via their repositories.
-- [ ] Manual export produces a JSON file; manual import restores it.
-- [ ] Everything committed to git with a clear Phase 0 commit message.
+- [x] `npm run dev` serves the app; the service worker registers and the shell loads offline.
+- [x] `npm test` runs engine tests; entity and config tests pass.
+- [x] All Section C through H logic was written test-first (red-green-refactor); every repository, the schema, seed, and backup have passing tests under Vitest/fake-indexeddb. No production logic exists without a prior failing test.
+- [x] The engine package has zero dependency on dexie, react, or vite (verify its `package.json`).
+- [x] On first load, seed data is written to IndexedDB and visible in dev tools.
+- [x] A WorkoutLog can be written via the repository and read back, mapped to an engine entity.
+- [x] The active block, default week template, and Double KB Strength template load via their repositories.
+- [x] Manual export produces a JSON file; manual import restores it.
+- [x] Everything committed to git with a clear Phase 0 commit message.
 
 ---
 

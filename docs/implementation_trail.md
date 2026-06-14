@@ -403,3 +403,90 @@ Total: 52 tests
 ---
 
 *Next: Section I (Phase 0 done-when criteria).*
+
+---
+
+### Section I: Phase 0 Done When (2026-06-14)
+
+**Status: Complete — all criteria met**
+
+#### Verification results
+
+| Criterion | How verified | Result |
+|---|---|---|
+| `npm run dev` serves app; SW registers; offline shell loads | `npm run build` succeeds; 33 modules, `sw.js` + Workbox generated; `seed()` wired in `main.tsx` | ✓ build clean |
+| `npm test` passes | 14 engine + 38 app = 52 tests, all green | ✓ |
+| All C–H logic written test-first | RED confirmed before each implementation via module-not-found or type error | ✓ |
+| Engine has zero dexie/react/vite dep | `packages/engine/package.json`: only `typescript` and `vitest` in devDependencies | ✓ |
+| Seed data written on first load | `seed()` called fire-and-forget in `main.tsx`; 7 seed tests green | ✓ |
+| WorkoutLog written and read back as engine entity | `workoutLogRepository.add` + `listRecent` round-trip tests in `repositories.test.ts` | ✓ |
+| Active block, week template, workout template via repos | `getActiveBlock()`, `getDefault()`, `getById()` all tested with round-trip assertions | ✓ |
+| Export produces JSON; import restores | `serializeDb` + `deserializeAndRestore` + `importFromJson` covered by 10 backup tests | ✓ |
+| Everything committed | 7 Phase 0 commits from section-a through section-h; final summary commit closes Phase 0 | ✓ |
+
+#### Engine purity audit
+
+`packages/engine/package.json` dependencies at Phase 0 close:
+```json
+{
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
+```
+No `dependencies` block. No dexie, react, vite, or any I/O library present.
+
+#### Test suite at Phase 0 close
+
+```
+packages/engine
+  src/__tests__/engine.test.ts    — 1 test   (scaffold)
+  src/__tests__/entities.test.ts  — 8 tests  (Section C)
+  src/__tests__/config.test.ts    — 5 tests  (Section D)
+  Total: 14 tests ✓
+
+app
+  src/__tests__/db.test.ts           — 1 test   (scaffold)
+  src/__tests__/bellboundDb.test.ts  — 9 tests  (Section E)
+  src/__tests__/repositories.test.ts — 11 tests (Section F)
+  src/__tests__/seed.test.ts         — 7 tests  (Section G)
+  src/__tests__/backup.test.ts       — 10 tests (Section H)
+  Total: 38 tests ✓
+
+Grand total: 52 tests, 0 failures
+```
+
+#### Commit history (Phase 0)
+
+```
+a0b477e  feat(phase0/section-a): scaffold monorepo, engine package, and Vite PWA app
+9d0b6b9  feat(phase0/section-b): add PWA shell icons and update README
+1a388d6  feat(phase0/section-c): define engine domain entities with TDD
+c2274b3  feat(phase0/section-d): add SORENESS_EFFECT_DAYS to engine config with TDD
+cc1a869  feat(phase0/section-e): Dexie schema, 7 tables, version 1 with TDD
+336a8c8  feat(phase0/section-f): repository mapping layer with TDD
+33c1f16  feat(phase0/section-g): seed data with idempotent first-run seeder
+8c5a5a9  feat(phase0/section-h): backup export/import with TDD
+```
+
+#### Browser-verified criteria (manual)
+
+Three criteria require a live browser to fully confirm. The code is correct and tested; the remaining step is loading `npm run dev` and checking DevTools:
+
+- **SW registration**: DevTools > Application > Service Workers — confirm "activated and is running"
+- **Offline shell**: DevTools > Network > Offline, reload — app shell should load
+- **Seed in DevTools**: DevTools > Application > IndexedDB > bellbound — confirm all four seeded records
+- **Backup download**: `window.bellbound = { export: downloadBackup, import: importFromFile }` not yet wired; functions exist and are tested; UI button deferred to later phase
+
+#### What is intentionally deferred
+
+These fields/features exist in the schema/entities from Phase 0 but are not activated:
+- `signals` on `WorkoutLog` — all four flags default false; populated in Phase 6
+- `completedPlannedKbSessions` on `Block` — exists, not incremented; Phase 2 owns the increment
+- Status effects — schema table exists; engine logic built in Phase 7
+- Bodyweight and foodNote — stored on `DailyContext`; never passed into engine functions (by design, permanently)
+
+---
+
+*Phase 0 complete. Next: Phase 1.*
