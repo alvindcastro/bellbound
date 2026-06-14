@@ -112,9 +112,9 @@ The repository is the ONLY place that knows both Dexie rows and engine entities.
 
 ## Section G: Seed Data
 
-- [ ] RED first: write failing tests (fake-indexeddb) asserting that seeding an empty DB produces the expected character, default week template, active block (tier 1, guard 6, counter 0), and Double KB Strength template with its tiers and movements; and that calling seed again does NOT duplicate or overwrite existing data. Then implement to pass.
-- [ ] Create `app/src/data/seed.ts` that seeds, on first run only (check if the DB is empty), a default user/character, the default week template (Mon KB, Tue KB, Wed Rest, Thu KB, Fri KB, Sat Free, Sun Rest), an active block at `baselineTier: 1` with `testGuardMinSessions: 6` and `completedPlannedKbSessions: 0`, and the Double KB Strength workout template with its tier definitions (tier 1 = 4 rounds, tier 2 = 5 rounds, tier 3 = 6 rounds) and its five movements (double clean 5, double press 3, double front squat 5, push-ups 8-10, farmer carry 30 sec, all at double 20 kg except push-ups bodyweight).
-- [ ] Call the seed function once at app startup, guarded so it does not overwrite existing data.
+- [x] RED first: write failing tests (fake-indexeddb) asserting that seeding an empty DB produces the expected character, default week template, active block (tier 1, guard 6, counter 0), and Double KB Strength template with its tiers and movements; and that calling seed again does NOT duplicate or overwrite existing data. Then implement to pass.
+- [x] Create `app/src/data/seed.ts` that seeds, on first run only (check if the DB is empty), a default user/character, the default week template (Mon KB, Tue KB, Wed Rest, Thu KB, Fri KB, Sat Free, Sun Rest), an active block at `baselineTier: 1` with `testGuardMinSessions: 6` and `completedPlannedKbSessions: 0`, and the Double KB Strength workout template with its tier definitions (tier 1 = 4 rounds, tier 2 = 5 rounds, tier 3 = 6 rounds) and its five movements (double clean 5, double press 3, double front squat 5, push-ups 8-10, farmer carry 30 sec, all at double 20 kg except push-ups bodyweight).
+- [x] Call the seed function once at app startup, guarded so it does not overwrite existing data.
 - [ ] Verify in browser dev tools (Application tab, IndexedDB) that the seeded records appear after first load.
 
 ## Section H: Backup Foundation (manual, minimal)

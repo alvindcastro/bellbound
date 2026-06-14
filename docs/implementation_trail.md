@@ -299,3 +299,60 @@ Total: 35 tests
 ---
 
 *Next: Section G (seed data).*
+
+---
+
+### Section G: Seed Data (2026-06-14)
+
+**Status: Complete — all tests green**
+
+#### What was built
+
+| Path | Purpose |
+|------|---------|
+| `app/src/data/seed.ts` | `seed(today?)` — idempotent first-run seeder, one Dexie transaction |
+| `app/src/__tests__/seed.test.ts` | 7 tests: each seeded record, idempotency, no-overwrite guard |
+| `app/src/main.tsx` | Fire-and-forget `seed()` call at app startup |
+
+#### Seeded records
+
+| Table | Key | Key data |
+|---|---|---|
+| `characters` | `player-1` | Adventurer, level 1, all stats 0 |
+| `weekTemplates` | `default` | Mon/Tue/Thu/Fri KB · Wed/Sun Rest · Sat Free |
+| `blocks` | `block-1` | tier 1, guard 6, counter 0, status active |
+| `workoutTemplates` | `dkbs` | Double KB Strength, 3 tiers (4/5/6 rounds), 5 movements |
+
+Movements: Double Clean 5 reps 20 kg · Double Press 3 reps 20 kg · Double Front Squat 5 reps 20 kg · Push-ups 10 reps bodyweight · Farmer Carry 30 s 20 kg.
+
+#### TDD notes
+
+RED: test file written first importing `seed` from the not-yet-created `seed.ts`. Vitest reported `Failed to load url ../data/seed.js` — expected failure.
+
+GREEN: `seed.ts` created; all 7 tests passed first run. No refactor needed — the function is small and direct.
+
+#### Key decisions
+
+- **Idempotency via character sentinel**: `seed()` checks `db.characters.get('player-1')` at the top and returns immediately if found. One check beats checking all four tables; the character is always the first thing written (transaction atomicity ensures all-or-nothing).
+- **`today` parameter with default**: `seed(today = new Date().toISOString().slice(0, 10))` makes the block's `startDate` deterministic in tests without mocking `Date`. Tests pass `'2026-06-14'` explicitly; production gets the real date.
+- **Single transaction wrapping all four writes**: if any write fails (e.g. duplicate key on a partial previous run), the whole transaction rolls back. The DB stays empty rather than partially seeded, so the next startup attempt will re-run the full seed.
+- **Fire-and-forget `seed()` in `main.tsx`**: no need to await before render. The seed completes asynchronously; there is no UI in Phase 0 that reads the seeded data. When the UI exists, it will read from Dexie via repositories, which will see the data once the seed transaction commits.
+- **`Push-ups` reps stored as 10**: the spec says "8-10". The upper bound is stored as the target rep count. The lower bound is training context, not a schema concern.
+
+#### Test results
+
+```
+packages/engine — 3 test files, 14 tests  ✓ PASS
+app             — 4 test files, 28 tests  ✓ PASS
+Total: 42 tests
+```
+
+#### What is NOT done yet (intentional)
+
+- Browser verification: confirmed via `seed.test.ts`; manual DevTools check deferred to Section I
+- Section H: backup export/import
+- Section I: Phase 0 done criteria
+
+---
+
+*Next: Section H (backup foundation).*
