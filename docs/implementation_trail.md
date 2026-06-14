@@ -199,3 +199,50 @@ app             — 1 test file,   1 test   ✓ PASS
 ---
 
 *Next: Section E (Dexie schema).*
+
+---
+
+### Section E: Dexie Schema (2026-06-14)
+
+**Status: Complete — all tests green**
+
+#### What was built
+
+| Path | Purpose |
+|------|---------|
+| `app/src/data/db/bellboundDb.ts` | Dexie subclass `BellboundDb`, version 1 schema, row types, exported `db` singleton |
+| `app/src/__tests__/bellboundDb.test.ts` | 9 schema tests (version, all 7 tables, primary keys, workoutLogs indexes) |
+
+#### TDD notes
+
+RED: test file written first importing `db` from the not-yet-created `bellboundDb.ts`. Vitest reported `Failed to load url ../data/db/bellboundDb.js — does the file exist?` — the correct failure before implementation.
+
+GREEN: `bellboundDb.ts` created; all 9 schema tests passed immediately. Full suite: 14 engine tests + 10 app tests, all green.
+
+#### Key decisions
+
+- **Row types defined in the data layer, no engine imports**: `CharacterRow`, `BlockRow`, `WeekTemplateRow`, `WorkoutTemplateRow`, `WorkoutLogRow`, `DailyContextRow`, `StatusEffectRow` are declared independently in `bellboundDb.ts`. The engine has no dependency on Dexie; the data layer doesn't import engine entity types. Shapes are intentionally duplicated at this boundary — the repository (Section F) is the place that maps between them.
+- **Dexie already installed**: `dexie: ^3.2.7` was present in `app/package.json` from the initial scaffold; no install step needed.
+- **`workoutLogs` schema string `'id, date, blockId'`**: Dexie uses the first token as the primary key; subsequent comma-separated names become secondary indexes. This gives efficient queries by date range and by block without a table scan.
+- **`dailyContext` keyed by `date`**: ISO date string is the natural identity for daily context — one row per day, primary key is the date itself. Eliminates the need for a separate id field.
+- **Structured fields stored as nested objects**: Dexie serialises JavaScript objects to IndexedDB directly (structured clone). No JSON stringification needed. Fields like `signals`, `stats`, `tiers`, `movements` are stored and retrieved as-is.
+- **`as const` table type parameters**: `Table<CharacterRow, string>` — second type param is the key type. All primary keys are strings.
+- **`afterEach(() => db.delete())`**: each test deletes the database after it runs. With `fake-indexeddb`, databases persist in memory across tests in the same file unless explicitly deleted. This prevents state leaking between tests.
+
+#### Test results
+
+```
+packages/engine — 3 test files, 14 tests  ✓ PASS
+app             — 2 test files, 10 tests  ✓ PASS
+```
+
+#### What is NOT done yet (intentional)
+
+- Section F: repository mapping layer (one repo per aggregate, round-trip tests)
+- Section G: seed data
+- Section H: backup export/import
+- Section I: Phase 0 done criteria
+
+---
+
+*Next: Section F (repository mapping layer).*

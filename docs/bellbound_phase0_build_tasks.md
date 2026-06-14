@@ -90,14 +90,14 @@ Define plain TypeScript types/interfaces in `packages/engine/src/entities`. Thes
 
 Define the IndexedDB schema in `app/src/data/db`. These are the stored row shapes. They mirror the entities but are Dexie's concern, not the engine's.
 
-- [ ] RED first: write a failing test (fake-indexeddb) asserting the DB opens at version 1 and exposes the seven expected tables with the expected primary keys/indexes. Then build the schema to pass it.
-- [ ] Install `dexie` in the `app` package.
-- [ ] Create `data/db/bellboundDb.ts` defining a Dexie subclass with these tables: `characters`, `blocks`, `weekTemplates`, `workoutTemplates`, `workoutLogs`, `dailyContext`, `statusEffects`.
-- [ ] Define the schema version 1 with appropriate primary keys and indexes: `workoutLogs` keyed by `id` and indexed by `date` and `blockId`; `dailyContext` keyed by `date`; `blocks` keyed by `id`; others keyed by `id` (or `userId` for `characters`).
-- [ ] Store structured fields (`tiers`, `movements`, `structuredNotes`, `signals`, the character `stats`) as nested objects; Dexie stores objects directly, so no JSON stringification is needed, but keep them typed.
-- [ ] Define TypeScript row types for each table (these may mirror the entity types but live in the data layer; do not import engine types into the Dexie file to keep the boundary clean — duplicate the shape or use a shared plain type if you prefer, but the engine must not depend on Dexie).
-- [ ] Export a single `db` instance.
-- [ ] Confirm the schema test from the first sub-step is green.
+- [x] RED first: write a failing test (fake-indexeddb) asserting the DB opens at version 1 and exposes the seven expected tables with the expected primary keys/indexes. Then build the schema to pass it.
+- [x] Install `dexie` in the `app` package.
+- [x] Create `data/db/bellboundDb.ts` defining a Dexie subclass with these tables: `characters`, `blocks`, `weekTemplates`, `workoutTemplates`, `workoutLogs`, `dailyContext`, `statusEffects`.
+- [x] Define the schema version 1 with appropriate primary keys and indexes: `workoutLogs` keyed by `id` and indexed by `date` and `blockId`; `dailyContext` keyed by `date`; `blocks` keyed by `id`; others keyed by `id` (or `userId` for `characters`).
+- [x] Store structured fields (`tiers`, `movements`, `structuredNotes`, `signals`, the character `stats`) as nested objects; Dexie stores objects directly, so no JSON stringification is needed, but keep them typed.
+- [x] Define TypeScript row types for each table (these may mirror the entity types but live in the data layer; do not import engine types into the Dexie file to keep the boundary clean — duplicate the shape or use a shared plain type if you prefer, but the engine must not depend on Dexie).
+- [x] Export a single `db` instance.
+- [x] Confirm the schema test from the first sub-step is green.
 
 ## Section F: Repository Mapping Layer
 
