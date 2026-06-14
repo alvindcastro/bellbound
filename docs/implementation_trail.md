@@ -470,14 +470,12 @@ cc1a869  feat(phase0/section-e): Dexie schema, 7 tables, version 1 with TDD
 8c5a5a9  feat(phase0/section-h): backup export/import with TDD
 ```
 
-#### Browser-verified criteria (manual)
+#### Browser-verified criteria
 
-Three criteria require a live browser to fully confirm. The code is correct and tested; the remaining step is loading `npm run dev` and checking DevTools:
-
-- **SW registration**: DevTools > Application > Service Workers — confirm "activated and is running"
-- **Offline shell**: DevTools > Network > Offline, reload — app shell should load
-- **Seed in DevTools**: DevTools > Application > IndexedDB > bellbound — confirm all four seeded records
-- **Backup download**: `window.bellbound = { export: downloadBackup, import: importFromFile }` not yet wired; functions exist and are tested; UI button deferred to later phase
+- **SW registration**: DevTools > Application > Service Workers — confirm "activated and is running" *(deferred — not yet checked)*
+- **Offline shell**: DevTools > Network > Offline, reload — app shell should load *(deferred — not yet checked)*
+- **Seed in DevTools**: Verified 2026-06-14 in Firefox (localhost:5173). Firefox DevTools > Storage > Indexed DB > bellbound (default) showed all 7 object stores with correct key paths: `blocks (id)`, `characters (userId)`, `dailyContext (date)`, `statusEffects (id)`, `weekTemplates (id)`, `workoutLogs (id, indexes: blockId + date)`, `workoutTemplates (id)`. Seed data present on first load.
+- **Backup download**: functions exist and are tested; UI button deferred to later phase
 
 #### What is intentionally deferred
 
