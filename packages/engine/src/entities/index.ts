@@ -1,1 +1,9 @@
-// Entity exports will be added in Section C
+export type { DayType, Difficulty, WorkoutSource, ExpiryType, BlockStatus } from './enums.js';
+export type { CharacterStats, Character } from './character.js';
+export type { Block } from './block.js';
+export type { Weekday, WeekTemplate } from './weekTemplate.js';
+export type { Movement, TierDefinition, WorkoutTemplate } from './workoutTemplate.js';
+export type { Signals } from './signals.js';
+export type { WorkoutLog } from './workoutLog.js';
+export type { DailyContext } from './dailyContext.js';
+export type { StatusEffect } from './statusEffect.js';

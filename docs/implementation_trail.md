@@ -101,3 +101,57 @@ app              — 1 test file, 1 test  ✓ PASS
 ---
 
 *Next: Section C (engine entities, TDD).*
+
+---
+
+### Section C: Engine Domain Entities (2026-06-14)
+
+**Status: Complete — all tests green**
+
+#### What was built
+
+| Path | Contents |
+|------|---------|
+| `packages/engine/src/entities/enums.ts` | `DayType`, `Difficulty`, `WorkoutSource`, `ExpiryType`, `BlockStatus` type aliases |
+| `packages/engine/src/entities/signals.ts` | `Signals` interface — four boolean flags, all default false |
+| `packages/engine/src/entities/character.ts` | `CharacterStats` interface (6 stat fields), `Character` interface |
+| `packages/engine/src/entities/block.ts` | `Block` interface — imports `BlockStatus` from enums |
+| `packages/engine/src/entities/weekTemplate.ts` | `Weekday` union type, `WeekTemplate` interface with `days: Record<Weekday, DayType>` |
+| `packages/engine/src/entities/workoutTemplate.ts` | `Movement` interface (optional reps/rounds/duration/load), `TierDefinition` interface (rounds), `WorkoutTemplate` interface |
+| `packages/engine/src/entities/workoutLog.ts` | `WorkoutLog` interface — imports from enums and signals; `signals` field defined but empty until Phase 6 |
+| `packages/engine/src/entities/dailyContext.ts` | `DailyContext` interface — bodyweight and foodNote are `null`able and never fed to engine functions |
+| `packages/engine/src/entities/statusEffect.ts` | `StatusEffect` interface — imports `ExpiryType` from enums |
+| `packages/engine/src/entities/index.ts` | Re-exports all entity types and enums with `export type { ... }` |
+
+#### TDD notes
+
+Test file written first: `packages/engine/src/__tests__/entities.test.ts` — 8 tests, one per entity, constructing valid object literals and asserting shape properties.
+
+RED phase was at the TypeScript level: `tsc --noEmit` failed with "File '...entities/index.ts' is not a module" before the entity files existed. Vitest (esbuild) strips `import type` so it did not catch the missing exports — this is the expected behavior for type-only entities. RED was confirmed via `tsc --noEmit`.
+
+GREEN: after entity files were created and `index.ts` re-exports were added, both `tsc --noEmit` and `vitest run` passed.
+
+#### Key decisions
+
+- **`import type` for all entity re-exports**: entities are pure interfaces and type aliases — no runtime values. Using `export type { ... }` in `index.ts` enforces this explicitly and prevents accidental value imports.
+- **`signals` field defined now but left at all-false**: per the Phase 0 corrections document, `Signals` is defined in Section C but not populated until Phase 6. The field exists on `WorkoutLog` with defaults; no code reads or acts on it yet. Not removing it for being unused.
+- **`bodyweight` and `foodNote` are `null`able on `DailyContext`**: they are stored but must never be passed into any engine function. Enforced by not wiring them into engine calls. The test comment names this constraint explicitly.
+- **`TierDefinition` as `{ rounds: number }`**: concretely typed from seed data (tier 1 = 4 rounds, tier 2 = 5 rounds, tier 3 = 6 rounds). Can be extended in later phases without breaking the interface.
+- **`Weekday` as a union type on `WeekTemplate.days`**: `Record<Weekday, DayType>` gives known-key semantics — TypeScript knows each weekday key exists, so access like `wt.days.monday` is `DayType` (not `DayType | undefined`) even with `noUncheckedIndexedAccess: true`. Avoids false positives on required keys.
+- **`plannedWorkout` / `actualWorkout` as `Record<string, unknown>`**: shape not specified in Section C; typed flexibly for now, to be refined when the workout log UI is built.
+
+#### Test results
+
+```
+packages/engine — 2 test files, 9 tests  ✓ PASS
+app             — 1 test file,  1 test   ✓ PASS
+```
+
+#### What is NOT done yet (intentional)
+
+- Section D: `config.ts` full constants including `SORENESS_EFFECT_DAYS`
+- Sections E–H: Dexie schema, repositories, seed, backup
+
+---
+
+*Next: Section D (engine config).*
