@@ -53,3 +53,51 @@ app              — 1 test file, 1 test  ✓ PASS
 ---
 
 *Next: Section B (PWA shell) — manual browser verification only, then Section C (engine entities, TDD).*
+
+---
+
+### Section B: PWA Shell Setup (2026-06-14)
+
+**Status: Complete — browser-verified, no unit tests (per protocol)**
+
+#### What was built
+
+| Path | Purpose |
+|------|---------|
+| `app/public/icon-192.png` | PWA manifest icon, 192x192 px, solid #1a1a2e fill |
+| `app/public/icon-512.png` | PWA manifest icon, 512x512 px, solid #1a1a2e fill |
+
+`vite.config.ts` and `vite-plugin-pwa` were already in place from Section A. No config changes were needed in this section.
+
+#### Key decisions
+
+- **Icons generated with Python stdlib only (struct + zlib)**: no build dependency, no third-party tool, no canvas or image library needed. The icons are minimal solid-color PNGs matching the manifest `theme_color` (`#1a1a2e`). They are static assets committed directly to the repo.
+- **Verification via built preview, not dev mode**: `vite-plugin-pwa` only registers a service worker in dev when `devOptions.enabled: true` is set. Rather than add that complexity, Phase 0 verification is done with `npm run build && npm run preview`. The config stays minimal.
+- **Workbox `globPatterns` precaches automatically**: the pattern `['**/*.{js,css,html,ico,png,svg}']` already covers the two icon PNGs and any future static assets dropped into `public/`. No manual cache-list maintenance needed.
+- **No unit tests for this section**: PWA shell behavior (service worker registration, offline load) is a browser runtime concern. The Phase 0 TDD protocol explicitly excludes service-worker config and React rendering from the red-green cycle. Verification is manual only.
+
+#### Verification steps (manual, browser)
+
+1. `npm run build && npm run preview` in `app/`.
+2. DevTools > Application > Service Workers — confirm SW registered and status is "activated and is running".
+3. DevTools > Network tab — set throttle to Offline.
+4. Reload page — confirm app shell loads from cache with no network requests.
+
+#### Test results
+
+No new tests. Existing test suite unchanged:
+
+```
+packages/engine  — 1 test file, 1 test  ✓ PASS
+app              — 1 test file, 1 test  ✓ PASS
+```
+
+#### What is NOT done yet (intentional)
+
+- `packages/engine/src/entities/` — real entity types (Section C)
+- `packages/engine/src/config.ts` — full constants with soreness effect days (Section D)
+- `app/src/data/` — Dexie schema, repositories, seed, backup (Sections E–H)
+
+---
+
+*Next: Section C (engine entities, TDD).*
