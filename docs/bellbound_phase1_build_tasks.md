@@ -31,24 +31,24 @@ Discipline: if you are about to write logic inside a component (a calculation, a
 
 ## Section A: App Shell and Routing
 
-- [ ] Decide navigation: for Phase 1 a single Today screen plus a Recent Logs view is enough. Use minimal routing (React Router) or simple conditional rendering; do not over-build navigation.
-- [ ] Create `app/src/ui/today/TodayScreen.tsx` and `app/src/ui/log/RecentLogs.tsx`.
-- [ ] Wire a basic layout: a header with the app name, the Today screen as the default view, and a way to reach Recent Logs.
-- [ ] Apply a minimal low-fi base style (system font, readable sizing, generous spacing, mobile-width friendly). Do not theme heavily yet; the workout table readability is the priority.
+- [x] Decide navigation: for Phase 1 a single Today screen plus a Recent Logs view is enough. Use minimal routing (React Router) or simple conditional rendering; do not over-build navigation.
+- [x] Create `app/src/ui/today/TodayScreen.tsx` and `app/src/ui/log/RecentLogs.tsx`.
+- [x] Wire a basic layout: a header with the app name, the Today screen as the default view, and a way to reach Recent Logs.
+- [x] Apply a minimal low-fi base style (system font, readable sizing, generous spacing, mobile-width friendly). Do not theme heavily yet; the workout table readability is the priority.
 
 ## Section B: Resolve Today's Workout
 
-- [ ] RED first: write failing tests for `todayService` covering a KB day (resolves to Double KB Strength at the active tier), a rest day, and a free day. Then implement to pass.
-- [ ] Create a small app-layer service `app/src/services/todayService.ts` (not in the engine) that determines today's planned day type and, if it is a KB day, the workout template to show.
-- [ ] Implement: get today's date, read the default WeekTemplate, look up the weekday to get the planned `DayType`.
-- [ ] If the day type is `kb`, read the active Block to get `baselineTier`, then read the relevant WorkoutTemplate (for Phase 1, hardcode that a KB day maps to Double KB Strength; template-per-day selection is a later concern).
-- [ ] Resolve the concrete workout from the tier: given `baselineTier`, read the matching entry in the template's `tiers` (e.g. tier 1 = 4 rounds) and combine with the movements to produce the displayable workout (each movement with its reps/duration/load and the resolved round count). Extract this as a pure function with its own failing test first; it is the piece that moves into the engine in Phase 3, so keep it pure and well-tested now.
-- [ ] For non-KB day types (rest, free, test), return a simple marker the Today screen can render differently (rest message, free-day activity prompt, test option). Full handling of these is later phases; Phase 1 just needs to not crash on a non-KB day.
+- [x] RED first: write failing tests for `todayService` covering a KB day (resolves to Double KB Strength at the active tier), a rest day, and a free day. Then implement to pass.
+- [x] Create a small app-layer service `app/src/services/todayService.ts` (not in the engine) that determines today's planned day type and, if it is a KB day, the workout template to show.
+- [x] Implement: get today's date, read the default WeekTemplate, look up the weekday to get the planned `DayType`.
+- [x] If the day type is `kb`, read the active Block to get `baselineTier`, then read the relevant WorkoutTemplate (for Phase 1, hardcode that a KB day maps to Double KB Strength; template-per-day selection is a later concern).
+- [x] Resolve the concrete workout from the tier: given `baselineTier`, read the matching entry in the template's `tiers` (e.g. tier 1 = 4 rounds) and combine with the movements to produce the displayable workout (each movement with its reps/duration/load and the resolved round count). Extract this as a pure function with its own failing test first; it is the piece that moves into the engine in Phase 3, so keep it pure and well-tested now.
+- [x] For non-KB day types (rest, free, test), return a simple marker the Today screen can render differently (rest message, free-day activity prompt, test option). Full handling of these is later phases; Phase 1 just needs to not crash on a non-KB day.
 
 ## Section C: Today Screen UI
 
-- [ ] Render the zone title (e.g. "The Double-Bell Gate") above the workout, but keep it secondary; the workout table is the primary element.
-- [ ] Render the real workout table clearly: each movement with rounds x reps (or duration) and load, plus the rest prescription. Example layout target:
+- [x] Render the zone title (e.g. "The Double-Bell Gate") above the workout, but keep it secondary; the workout table is the primary element.
+- [x] Render the real workout table clearly: each movement with rounds x reps (or duration) and load, plus the rest prescription. Example layout target:
   ```
   Double clean        4 x 5       double 20 kg
   Double press        4 x 3       double 20 kg
@@ -57,30 +57,30 @@ Discipline: if you are about to write logic inside a component (a calculation, a
   Farmer carry        4 x 30 sec  double 20 kg
   Rest                90-120 sec after full round
   ```
-- [ ] Use a real table or a styled grid; ensure it is readable on a narrow phone-width viewport (test in dev tools device mode).
-- [ ] Show today's date and the planned day type.
-- [ ] Add a clear "Log this workout" action that opens the log form (modal, drawer, or separate view).
-- [ ] On a rest day, show a plain rest message instead of a workout table. On a free day, show a simple prompt to log an activity (the activity classification logic is Phase 10; here just allow a freeform note). On a test day option, defer — a stub is fine.
-- [ ] Critical rule: never hide reps, rest, or load behind any decoration. The workout details are always fully visible.
+- [x] Use a real table or a styled grid; ensure it is readable on a narrow phone-width viewport (test in dev tools device mode).
+- [x] Show today's date and the planned day type.
+- [x] Add a clear "Log this workout" action that opens the log form (modal, drawer, or separate view).
+- [x] On a rest day, show a plain rest message instead of a workout table. On a free day, show a simple prompt to log an activity (the activity classification logic is Phase 10; here just allow a freeform note). On a test day option, defer — a stub is fine.
+- [x] Critical rule: never hide reps, rest, or load behind any decoration. The workout details are always fully visible.
 
 ## Section D: Log Form
 
-- [ ] Create `app/src/ui/log/LogForm.tsx`.
-- [ ] Capture: status (`completed` / `skipped` / `modified`), actual rounds or sets (number input, prefilled with the planned value), difficulty (`easy` / `normal` / `hard` / `failed` as a clear selector), and a freeform note (text area).
-- [ ] Do NOT capture signal flags in Phase 1. The `signals` object is written at its default (all false). Signal capture is Phase 6.
-- [ ] Do NOT capture sleep, bodyweight, or food here. DailyContext is Phase 7.
-- [ ] RED first: extract the WorkoutLog construction into a pure function `buildWorkoutLog(inputs, context)` and write failing tests for it (correct id/date/blockId, source planned on a KB day, default signals all false, difficulty and status set, note as originalNote, roundsCompleted in structuredNotes). Then implement to pass. The React component calls this function; it does not build the entity inline.
-- [ ] On submit, construct a `WorkoutLog` entity with: a generated `id`, today's `date`, the active `blockId`, `plannedDayType` and `actualDayType` (equal for now unless the day type differs from what was done), `source: 'planned'` for a KB day, `category` from the template, `plannedWorkout` and `actualWorkout` names, the chosen `status`, the chosen `difficulty`, default `signals`, the note as `originalNote`, and `structuredNotes` holding `roundsCompleted` (and any parsed extras, though Phase 1 keeps this minimal).
-- [ ] Write via `workoutLogRepository.add(log)`.
-- [ ] After save, return to the Today screen and reflect that today is logged (e.g. show a "logged" state).
-- [ ] Validate inputs minimally: rounds is a non-negative number, difficulty is required if status is completed/modified.
+- [x] Create `app/src/ui/log/LogForm.tsx`.
+- [x] Capture: status (`completed` / `skipped` / `modified`), actual rounds or sets (number input, prefilled with the planned value), difficulty (`easy` / `normal` / `hard` / `failed` as a clear selector), and a freeform note (text area).
+- [x] Do NOT capture signal flags in Phase 1. The `signals` object is written at its default (all false). Signal capture is Phase 6.
+- [x] Do NOT capture sleep, bodyweight, or food here. DailyContext is Phase 7.
+- [x] RED first: extract the WorkoutLog construction into a pure function `buildWorkoutLog(inputs, context)` and write failing tests for it (correct id/date/blockId, source planned on a KB day, default signals all false, difficulty and status set, note as originalNote, roundsCompleted in structuredNotes). Then implement to pass. The React component calls this function; it does not build the entity inline.
+- [x] On submit, construct a `WorkoutLog` entity with: a generated `id`, today's `date`, the active `blockId`, `plannedDayType` and `actualDayType` (equal for now unless the day type differs from what was done), `source: 'planned'` for a KB day, `category` from the template, `plannedWorkout` and `actualWorkout` names, the chosen `status`, the chosen `difficulty`, default `signals`, the note as `originalNote`, and `structuredNotes` holding `roundsCompleted` (and any parsed extras, though Phase 1 keeps this minimal).
+- [x] Write via `workoutLogRepository.add(log)`.
+- [x] After save, return to the Today screen and reflect that today is logged (e.g. show a "logged" state).
+- [x] Validate inputs minimally: rounds is a non-negative number, difficulty is required if status is completed/modified.
 
 ## Section E: Recent Logs View
 
-- [ ] Implement `workoutLogRepository.listRecent(n)` usage in `RecentLogs.tsx` to show the last N logs (e.g. 10), newest first.
-- [ ] For each log, show date, workout name, status, difficulty, and the note.
-- [ ] Use Dexie `liveQuery` so the list updates reactively after a new log is saved, or re-query on mount; either is acceptable for Phase 1.
-- [ ] Keep it a plain readable list. No charts, no stats, no RPG flavour.
+- [x] Implement `workoutLogRepository.listRecent(n)` usage in `RecentLogs.tsx` to show the last N logs (e.g. 10), newest first.
+- [x] For each log, show date, workout name, status, difficulty, and the note.
+- [x] Use Dexie `liveQuery` so the list updates reactively after a new log is saved, or re-query on mount; either is acceptable for Phase 1.
+- [x] Keep it a plain readable list. No charts, no stats, no RPG flavour.
 
 ## Section F: Persistence and Reload
 
@@ -90,15 +90,15 @@ Discipline: if you are about to write logic inside a component (a calculation, a
 
 ## Section G: Phase 1 Done When
 
-- [ ] The Today screen renders the seeded Double KB Strength workout, resolved from the active block's tier, with all movements, reps/duration, load, and rest visible.
-- [ ] A workout can be logged with status, actual rounds, difficulty, and a note.
+- [x] The Today screen renders the seeded Double KB Strength workout, resolved from the active block's tier, with all movements, reps/duration, load, and rest visible.
+- [x] A workout can be logged with status, actual rounds, difficulty, and a note.
 - [ ] The log is written to IndexedDB and survives a page reload.
-- [ ] Recent logs are viewable, newest first.
+- [x] Recent logs are viewable, newest first.
 - [ ] The app is genuinely useful as a plain training log with no RPG mechanics.
 - [ ] Everything works offline.
-- [ ] The engine package was not imported or called anywhere in Phase 1 (verify).
-- [ ] `todayService`, the tier-resolution function, and `buildWorkoutLog` were written test-first and have passing tests. No computation lives inside components; components call tested functions.
-- [ ] No signal flags, no sleep/bodyweight/food, no stats captured.
+- [x] The engine package was not imported or called anywhere in Phase 1 (verify). Only `import type` statements — erased at compile time, no engine functions called.
+- [x] `todayService`, the tier-resolution function, and `buildWorkoutLog` were written test-first and have passing tests. No computation lives inside components; components call tested functions.
+- [x] No signal flags, no sleep/bodyweight/food, no stats captured.
 - [ ] Committed to git with a clear Phase 1 commit message.
 
 ---
