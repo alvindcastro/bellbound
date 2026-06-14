@@ -42,6 +42,7 @@ export default function TodayScreen({ date, todayResult, onLogWorkout }: Props) 
       <div>
         <p className="day-meta">{formatDate(date)} · {DAY_LABEL[todayResult.dayType]}</p>
         <p className="rest-message">{DAY_MESSAGE[todayResult.dayType]}</p>
+        <button className="btn" onClick={onLogWorkout}>Log a workout anyway</button>
       </div>
     );
   }

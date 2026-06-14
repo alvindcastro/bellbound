@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import type { Block } from '@bellbound/engine';
-import { resolveToday } from './services/todayService.js';
-import type { TodayResult } from './services/todayService.js';
+import { resolveToday, resolveTierWorkout } from './services/todayService.js';
+import type { TodayResult, ResolvedWorkout } from './services/todayService.js';
 import { blockRepository } from './data/repositories/blockRepository.js';
+import { workoutTemplateRepository } from './data/repositories/workoutTemplateRepository.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
 import RecentLogs from './ui/log/RecentLogs.js';
@@ -14,17 +15,23 @@ export default function App() {
   const [view, setView] = useState<AppView>('today');
   const [todayResult, setTodayResult] = useState<TodayResult | null>(null);
   const [activeBlock, setActiveBlock] = useState<Block | null>(null);
+  const [resolvedWorkout, setResolvedWorkout] = useState<ResolvedWorkout | null>(null);
 
   useEffect(() => {
-    Promise.all([resolveToday(today), blockRepository.getActiveBlock()]).then(
-      ([result, block]) => {
-        setTodayResult(result);
-        setActiveBlock(block);
+    Promise.all([
+      resolveToday(today),
+      blockRepository.getActiveBlock(),
+      workoutTemplateRepository.getById('dkbs'),
+    ]).then(([result, block, template]) => {
+      setTodayResult(result);
+      setActiveBlock(block);
+      if (block && template) {
+        setResolvedWorkout(resolveTierWorkout(template, block.baselineTier));
       }
-    );
+    });
   }, [today]);
 
-  if (view === 'log' && todayResult?.dayType === 'kb' && activeBlock) {
+  if (view === 'log' && resolvedWorkout && activeBlock && todayResult) {
     return (
       <div className="app">
         <header className="app-header">
@@ -35,7 +42,8 @@ export default function App() {
           <LogForm
             date={today}
             blockId={activeBlock.id}
-            workout={todayResult.workout}
+            workout={resolvedWorkout}
+            plannedDayType={todayResult.dayType}
             onSave={() => setView('today')}
             onCancel={() => setView('today')}
           />

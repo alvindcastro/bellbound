@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Difficulty } from '@bellbound/engine';
+import type { Difficulty, DayType } from '@bellbound/engine';
 import type { ResolvedWorkout } from '../../services/todayService.js';
 import type { WorkoutContext, LogFormInputs } from '../../services/buildWorkoutLog.js';
 import { buildWorkoutLog } from '../../services/buildWorkoutLog.js';
@@ -9,6 +9,7 @@ interface Props {
   date: string;
   blockId: string;
   workout: ResolvedWorkout;
+  plannedDayType: DayType;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -28,7 +29,7 @@ const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
   { value: 'failed', label: 'Failed' },
 ];
 
-export default function LogForm({ date, blockId, workout, onSave, onCancel }: Props) {
+export default function LogForm({ date, blockId, workout, plannedDayType, onSave, onCancel }: Props) {
   const [status, setStatus] = useState<Status>('completed');
   const [rounds, setRounds] = useState(workout.rounds);
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
@@ -42,7 +43,7 @@ export default function LogForm({ date, blockId, workout, onSave, onCancel }: Pr
     const context: WorkoutContext = {
       date,
       blockId,
-      plannedDayType: 'kb',
+      plannedDayType,
       actualDayType: 'kb',
       templateId: workout.templateId,
       templateName: workout.name,
