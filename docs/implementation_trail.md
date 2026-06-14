@@ -246,3 +246,56 @@ app             — 2 test files, 10 tests  ✓ PASS
 ---
 
 *Next: Section F (repository mapping layer).*
+
+---
+
+### Section F: Repository Mapping Layer (2026-06-14)
+
+**Status: Complete — all tests green**
+
+#### What was built
+
+| Path | Purpose |
+|------|---------|
+| `app/src/data/repositories/blockRepository.ts` | `getActiveBlock()` — filters by status, returns `Block` entity |
+| `app/src/data/repositories/workoutTemplateRepository.ts` | `getById(id)` — returns `WorkoutTemplate` entity |
+| `app/src/data/repositories/weekTemplateRepository.ts` | `getDefault()` — returns first `WeekTemplate` entity |
+| `app/src/data/repositories/workoutLogRepository.ts` | `add(log)` and `listRecent(n)` — writes/reads `WorkoutLog` entities |
+| `app/src/__tests__/repositories.test.ts` | 11 round-trip tests covering all repo functions |
+
+#### TDD notes
+
+RED: test file written first importing all four repositories from paths that didn't exist yet. Vitest reported `Failed to load url ../data/repositories/blockRepository.js` — the expected module-not-found failure.
+
+GREEN step 1: Created all four repository files. Tests ran but hit `DatabaseClosedError` — the shared `db` singleton was left closed by `afterEach(() => db.delete())` from the previous test. Fixed by adding `beforeEach(async () => { await db.open(); })` to mirror the pattern already used in `bellboundDb.test.ts`.
+
+GREEN step 2: `blockRepository.getActiveBlock()` initially used `.where('status').equals('active')` which threw `SchemaError: KeyPath status on object store blocks is not indexed`. The `blocks` table schema only indexes `id`. Fixed by switching to `.filter((b) => b.status === 'active')` — a JS-side table scan appropriate for the tiny number of blocks that will ever exist.
+
+All 11 repository tests passed; full suite: 14 engine + 21 app = 35 tests green.
+
+#### Key decisions
+
+- **`fromRow()` helper per repository**: each file has a private `fromRow(row: XxxRow): Xxx` function. The mapping is the named boundary even when it's mostly a spread — it makes the intent explicit and gives a single place to diverge if entity and row shapes diverge in a later phase.
+- **`filter()` not `where()` on `blocks.status`**: Dexie's `.where()` requires a declared index. Adding a `status` index to the Dexie schema would require bumping the schema version and isn't warranted for a field queried so rarely. `.filter()` does a JS table scan, which is correct for a table that will have at most a handful of rows.
+- **`beforeEach(db.open)` required in test files using the shared singleton**: after `db.delete()`, Dexie marks the connection closed. The next test must call `db.open()` before doing any db operations. This is a Dexie lifecycle requirement — the singleton doesn't auto-reopen after explicit deletion.
+- **`workoutLogs.orderBy('date').reverse().limit(n)`**: uses the `date` secondary index declared in the Dexie schema string for efficient newest-first ordering. No JS sort needed.
+- **Type casts for enum-like strings**: row types store `status`, `plannedDayType`, etc. as plain `string`. The `fromRow()` functions cast to the engine's union types (`BlockStatus`, `DayType`, etc.) — safe because the engine is the only writer and always writes valid values.
+- **`{ ...log }` for write mapping**: `WorkoutLog` fields are structurally assignable to `WorkoutLogRow` (narrow union types are subtypes of `string`; `Signals` and `SignalsRow` are structurally identical). Spreading produces a plain object Dexie can store without an explicit `toRow()` conversion.
+
+#### Test results
+
+```
+packages/engine — 3 test files, 14 tests  ✓ PASS
+app             — 3 test files, 21 tests  ✓ PASS
+Total: 35 tests
+```
+
+#### What is NOT done yet (intentional)
+
+- Section G: seed data
+- Section H: backup export/import
+- Section I: Phase 0 done criteria
+
+---
+
+*Next: Section G (seed data).*

@@ -103,12 +103,12 @@ Define the IndexedDB schema in `app/src/data/db`. These are the stored row shape
 
 The repository is the ONLY place that knows both Dexie rows and engine entities. It maps between them.
 
-- [ ] Create `app/src/data/repositories`.
-- [ ] Create a repository per aggregate (e.g. `blockRepository.ts`, `workoutTemplateRepository.ts`, `workoutLogRepository.ts`, `characterRepository.ts`, `dailyContextRepository.ts`, `statusEffectRepository.ts`, `weekTemplateRepository.ts`).
-- [ ] Each repository exposes typed functions returning engine entity types (not Dexie row types) for reads, and accepting engine entity types for writes, performing the mapping inside.
-- [ ] For each repository function, RED first: write a failing round-trip test (fake-indexeddb) that writes an engine entity, reads it back, and asserts the mapping is correct. Then implement to pass.
-- [ ] Implement at minimum for Phase 0: `blockRepository.getActiveBlock()`, `workoutTemplateRepository.getById(id)`, `weekTemplateRepository.getDefault()`, `workoutLogRepository.add(log)` and `workoutLogRepository.listRecent(n)`.
-- [ ] Keep mapping functions pure and small; if a Dexie row and an engine entity are identical in shape, the mapping is a passthrough but should still exist as the named boundary.
+- [x] Create `app/src/data/repositories`.
+- [x] Create a repository per aggregate (e.g. `blockRepository.ts`, `workoutTemplateRepository.ts`, `workoutLogRepository.ts`, `characterRepository.ts`, `dailyContextRepository.ts`, `statusEffectRepository.ts`, `weekTemplateRepository.ts`).
+- [x] Each repository exposes typed functions returning engine entity types (not Dexie row types) for reads, and accepting engine entity types for writes, performing the mapping inside.
+- [x] For each repository function, RED first: write a failing round-trip test (fake-indexeddb) that writes an engine entity, reads it back, and asserts the mapping is correct. Then implement to pass.
+- [x] Implement at minimum for Phase 0: `blockRepository.getActiveBlock()`, `workoutTemplateRepository.getById(id)`, `weekTemplateRepository.getDefault()`, `workoutLogRepository.add(log)` and `workoutLogRepository.listRecent(n)`.
+- [x] Keep mapping functions pure and small; if a Dexie row and an engine entity are identical in shape, the mapping is a passthrough but should still exist as the named boundary.
 
 ## Section G: Seed Data
 

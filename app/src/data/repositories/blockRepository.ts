@@ -1,0 +1,17 @@
+import { db } from '../db/bellboundDb.js';
+import type { BlockRow } from '../db/bellboundDb.js';
+import type { Block, BlockStatus } from '@bellbound/engine';
+
+function fromRow(row: BlockRow): Block {
+  return {
+    ...row,
+    status: row.status as BlockStatus,
+  };
+}
+
+export const blockRepository = {
+  async getActiveBlock(): Promise<Block | null> {
+    const row = await db.blocks.filter((b) => b.status === 'active').first();
+    return row ? fromRow(row) : null;
+  },
+};
