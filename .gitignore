@@ -3,3 +3,25 @@
 .dolt/
 *.db
 .beads-credential-key
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# Vite
+*.local
+dist-ssr/
+
+# Editor
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
