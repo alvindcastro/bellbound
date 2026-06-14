@@ -155,3 +155,47 @@ app             — 1 test file,  1 test   ✓ PASS
 ---
 
 *Next: Section D (engine config).*
+
+---
+
+### Section D: Engine Config (2026-06-14)
+
+**Status: Complete — all tests green**
+
+#### What was built
+
+| Path | Purpose |
+|------|---------|
+| `packages/engine/src/config.ts` | Full config with `TEST_GUARD_MIN_SESSIONS`, `SLEEP_OK_HOURS`, and `SORENESS_EFFECT_DAYS` |
+| `packages/engine/src/__tests__/config.test.ts` | 5 tests asserting each constant's default value |
+
+`packages/engine/src/index.ts` already re-exported `./config.js` from Section A; no change needed there.
+
+#### TDD notes
+
+RED: test file written first; importing `SORENESS_EFFECT_DAYS` from the placeholder `config.ts` produced `TypeError: Cannot read properties of undefined` for all three soreness constants — the right failure for the right reason.
+
+GREEN: expanded `config.ts` with `SORENESS_EFFECT_DAYS` as a `const` assertion object. All 5 config tests plus all prior tests passed immediately.
+
+#### Key decisions
+
+- **`as const` on `SORENESS_EFFECT_DAYS`**: narrows the type to literal numbers (`3`, `3`, `2`) rather than `number`. Callers that compare against the constants get exact type narrowing without needing a separate enum.
+- **Concrete defaults picked**: Breathless Fog → 3 days, Squat Tax → 3 days, Grip Curse → 2 days. These are within the ranges given in the corrections doc (2-3 and 1-2); chosen at the upper end for conservatism (longer recovery window is safer than shorter).
+- **Comment block**: leads with "Tunable constants — single source of truth for the engine." The second line states the enforcement rule: don't hardcode elsewhere.
+
+#### Test results
+
+```
+packages/engine — 3 test files, 14 tests  ✓ PASS
+app             — 1 test file,   1 test   ✓ PASS
+```
+
+#### What is NOT done yet (intentional)
+
+- Section E: Dexie schema (fake-indexeddb, 7 tables, version 1)
+- Sections F–H: repositories, seed, backup
+- Section I: Phase 0 done criteria
+
+---
+
+*Next: Section E (Dexie schema).*

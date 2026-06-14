@@ -40,51 +40,51 @@ If a task below produces logic or data behavior, its first sub-step is "write th
 
 ## Section A: Project Setup
 
-- [ ] IDE: with the JetBrains All Products Pack, use WebStorm for Phases 0 through 12 (TypeScript/React PWA) and GoLand at Phase 13 (Go backend). Each is best-in-class for its language. Open the same monorepo in both when the backend exists; the only cost is two windows, and the two languages are worked in different phases anyway.
-- [ ] Create a new directory `bellbound-web` and initialize a git repository in it.
-- [ ] Create a new remote repository (e.g. github.com/alvindcastro/bellbound-web) and set it as the origin. Push the initial commit once the scaffold exists.
-- [ ] Plan the repo layout to anticipate the backend: `packages/engine` and `app` now, and a sibling `server/` directory reserved for the Go AI proxy and optional backup endpoint at Phase 13. Do not create `server/` yet; just keep the root uncluttered so it slots in cleanly. Open the frontend in WebStorm; at Phase 13 open the same repo in GoLand for the `server/` directory.
-- [ ] Set up a monorepo with two packages: `packages/engine` (pure TypeScript) and `app` (the Vite React PWA). Use npm workspaces (root `package.json` with a `workspaces` field listing `packages/*` and `app`).
-- [ ] In the root `package.json`, set `"private": true` and define the workspaces array.
-- [ ] Scaffold the `app` package with Vite using the React + TypeScript template (`npm create vite@latest app -- --template react-ts`), then move it under the workspace layout if needed.
-- [ ] Scaffold `packages/engine` as a plain TypeScript package: its own `package.json` (name `@bellbound/engine`), a `tsconfig.json`, and a `src/` directory. It must NOT depend on react, dexie, or vite.
-- [ ] Add `@bellbound/engine` as a workspace dependency of `app` (path/workspace reference).
-- [ ] Install and configure Vitest at the root or per-package for running engine tests. Confirm `npm test` runs an empty/placeholder engine test successfully.
-- [ ] Install `fake-indexeddb` as a dev dependency in the `app` package and configure a Vitest setup file that registers it, so data-layer tests (Dexie, repositories, seed, backup) run against a fake IndexedDB with no browser. Confirm a placeholder data-layer test can open the DB under fake-indexeddb.
-- [ ] Confirm `npm run dev` in `app` starts the Vite dev server and serves the default page in a browser.
-- [ ] Add a `.gitignore` covering `node_modules`, `dist`, and Vite/editor artifacts (include `.idea/` if you do not want IDEA project files tracked, or keep shareable parts per preference).
-- [ ] Commit the empty scaffold as the first commit and push to the remote.
+- [x] IDE: with the JetBrains All Products Pack, use WebStorm for Phases 0 through 12 (TypeScript/React PWA) and GoLand at Phase 13 (Go backend). Each is best-in-class for its language. Open the same monorepo in both when the backend exists; the only cost is two windows, and the two languages are worked in different phases anyway.
+- [x] Create a new directory `bellbound-web` and initialize a git repository in it.
+- [x] Create a new remote repository (e.g. github.com/alvindcastro/bellbound-web) and set it as the origin. Push the initial commit once the scaffold exists.
+- [x] Plan the repo layout to anticipate the backend: `packages/engine` and `app` now, and a sibling `server/` directory reserved for the Go AI proxy and optional backup endpoint at Phase 13. Do not create `server/` yet; just keep the root uncluttered so it slots in cleanly. Open the frontend in WebStorm; at Phase 13 open the same repo in GoLand for the `server/` directory.
+- [x] Set up a monorepo with two packages: `packages/engine` (pure TypeScript) and `app` (the Vite React PWA). Use npm workspaces (root `package.json` with a `workspaces` field listing `packages/*` and `app`).
+- [x] In the root `package.json`, set `"private": true` and define the workspaces array.
+- [x] Scaffold the `app` package with Vite using the React + TypeScript template (`npm create vite@latest app -- --template react-ts`), then move it under the workspace layout if needed.
+- [x] Scaffold `packages/engine` as a plain TypeScript package: its own `package.json` (name `@bellbound/engine`), a `tsconfig.json`, and a `src/` directory. It must NOT depend on react, dexie, or vite.
+- [x] Add `@bellbound/engine` as a workspace dependency of `app` (path/workspace reference).
+- [x] Install and configure Vitest at the root or per-package for running engine tests. Confirm `npm test` runs an empty/placeholder engine test successfully.
+- [x] Install `fake-indexeddb` as a dev dependency in the `app` package and configure a Vitest setup file that registers it, so data-layer tests (Dexie, repositories, seed, backup) run against a fake IndexedDB with no browser. Confirm a placeholder data-layer test can open the DB under fake-indexeddb.
+- [x] Confirm `npm run dev` in `app` starts the Vite dev server and serves the default page in a browser.
+- [x] Add a `.gitignore` covering `node_modules`, `dist`, and Vite/editor artifacts (include `.idea/` if you do not want IDEA project files tracked, or keep shareable parts per preference).
+- [x] Commit the empty scaffold as the first commit and push to the remote.
 
 ## Section B: PWA Shell Setup
 
-- [ ] Install `vite-plugin-pwa` in the `app` package.
-- [ ] Configure `vite-plugin-pwa` in `vite.config.ts` with `registerType: 'autoUpdate'` and a Workbox config that precaches the app shell (HTML, JS, CSS).
-- [ ] Create the web app manifest fields in the plugin config: `name: "Bellbound"`, `short_name: "Bellbound"`, `display: "standalone"`, a theme color, a background color, and placeholder icon entries (real icons can come later; use a simple placeholder PNG for now).
-- [ ] Verify the service worker registers without errors in the browser dev tools (Application tab, Service Workers).
-- [ ] Verify the app still loads after going offline in dev tools (Network tab, offline checkbox) — the shell should load even with no network. Data layer is not built yet, so only the shell needs to load.
-- [ ] Note: do NOT build the iOS install hint or persistent-storage request yet; those are polish for a later phase. Phase 0 only proves the shell caches.
+- [x] Install `vite-plugin-pwa` in the `app` package.
+- [x] Configure `vite-plugin-pwa` in `vite.config.ts` with `registerType: 'autoUpdate'` and a Workbox config that precaches the app shell (HTML, JS, CSS).
+- [x] Create the web app manifest fields in the plugin config: `name: "Bellbound"`, `short_name: "Bellbound"`, `display: "standalone"`, a theme color, a background color, and placeholder icon entries (real icons can come later; use a simple placeholder PNG for now).
+- [x] Verify the service worker registers without errors in the browser dev tools (Application tab, Service Workers).
+- [x] Verify the app still loads after going offline in dev tools (Network tab, offline checkbox) — the shell should load even with no network. Data layer is not built yet, so only the shell needs to load.
+- [x] Note: do NOT build the iOS install hint or persistent-storage request yet; those are polish for a later phase. Phase 0 only proves the shell caches.
 
 ## Section C: Engine Domain Entities (pure TypeScript)
 
 Define plain TypeScript types/interfaces in `packages/engine/src/entities`. These are the domain types the engine reasons about. They are independent of Dexie's row shapes.
 
-- [ ] Create `entities/enums.ts` with: `DayType` (`'kb' | 'rest' | 'free' | 'test'`), `Difficulty` (`'easy' | 'normal' | 'hard' | 'failed'`), `WorkoutSource` (`'planned' | 'off_block' | 'recovery_skill'`), `ExpiryType` (`'after_next_rest_day' | 'after_next_session' | 'after_n_days' | 'after_successful_light_session' | 'manual'`), `BlockStatus` (`'active' | 'completed' | 'archived'`).
-- [ ] Create `entities/character.ts`: `Character` with `userId`, `characterName`, `className`, `level`, and a `stats` object with the six stats (`strength`, `conditioning`, `control`, `consistency`, `recovery`, `judgment`), all numbers.
-- [ ] Create `entities/block.ts`: `Block` with `id`, `name`, `baselineTier` (number), `startDate` (ISO string), `status` (`BlockStatus`), `testGuardMinSessions` (number), `completedPlannedKbSessions` (number).
-- [ ] Create `entities/weekTemplate.ts`: `WeekTemplate` with `id` and a `days` map from weekday to `DayType` (seven entries).
-- [ ] Create `entities/workoutTemplate.ts`: `WorkoutTemplate` with `id`, `name`, `zoneName`, `category`, `defaultRest`, `tierStep` (string description), `tiers` (a record keyed by tier number string to a tier-definition object), and `movements` (array of movement objects with `name`, and optional `reps`, `rounds`, `duration`, `load`).
-- [ ] Create `entities/signals.ts`: `Signals` with the four booleans `pressGrindy`, `breathless`, `gripCooked`, `legsSore`, all defaulting to false.
-- [ ] Create `entities/workoutLog.ts`: `WorkoutLog` with `id`, `date` (ISO string), `blockId`, `plannedDayType` (`DayType`), `actualDayType` (`DayType`), `source` (`WorkoutSource`), `category` (string), `plannedWorkout`, `actualWorkout`, `status`, `difficulty` (`Difficulty`), `signals` (`Signals`), `originalNote`, `structuredNotes` (a record/object). The `signals` field is defined here but will be left at default until Phase 6.
-- [ ] Create `entities/dailyContext.ts`: `DailyContext` with `date` (ISO string, primary identity), `hoursSlept` (number, nullable), `bodyweight` (number, nullable), `foodNote` (string, nullable).
-- [ ] Create `entities/statusEffect.ts`: `StatusEffect` with `id`, `name`, `source`, `recommendationEffect`, `expiryType` (`ExpiryType`), `expiryParam` (number, nullable).
-- [ ] Create `entities/index.ts` re-exporting all entity types and enums.
-- [ ] Write a trivial Vitest test that imports the entities and constructs one of each with valid values, to confirm the types compile and the package is importable.
+- [x] Create `entities/enums.ts` with: `DayType` (`'kb' | 'rest' | 'free' | 'test'`), `Difficulty` (`'easy' | 'normal' | 'hard' | 'failed'`), `WorkoutSource` (`'planned' | 'off_block' | 'recovery_skill'`), `ExpiryType` (`'after_next_rest_day' | 'after_next_session' | 'after_n_days' | 'after_successful_light_session' | 'manual'`), `BlockStatus` (`'active' | 'completed' | 'archived'`).
+- [x] Create `entities/character.ts`: `Character` with `userId`, `characterName`, `className`, `level`, and a `stats` object with the six stats (`strength`, `conditioning`, `control`, `consistency`, `recovery`, `judgment`), all numbers.
+- [x] Create `entities/block.ts`: `Block` with `id`, `name`, `baselineTier` (number), `startDate` (ISO string), `status` (`BlockStatus`), `testGuardMinSessions` (number), `completedPlannedKbSessions` (number).
+- [x] Create `entities/weekTemplate.ts`: `WeekTemplate` with `id` and a `days` map from weekday to `DayType` (seven entries).
+- [x] Create `entities/workoutTemplate.ts`: `WorkoutTemplate` with `id`, `name`, `zoneName`, `category`, `defaultRest`, `tierStep` (string description), `tiers` (a record keyed by tier number string to a tier-definition object), and `movements` (array of movement objects with `name`, and optional `reps`, `rounds`, `duration`, `load`).
+- [x] Create `entities/signals.ts`: `Signals` with the four booleans `pressGrindy`, `breathless`, `gripCooked`, `legsSore`, all defaulting to false.
+- [x] Create `entities/workoutLog.ts`: `WorkoutLog` with `id`, `date` (ISO string), `blockId`, `plannedDayType` (`DayType`), `actualDayType` (`DayType`), `source` (`WorkoutSource`), `category` (string), `plannedWorkout`, `actualWorkout`, `status`, `difficulty` (`Difficulty`), `signals` (`Signals`), `originalNote`, `structuredNotes` (a record/object). The `signals` field is defined here but will be left at default until Phase 6.
+- [x] Create `entities/dailyContext.ts`: `DailyContext` with `date` (ISO string, primary identity), `hoursSlept` (number, nullable), `bodyweight` (number, nullable), `foodNote` (string, nullable).
+- [x] Create `entities/statusEffect.ts`: `StatusEffect` with `id`, `name`, `source`, `recommendationEffect`, `expiryType` (`ExpiryType`), `expiryParam` (number, nullable).
+- [x] Create `entities/index.ts` re-exporting all entity types and enums.
+- [x] Write a trivial Vitest test that imports the entities and constructs one of each with valid values, to confirm the types compile and the package is importable.
 
 ## Section D: Engine Config
 
-- [ ] Create `packages/engine/src/config.ts` exporting the tunable constants: `TEST_GUARD_MIN_SESSIONS = 6`, `SLEEP_OK_HOURS = 7`, and a `SORENESS_EFFECT_DAYS` object or constants for the after_n_days durations (Breathless Fog 2-3, Squat Tax 2-3, Grip Curse 1-2 — pick concrete defaults, e.g. 3, 3, 2).
-- [ ] Add a brief comment block noting these are tunable and are the single source of truth for the engine.
-- [ ] Export config from the engine package index so the app can read the same values.
+- [x] Create `packages/engine/src/config.ts` exporting the tunable constants: `TEST_GUARD_MIN_SESSIONS = 6`, `SLEEP_OK_HOURS = 7`, and a `SORENESS_EFFECT_DAYS` object or constants for the after_n_days durations (Breathless Fog 2-3, Squat Tax 2-3, Grip Curse 1-2 — pick concrete defaults, e.g. 3, 3, 2).
+- [x] Add a brief comment block noting these are tunable and are the single source of truth for the engine.
+- [x] Export config from the engine package index so the app can read the same values.
 
 ## Section E: Dexie Schema (persistence)
 
