@@ -92,6 +92,7 @@ export interface StatusEffectRow {
   recommendationEffect: string;
   expiryType: string;
   expiryParam: number | null;
+  createdDate: string;
 }
 
 class BellboundDb extends Dexie {

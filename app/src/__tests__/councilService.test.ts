@@ -4,6 +4,7 @@ import { seed } from '../data/seed.js';
 import { workoutLogRepository } from '../data/repositories/workoutLogRepository.js';
 import { buildWorkoutLog } from '../services/buildWorkoutLog.js';
 import { getRecommendationForTemplate } from '../services/councilService.js';
+import type { StatusEffectRow } from '../data/db/bellboundDb.js';
 
 const dkbsContext = {
   date: '2026-06-15',
@@ -53,5 +54,40 @@ describe('getRecommendationForTemplate', () => {
     await workoutLogRepository.add(log);
     const rec = await getRecommendationForTemplate('dkbs');
     expect(rec.kind).toBe('reduce');
+  });
+
+  it('returns hold_pressing when a non-expired Press Gremlin is in the DB', async () => {
+    // Press Gremlin expires 'after_next_session' — no logs after createdDate → not expired
+    const today = new Date().toISOString().slice(0, 10);
+    const row: StatusEffectRow = {
+      id: 'pg-1',
+      name: 'Press Gremlin',
+      source: 'pressGrindy',
+      recommendationEffect: 'hold_pressing',
+      expiryType: 'after_next_session',
+      expiryParam: null,
+      createdDate: today,
+    };
+    await db.statusEffects.add(row);
+    const rec = await getRecommendationForTemplate('dkbs');
+    expect(rec.kind).toBe('hold_pressing');
+  });
+
+  it('ignores expired effects (Grip Curse with after_n_days=2 created 10 days ago)', async () => {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() - 10);
+    const tenDaysAgo = d.toISOString().slice(0, 10);
+    const row: StatusEffectRow = {
+      id: 'gc-1',
+      name: 'Grip Curse',
+      source: 'gripCooked',
+      recommendationEffect: 'hold_carry',
+      expiryType: 'after_n_days',
+      expiryParam: 2,
+      createdDate: tenDaysAgo,
+    };
+    await db.statusEffects.add(row);
+    const rec = await getRecommendationForTemplate('dkbs');
+    expect(rec.kind).toBe('maintain'); // expired, no logs, so maintain
   });
 });
