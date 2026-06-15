@@ -15,3 +15,6 @@ export * from './recovery/statusEffects.js';
 export * from './recovery/expiry.js';
 export * from './recovery/stacking.js';
 export * from './stats/statGain.js';
+export * from './quests/questDefinitions.js';
+export * from './quests/questProgress.js';
+export * from './quests/questUnlock.js';

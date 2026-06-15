@@ -95,6 +95,26 @@ export interface StatusEffectRow {
   createdDate: string;
 }
 
+export interface QuestRow {
+  id: string;
+  progress: number;
+  completed: boolean;
+}
+
+export interface ItemRow {
+  id: string;
+  name: string;
+  flavourText: string;
+  unlockedAt: string;
+}
+
+export interface TitleRow {
+  id: string;
+  name: string;
+  flavourText: string;
+  unlockedAt: string;
+}
+
 class BellboundDb extends Dexie {
   characters!: Table<CharacterRow, string>;
   blocks!: Table<BlockRow, string>;
@@ -103,6 +123,9 @@ class BellboundDb extends Dexie {
   workoutLogs!: Table<WorkoutLogRow, string>;
   dailyContext!: Table<DailyContextRow, string>;
   statusEffects!: Table<StatusEffectRow, string>;
+  quests!: Table<QuestRow, string>;
+  items!: Table<ItemRow, string>;
+  titles!: Table<TitleRow, string>;
 
   constructor() {
     super('bellbound');
@@ -114,6 +137,11 @@ class BellboundDb extends Dexie {
       workoutLogs: 'id, date, blockId',
       dailyContext: 'date',
       statusEffects: 'id',
+    });
+    this.version(2).stores({
+      quests: 'id',
+      items: 'id',
+      titles: 'id',
     });
   }
 }

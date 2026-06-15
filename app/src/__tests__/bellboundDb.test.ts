@@ -6,19 +6,22 @@ afterEach(async () => {
 });
 
 describe('bellboundDb schema', () => {
-  it('opens at version 1', async () => {
+  it('opens at version 2', async () => {
     await db.open();
-    expect(db.verno).toBe(1);
+    expect(db.verno).toBe(2);
   });
 
-  it('exposes all seven tables', async () => {
+  it('exposes all ten tables', async () => {
     await db.open();
     const names = db.tables.map((t) => t.name).sort();
     expect(names).toEqual([
       'blocks',
       'characters',
       'dailyContext',
+      'items',
+      'quests',
       'statusEffects',
+      'titles',
       'weekTemplates',
       'workoutLogs',
       'workoutTemplates',
@@ -62,5 +65,20 @@ describe('bellboundDb schema', () => {
   it('statusEffects keyed by id', async () => {
     await db.open();
     expect(db.table('statusEffects').schema.primKey.name).toBe('id');
+  });
+
+  it('quests keyed by id', async () => {
+    await db.open();
+    expect(db.table('quests').schema.primKey.name).toBe('id');
+  });
+
+  it('items keyed by id', async () => {
+    await db.open();
+    expect(db.table('items').schema.primKey.name).toBe('id');
+  });
+
+  it('titles keyed by id', async () => {
+    await db.open();
+    expect(db.table('titles').schema.primKey.name).toBe('id');
   });
 });

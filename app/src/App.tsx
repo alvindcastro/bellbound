@@ -10,6 +10,7 @@ import { workoutLogRepository } from './data/repositories/workoutLogRepository.j
 import { statusEffectRepository } from './data/repositories/statusEffectRepository.js';
 import { createAndPersistEffectsFromLog } from './services/effectService.js';
 import { applyStatGainsFromLog } from './services/statService.js';
+import { evaluateAndPersistQuests } from './services/questService.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
 import RecentLogs from './ui/log/RecentLogs.js';
@@ -17,8 +18,9 @@ import WeeklyHistory from './ui/history/WeeklyHistory.js';
 import WeeklyReportScreen from './ui/review/WeeklyReportScreen.js';
 import CharacterView from './ui/character/CharacterView.js';
 import DailyContextForm from './ui/daily/DailyContextForm.js';
+import QuestsView from './ui/quests/QuestsView.js';
 
-type AppView = 'today' | 'log' | 'recent' | 'history' | 'review' | 'character' | 'daily';
+type AppView = 'today' | 'log' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
 
 function AppShell({ nav, children }: { nav: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -80,6 +82,7 @@ export default function App() {
             if (log) {
               await createAndPersistEffectsFromLog(log);
               await applyStatGainsFromLog(log);
+              await evaluateAndPersistQuests(today);
             }
             await loadActiveEffects();
             if (resolvedWorkout) {
@@ -142,6 +145,14 @@ export default function App() {
     );
   }
 
+  if (view === 'quests') {
+    return (
+      <AppShell nav={<button onClick={() => setView('today')}>← Today</button>}>
+        <QuestsView />
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell nav={<>
       <button onClick={() => setView('daily')}>Daily</button>
@@ -149,6 +160,7 @@ export default function App() {
       <button onClick={() => setView('history')}>Week</button>
       <button onClick={() => setView('review')}>Report</button>
       <button onClick={() => setView('character')}>Character</button>
+      <button onClick={() => setView('quests')}>Quests</button>
     </>}>
       <TodayScreen
         date={today}

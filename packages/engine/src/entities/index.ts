@@ -9,3 +9,4 @@ export type { DailyContext } from './dailyContext.js';
 export type { StatusEffect } from './statusEffect.js';
 export type { ResolvedMovement, ResolvedWorkout } from './resolvedWorkout.js';
 export type { RecommendationKind, Recommendation } from './recommendation.js';
+export type { QuestDefinition, QuestRewardDefinition } from './quest.js';
