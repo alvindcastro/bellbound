@@ -5,3 +5,7 @@ export * from './schedule/classifyDay.js';
 export * from './counter/shouldIncrementCounter.js';
 export * from './progression/resolveWorkoutAtTier.js';
 export * from './schedule/reportWindow.js';
+export * from './flavour/zones.js';
+export * from './flavour/encounterText.js';
+export * from './flavour/completionMessages.js';
+export * from './flavour/characterClasses.js';
