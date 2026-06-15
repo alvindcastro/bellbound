@@ -66,4 +66,12 @@ describe('shouldIncrementCounter', () => {
   it('returns false when plannedDayType is test', () => {
     expect(shouldIncrementCounter(makeLog('test', 'completed', 'planned'))).toBe(false);
   });
+
+  it('returns false when plannedDayType is kb but actualDayType is test — test workouts do not inflate the session counter', () => {
+    const testLog: WorkoutLog = {
+      ...makeLog('kb', 'completed', 'planned'),
+      actualDayType: 'test',
+    };
+    expect(shouldIncrementCounter(testLog)).toBe(false);
+  });
 });

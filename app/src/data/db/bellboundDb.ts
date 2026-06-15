@@ -115,6 +115,14 @@ export interface TitleRow {
   unlockedAt: string;
 }
 
+export interface LessonRow {
+  id: string;
+  title: string;
+  description: string;
+  earnedDate: string;
+  blockId: string;
+}
+
 class BellboundDb extends Dexie {
   characters!: Table<CharacterRow, string>;
   blocks!: Table<BlockRow, string>;
@@ -126,6 +134,7 @@ class BellboundDb extends Dexie {
   quests!: Table<QuestRow, string>;
   items!: Table<ItemRow, string>;
   titles!: Table<TitleRow, string>;
+  lessons!: Table<LessonRow, string>;
 
   constructor() {
     super('bellbound');
@@ -142,6 +151,9 @@ class BellboundDb extends Dexie {
       quests: 'id',
       items: 'id',
       titles: 'id',
+    });
+    this.version(3).stores({
+      lessons: 'id',
     });
   }
 }

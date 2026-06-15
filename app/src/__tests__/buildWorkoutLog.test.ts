@@ -130,4 +130,18 @@ describe('buildWorkoutLog', () => {
     const log = buildWorkoutLog(inputs, activityContext);
     expect(log.source).toBe('recovery_skill');
   });
+
+  it('sets actualDayType to test when provided', () => {
+    const testContext = { ...context, actualDayType: 'test' as const, plannedDayType: 'kb' as const };
+    const log = buildWorkoutLog(inputs, testContext);
+    expect(log.actualDayType).toBe('test');
+    expect(log.plannedDayType).toBe('kb');
+  });
+
+  it('test log carries status and difficulty like any other log', () => {
+    const testContext = { ...context, actualDayType: 'test' as const };
+    const log = buildWorkoutLog({ ...inputs, status: 'completed', difficulty: 'hard' }, testContext);
+    expect(log.status).toBe('completed');
+    expect(log.difficulty).toBe('hard');
+  });
 });

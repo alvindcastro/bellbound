@@ -13,6 +13,8 @@ import { applyStatGainsFromLog } from './services/statService.js';
 import { evaluateAndPersistQuests } from './services/questService.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
+import TestWorkoutForm from './ui/log/TestWorkoutForm.js';
+import AscensionScreen from './ui/ascension/AscensionScreen.js';
 import FreeDayForm from './ui/log/FreeDayForm.js';
 import RecentLogs from './ui/log/RecentLogs.js';
 import WeeklyHistory from './ui/history/WeeklyHistory.js';
@@ -20,8 +22,9 @@ import WeeklyReportScreen from './ui/review/WeeklyReportScreen.js';
 import CharacterView from './ui/character/CharacterView.js';
 import DailyContextForm from './ui/daily/DailyContextForm.js';
 import QuestsView from './ui/quests/QuestsView.js';
+import { evaluateAndApplyAscension, type AscensionOutcome } from './services/ascensionService.js';
 
-type AppView = 'today' | 'log' | 'activity' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
+type AppView = 'today' | 'log' | 'test' | 'ascension' | 'activity' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
 
 function AppShell({ nav, children }: { nav: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -44,6 +47,7 @@ export default function App() {
   const [todayLog, setTodayLog] = useState<WorkoutLog | null>(null);
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [activeEffects, setActiveEffects] = useState<StatusEffect[]>([]);
+  const [ascensionOutcome, setAscensionOutcome] = useState<AscensionOutcome | null>(null);
 
   async function loadActiveEffects() {
     // UI shows stored effects; expiry evaluation is handled in councilService
@@ -68,6 +72,48 @@ export default function App() {
       setActiveEffects(effects);
     });
   }, [today]);
+
+  if (view === 'test' && activeBlock && resolvedWorkout) {
+    return (
+      <AppShell nav={<button onClick={() => setView('today')}>Cancel</button>}>
+        <TestWorkoutForm
+          date={today}
+          blockId={activeBlock.id}
+          workout={resolvedWorkout}
+          sessionsCompleted={activeBlock.completedPlannedKbSessions}
+          sessionsNeeded={activeBlock.testGuardMinSessions}
+          onSave={async (log) => {
+            const outcome = await evaluateAndApplyAscension(activeBlock, log, today);
+            setAscensionOutcome(outcome);
+            const newBlock = await blockRepository.getActiveBlock();
+            setActiveBlock(newBlock);
+            if (newBlock) {
+              const template = await workoutTemplateRepository.getById('dkbs');
+              if (template) setResolvedWorkout(resolveWorkoutAtTier(template, newBlock.baselineTier));
+            }
+            const log2 = await workoutLogRepository.getByDate(today);
+            setTodayLog(log2);
+            setView('ascension');
+          }}
+          onCancel={() => setView('today')}
+        />
+      </AppShell>
+    );
+  }
+
+  if (view === 'ascension' && ascensionOutcome) {
+    return (
+      <AppShell nav={null}>
+        <AscensionScreen
+          outcome={ascensionOutcome}
+          onDismiss={() => {
+            setAscensionOutcome(null);
+            setView('today');
+          }}
+        />
+      </AppShell>
+    );
+  }
 
   if (view === 'log' && resolvedWorkout && activeBlock && todayResult) {
     return (
@@ -193,6 +239,7 @@ export default function App() {
         activeEffects={activeEffects}
         onLogWorkout={() => setView('log')}
         onLogActivity={() => setView('activity')}
+        onAttemptTest={() => setView('test')}
       />
     </AppShell>
   );

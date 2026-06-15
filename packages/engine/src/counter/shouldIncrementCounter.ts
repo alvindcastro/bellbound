@@ -7,6 +7,7 @@ export function shouldIncrementCounter(log: WorkoutLog): boolean {
   // inflate the counter.
   return (
     log.plannedDayType === 'kb' &&
+    log.actualDayType !== 'test' &&
     (log.status === 'completed' || log.status === 'modified') &&
     log.source === 'planned'
   );

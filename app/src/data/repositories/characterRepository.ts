@@ -29,4 +29,16 @@ export const characterRepository = {
     };
     await db.characters.update(userId, { stats: updatedStats });
   },
+
+  async resetStats(userId: string): Promise<void> {
+    const baseline: CharacterStats = {
+      strength: 0,
+      conditioning: 0,
+      control: 0,
+      consistency: 0,
+      recovery: 0,
+      judgment: 0,
+    };
+    await db.characters.update(userId, { stats: baseline });
+  },
 };

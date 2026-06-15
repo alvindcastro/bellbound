@@ -53,6 +53,41 @@ describe('blockRepository', () => {
     const block = await blockRepository.getActiveBlock();
     expect(block).toBeNull();
   });
+
+  it('closeBlock sets status to completed', async () => {
+    await db.blocks.add({
+      id: 'block-1',
+      name: 'Phase 0 Block',
+      baselineTier: 1,
+      startDate: '2026-06-01',
+      status: 'active',
+      testGuardMinSessions: 6,
+      completedPlannedKbSessions: 6,
+    });
+    await blockRepository.closeBlock('block-1');
+    const row = await db.blocks.get('block-1');
+    expect(row?.status).toBe('completed');
+    const active = await blockRepository.getActiveBlock();
+    expect(active).toBeNull();
+  });
+
+  it('addBlock inserts a new block into the db', async () => {
+    const newBlock = {
+      id: 'block-2',
+      name: 'Phase 1 Block',
+      baselineTier: 2,
+      startDate: '2026-09-01',
+      status: 'active' as const,
+      testGuardMinSessions: 6,
+      completedPlannedKbSessions: 0,
+    };
+    await blockRepository.addBlock(newBlock);
+    const row = await db.blocks.get('block-2');
+    expect(row?.id).toBe('block-2');
+    expect(row?.baselineTier).toBe(2);
+    expect(row?.status).toBe('active');
+    expect(row?.completedPlannedKbSessions).toBe(0);
+  });
 });
 
 describe('workoutTemplateRepository', () => {
@@ -279,5 +314,21 @@ describe('characterRepository', () => {
   it('applyStatDeltas does nothing when userId not found', async () => {
     // no character in DB
     await expect(characterRepository.applyStatDeltas('nobody', { strength: 1 })).resolves.not.toThrow();
+  });
+
+  it('resetStats sets all stats to zero', async () => {
+    const charWithStats = {
+      ...sampleCharacterRow,
+      stats: { strength: 10, conditioning: 8, control: 5, consistency: 12, recovery: 3, judgment: 4 },
+    };
+    await db.characters.add(charWithStats);
+    await characterRepository.resetStats('player-1');
+    const after = await characterRepository.getPlayer();
+    expect(after?.stats.strength).toBe(0);
+    expect(after?.stats.conditioning).toBe(0);
+    expect(after?.stats.control).toBe(0);
+    expect(after?.stats.consistency).toBe(0);
+    expect(after?.stats.recovery).toBe(0);
+    expect(after?.stats.judgment).toBe(0);
   });
 });

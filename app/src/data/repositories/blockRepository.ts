@@ -23,4 +23,12 @@ export const blockRepository = {
         row.completedPlannedKbSessions += 1;
       });
   },
+
+  async closeBlock(blockId: string): Promise<void> {
+    await db.blocks.update(blockId, { status: 'completed' });
+  },
+
+  async addBlock(block: Block): Promise<void> {
+    await db.blocks.add({ ...block });
+  },
 };

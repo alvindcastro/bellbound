@@ -21,3 +21,7 @@ export * from './quests/questUnlock.js';
 export { defaultSourceForActivity } from './activities/activitySource.js';
 export type { ActivityType } from './activities/activitySource.js';
 export { computeActivityStatDeltas } from './activities/activityStatMap.js';
+export type { PermanentLesson } from './entities/lesson.js';
+export type { BlockTransitionResult } from './ascension/blockTransition.js';
+export { isTestEligibleForAscension } from './ascension/ascensionGuard.js';
+export { computeBlockTransition } from './ascension/blockTransition.js';

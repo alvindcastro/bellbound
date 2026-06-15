@@ -21,6 +21,7 @@ interface Props {
   activeEffects: StatusEffect[];
   onLogWorkout: () => void;
   onLogActivity?: () => void;
+  onAttemptTest?: () => void;
 }
 
 function formatReps(m: ResolvedMovement): string {
@@ -49,7 +50,7 @@ const DAY_MESSAGE: Record<string, string> = {
   test: 'Test day — logging coming in a later phase.',
 };
 
-export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, onLogWorkout, onLogActivity }: Props) {
+export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, onLogWorkout, onLogActivity, onAttemptTest }: Props) {
   if (todayResult === null) {
     return <p className="loading">Loading…</p>;
   }
@@ -134,6 +135,9 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
         <button className="btn" onClick={onLogWorkout}>Edit log</button>
       ) : (
         <button className="btn-primary" onClick={onLogWorkout}>Log this workout</button>
+      )}
+      {onAttemptTest && (
+        <button className="btn" onClick={onAttemptTest}>Attempt test</button>
       )}
     </div>
   );
