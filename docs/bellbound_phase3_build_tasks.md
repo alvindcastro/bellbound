@@ -76,8 +76,8 @@ The tier bump itself (on a successful test) is a later phase. Phase 3 only prove
 
 ## Section F: Persistence and Offline
 
-- [ ] Confirm the seeded templates and their tiers persist and load offline.
-- [ ] Confirm today's workout resolves correctly offline from the local block tier and template.
+- [x] Confirm the seeded templates and their tiers persist and load offline.
+- [x] Confirm today's workout resolves correctly offline from the local block tier and template.
 - [x] No network calls introduced in Phase 3.
 
 ## Section G: Phase 3 Done When
@@ -88,7 +88,7 @@ The tier bump itself (on a successful test) is a later phase. Phase 3 only prove
 - [x] The initial template set is seeded with tiers and movements, with no duplication on re-seed.
 - [x] A change to the block's `baselineTier` propagates to all workouts with no per-day editing, proven by test.
 - [x] All tier logic written test-first; the engine stayed pure; I/O stayed in the app layer.
-- [ ] Everything works offline.
+- [x] Everything works offline.
 - [x] The bump/ascension flow is documented as deferred, not built.
 - [x] Committed on green, pushed, with a clear Phase 3 commit message.
 
