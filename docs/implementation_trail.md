@@ -543,3 +543,25 @@ Total: 271 tests
 ---
 
 *Phase 7 complete. Next: Phase 8 (Stats).*
+
+---
+
+## Structural Refactor — Post-Phase 7 (2026-06-15)
+
+**Status: Complete — all tests green, pushed**
+
+### What changed
+
+| Before | After |
+|--------|-------|
+| `packages/engine/src/__tests__/recovery.test.ts` (509 lines) | Deleted |
+| — | `packages/engine/src/__tests__/statusEffects.test.ts` (9 tests) |
+| — | `packages/engine/src/__tests__/expiry.test.ts` (23 tests) |
+| — | `packages/engine/src/__tests__/stacking.test.ts` (8 tests) |
+| `app/src/App.tsx` (189 lines, 7 repeated shell structures) | 162 lines with `AppShell` component |
+
+### Key decisions
+
+- **`recovery.test.ts` split into 3 focused files**: Each file maps to one source file (`statusEffects.ts`, `expiry.ts`, `stacking.ts`). Same 40 tests; no test was added or removed, just reorganised. The split makes failure location obvious and keeps each file under 230 lines.
+
+- **`AppShell` as a local function component**: `function AppShell({ nav, children })` — a render helper, not an abstraction. It removes the 7× repetition of `<div className="app"><header className="app-header">...</header><main>...</main></div>` without introducing a new file or exported component. The `nav` prop carries per-view nav buttons; `children` carries the view body.
