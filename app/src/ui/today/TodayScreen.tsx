@@ -122,8 +122,10 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
           <p className="council-explanation">{recommendation.explanation}</p>
         </div>
       )}
-      <ArtSlot slotId={zoneSlotId(workout.zoneName)} width={48} height={48} alt={workout.zoneName} />
-      <p className="zone-title">{workout.zoneName}</p>
+      <div className="zone-header">
+        <ArtSlot slotId={zoneSlotId(workout.zoneName)} width={48} height={48} alt={workout.zoneName} />
+        <p className="zone-title">{workout.zoneName}</p>
+      </div>
       <table className="workout-table">
         <thead>
           <tr>
@@ -152,22 +154,29 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
           </tr>
         </tbody>
       </table>
-      {alreadyLogged ? (
-        <button className="btn" onClick={onLogWorkout}>Edit log</button>
-      ) : (
-        <>
+      <div className="today-actions">
+        {alreadyLogged ? (
+          <button className="btn" onClick={onLogWorkout}>Edit log</button>
+        ) : (
           <button className="btn-primary" onClick={onLogWorkout}>Log this workout</button>
-          {onSwapWorkout && (
-            <button className="btn" onClick={onSwapWorkout}>Swap workout</button>
-          )}
-          {onLogActivityFromKbDay && (
-            <button className="btn" onClick={onLogActivityFromKbDay}>Log an activity instead</button>
-          )}
-        </>
-      )}
-      {onAttemptTest && (
-        <button className="btn" onClick={onAttemptTest}>Attempt test</button>
-      )}
+        )}
+        {!alreadyLogged && (onSwapWorkout || onLogActivityFromKbDay || onAttemptTest) && (
+          <div className="today-actions-secondary">
+            {onSwapWorkout && (
+              <button className="btn" onClick={onSwapWorkout}>Swap workout</button>
+            )}
+            {onLogActivityFromKbDay && (
+              <button className="btn" onClick={onLogActivityFromKbDay}>Log activity instead</button>
+            )}
+            {onAttemptTest && (
+              <button className="btn" onClick={onAttemptTest}>Attempt test</button>
+            )}
+          </div>
+        )}
+        {alreadyLogged && onAttemptTest && (
+          <button className="btn" onClick={onAttemptTest}>Attempt test</button>
+        )}
+      </div>
     </div>
   );
 }

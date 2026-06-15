@@ -35,7 +35,7 @@ function AppShell({ nav, children }: { nav: React.ReactNode; children: React.Rea
     <div className="app">
       <header className="app-header">
         <span className="app-title">Bellbound</span>
-        {nav}
+        {nav && <nav className="app-nav">{nav}</nav>}
       </header>
       <main>{children}</main>
     </div>
@@ -305,7 +305,7 @@ export default function App() {
   return (
     <AppShell nav={<>
       <button onClick={() => setView('daily')}>Daily</button>
-      <button onClick={() => setView('recent')}>Log History</button>
+      <button onClick={() => setView('recent')}>Logs</button>
       <button onClick={() => setView('history')}>Week</button>
       <button onClick={() => setView('review')}>Report</button>
       <button onClick={() => setView('character')}>Character</button>

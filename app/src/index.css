@@ -34,10 +34,22 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--color-border-light);
   margin-bottom: 24px;
+  gap: 8px;
 }
+
+.app-nav {
+  display: flex;
+  gap: 4px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.app-nav::-webkit-scrollbar { display: none; }
 
 .app-title {
   font-weight: 700;
@@ -45,7 +57,17 @@ body {
   letter-spacing: 0.02em;
 }
 
-.app-header button,
+.app-header button {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
 .btn {
   background: none;
   border: 1px solid var(--color-border);
@@ -58,6 +80,35 @@ body {
 
 .app-header button:hover,
 .btn:hover { background: var(--color-panel); }
+
+.zone-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.zone-header .zone-title {
+  margin: 0;
+}
+
+.today-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.today-actions .btn-primary {
+  width: 100%;
+  text-align: center;
+}
+
+.today-actions-secondary {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
 .btn-primary {
   background: var(--color-accent);
