@@ -55,7 +55,7 @@ This counter is defined on the Block in Phase 0 but is incremented here. The asc
 - [x] Decide and document: does `status === 'modified'` increment the counter? Yes — a modified-but-completed KB session still counts as a baseline session. Encoded explicitly in `shouldIncrementCounter.test.ts`.
 - [x] Implement the increment as part of the log-save flow: after `workoutLogRepository.add(log)`, evaluate the rule and, if it holds, increment the active block's counter via the block repository. Keep the decision (should-increment) as a pure function tested separately from the repository write.
 - [x] RED first: write a failing test that the counter persists across reload (write a qualifying log, reload the DB under fake-indexeddb, read the block, assert the counter). Then confirm it passes.
-- [ ] Counter reset: the counter resets to 0 when a new block opens. New-block creation does not happen until the ascension phase, so for Phase 2 only document that the reset belongs to the block-open flow (a comment or a placeholder test marked as pending). Do NOT build block creation here.
+- [x] Counter reset: the counter resets to 0 when a new block opens. New-block creation does not happen until the ascension phase, so for Phase 2 only document that the reset belongs to the block-open flow (a comment or a placeholder test marked as pending). Do NOT build block creation here.
 - [x] Guard against double-counting: ensure editing or re-saving the same log does not increment again. Rule: increment only on first insert (getById check before add). Tested in counterIntegration.test.ts.
 
 ## Section D: Today Screen — Planned vs Actual Awareness
@@ -72,13 +72,13 @@ This is a precursor to the full Weekly Council Report (Phase 4). Phase 2 just ne
 - [x] RED first: write failing tests for a pure aggregation function that, given the WeekTemplate and the set of logs for a date range (last 7 days), returns a structured summary: planned sessions, actual sessions, extras (trained on rest), and misses (skipped training days). Then implement.
 - [x] Build a simple weekly history view in the UI that renders the summary for the last 7 calendar days. Plain and readable; no RPG flavour, no progression, no AI prose (those are later phases).
 - [x] Use the classification function from Section B per day to build the summary; do not duplicate the logic.
-- [ ] Verify rendering manually in the browser.
+- [x] Verify rendering manually in the browser.
 
 ## Section F: Persistence and Offline
 
-- [ ] Confirm the counter and all classifications survive a full reload (data is in IndexedDB).
-- [ ] Confirm the weekly history loads and is correct offline.
-- [ ] No network calls introduced in Phase 2.
+- [x] Confirm the counter and all classifications survive a full reload (data is in IndexedDB).
+- [x] Confirm the weekly history loads and is correct offline.
+- [x] No network calls introduced in Phase 2.
 
 ## Section G: Phase 2 Done When
 
@@ -88,8 +88,8 @@ This is a precursor to the full Weekly Council Report (Phase 4). Phase 2 just ne
 - [x] The counter reset is documented as belonging to the block-open flow, not built here.
 - [x] Weekly history shows planned vs actual for the last 7 days, built from the tested classification and aggregation functions.
 - [x] All logic was written test-first; the engine stayed pure; no Dexie calls in components.
-- [ ] Everything works offline.
-- [ ] Committed on green, pushed, with a clear Phase 2 commit message.
+- [x] Everything works offline.
+- [x] Committed on green, pushed, with a clear Phase 2 commit message.
 
 ---
 

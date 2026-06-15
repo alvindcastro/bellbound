@@ -96,4 +96,10 @@ describe('saveLogAndUpdateCounter', () => {
     const updated = await db.blocks.get('block-1');
     expect(updated?.completedPlannedKbSessions).toBe(2);
   });
+
+  // PENDING (ascension phase): counter resets to 0 when a new block opens.
+  // The reset belongs to the block-open flow — when openNewBlock() is implemented,
+  // it must set completedPlannedKbSessions = 0 on the new block row.
+  // Test to add there: save N qualified logs, open new block, assert new block counter = 0.
+  it.todo('counter resets to 0 when a new block is opened (implement in ascension phase)');
 });
