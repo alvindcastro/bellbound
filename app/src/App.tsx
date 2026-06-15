@@ -49,7 +49,11 @@ export default function App() {
             blockId={activeBlock.id}
             workout={resolvedWorkout}
             plannedDayType={todayResult.dayType}
-            onSave={() => setView('today')}
+            onSave={async () => {
+              const log = await workoutLogRepository.getByDate(today);
+              setTodayLog(log);
+              setView('today');
+            }}
             onCancel={() => setView('today')}
           />
         </main>
