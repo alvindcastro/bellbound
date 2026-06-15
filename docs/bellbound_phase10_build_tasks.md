@@ -33,52 +33,52 @@ Discipline unchanged. Commit on green.
 
 ## Section A: Free Day Logging
 
-- [ ] Build free-day activity logging for the Saturday free slot (and any rest-day extra). The free day is NOT a rest day and does not earn the rest-day reward; resting on a free day is neutral and not a missed session (this classification already exists from Phase 2; confirm it holds for the free slot).
-- [ ] The free-day UI lets the user log an activity: type (run, hike, pickleball, barbell, yoga, walk, etc.), and a freeform note. It produces a WorkoutLog with the appropriate source and category.
-- [ ] RED first: update/extend `buildWorkoutLog` (and tests) to handle a free-day or off-routine activity: set `actualDayType` appropriately, set `source` and `category` from the activity, allow signals to be captured (a hard run can set `breathless`). Then implement.
+- [x] Build free-day activity logging for the Saturday free slot (and any rest-day extra). The free day is NOT a rest day and does not earn the rest-day reward; resting on a free day is neutral and not a missed session (this classification already exists from Phase 2; confirm it holds for the free slot).
+- [x] The free-day UI lets the user log an activity: type (run, hike, pickleball, barbell, yoga, walk, etc.), and a freeform note. It produces a WorkoutLog with the appropriate source and category.
+- [x] RED first: update/extend `buildWorkoutLog` (and tests) to handle a free-day or off-routine activity: set `actualDayType` appropriately, set `source` and `category` from the activity, allow signals to be captured (a hard run can set `breathless`). Then implement.
 
 ## Section B: Source Classes and Defaults
 
-- [ ] RED first: write failing tests for the activity-to-source default mapping, then implement: run → off_block, barbell → off_block, pickleball → off_block, yoga → recovery_skill, walk → recovery_skill, hike → recovery_skill. (Hike is intensity-dependent; default recovery_skill, user can override.)
-- [ ] The user can override the source at log time (a hard hike reclassified to off_block conditioning). Build the override control with the default preselected.
-- [ ] RED first: test that an ambiguous activity has its default and that an override is respected on save. Then implement.
+- [x] RED first: write failing tests for the activity-to-source default mapping, then implement: run → off_block, barbell → off_block, pickleball → off_block, yoga → recovery_skill, walk → recovery_skill, hike → recovery_skill. (Hike is intensity-dependent; default recovery_skill, user can override.)
+- [x] The user can override the source at log time (a hard hike reclassified to off_block conditioning). Build the override control with the default preselected.
+- [x] RED first: test that an ambiguous activity has its default and that an override is respected on save. Then implement.
 
 ## Section C: Stat and Effect Routing
 
-- [ ] RED first: write failing tests for activity-to-stat mapping, then implement:
+- [x] RED first: write failing tests for activity-to-stat mapping, then implement:
     - off_block training (run, vest walk, pickleball, barbell): maps to the relevant physical stat (run/conditioning → Conditioning; barbell → Strength) and to Consistency for logging the work.
     - recovery_skill (yoga, walk, hike, and the reflective ones like reading a book or solving a cube if you choose to support them): small deterministic Recovery or Judgment, or flavour only. Reading/cube give Judgment or flavour, not physical stats.
-- [ ] off_block training feeds the existing status engine: a hard run sets `breathless` → Breathless Fog via the Phase 7 engine. RED first: assert that an off_block log with a signal produces the same status effect as a planned log with that signal. Then confirm (the engine is already source-agnostic; this proves the path).
-- [ ] recovery_skill activities do NOT feed fatigue and do not create blocking status effects. They give small positive feedback only.
+- [x] off_block training feeds the existing status engine: a hard run sets `breathless` → Breathless Fog via the Phase 7 engine. RED first: assert that an off_block log with a signal produces the same status effect as a planned log with that signal. Then confirm (the engine is already source-agnostic; this proves the path).
+- [x] recovery_skill activities do NOT feed fatigue and do not create blocking status effects. They give small positive feedback only.
 
 ## Section D: No Fatigue Model, No Random Rewards
 
-- [ ] Confirm and enforce: there is no numeric fatigue score anywhere. "Feeds fatigue" means "can trigger a status effect" and nothing more. Grep the codebase for any fatigue-score remnant and remove it.
-- [ ] Confirm and enforce: no activity gives a random or variable reward. All off_block and recovery_skill effects are small, deterministic, and always-positive (or a neutral status effect for hard work). A random flavour line is acceptable only if it touches nothing stateful; prefer deterministic flavour for now.
-- [ ] RED first: write a test asserting the same activity logged twice with the same inputs produces the same stat deltas and effects (determinism). Then confirm.
+- [x] Confirm and enforce: there is no numeric fatigue score anywhere. "Feeds fatigue" means "can trigger a status effect" and nothing more. Grep the codebase for any fatigue-score remnant and remove it.
+- [x] Confirm and enforce: no activity gives a random or variable reward. All off_block and recovery_skill effects are small, deterministic, and always-positive (or a neutral status effect for hard work). A random flavour line is acceptable only if it touches nothing stateful; prefer deterministic flavour for now.
+- [x] RED first: write a test asserting the same activity logged twice with the same inputs produces the same stat deltas and effects (determinism). Then confirm.
 
 ## Section E: UI and Tone
 
-- [ ] The free-day view shows the slot as free, prompts for an activity, and reacts to what is logged. The Council does not push a specific free-day workout.
-- [ ] Off-block work is acknowledged neutrally as real work that factors into recovery, never as a bonus or a guilt source. ("You trained on a rest day. That was real work. The recovery math now includes it.")
-- [ ] Verify rendering manually.
+- [x] The free-day view shows the slot as free, prompts for an activity, and reacts to what is logged. The Council does not push a specific free-day workout.
+- [x] Off-block work is acknowledged neutrally as real work that factors into recovery, never as a bonus or a guilt source. ("You trained on a rest day. That was real work. The recovery math now includes it.")
+- [x] Verify rendering manually.
 
 ## Section F: Persistence and Offline
 
-- [ ] Confirm activities, their source/category, and resulting effects persist and compute offline.
-- [ ] No network calls introduced in Phase 10.
+- [x] Confirm activities, their source/category, and resulting effects persist and compute offline.
+- [x] No network calls introduced in Phase 10.
 
 ## Section G: Phase 10 Done When
 
-- [ ] Free-day and off-routine activities can be logged with a source class, a sensible default, and an override.
-- [ ] Off-block training can trigger the same status effects as planned training through the existing Phase 7 engine, proven by test.
-- [ ] Off-block training maps to the relevant physical stat and Consistency; recovery_skill gives small Recovery/Judgment or flavour, no fatigue, no blocking effects.
-- [ ] There is no numeric fatigue model; "feeds fatigue" reads as "can trigger status effects" everywhere.
-- [ ] No activity gives a random or variable reward; determinism proven by test.
-- [ ] The free day is not a rest day; resting on it is neutral, not a miss.
-- [ ] All logic test-first; engine pure and unchanged in its source-agnostic behavior; no routing logic in components.
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 10 commit message.
+- [x] Free-day and off-routine activities can be logged with a source class, a sensible default, and an override.
+- [x] Off-block training can trigger the same status effects as planned training through the existing Phase 7 engine, proven by test.
+- [x] Off-block training maps to the relevant physical stat and Consistency; recovery_skill gives small Recovery/Judgment or flavour, no fatigue, no blocking effects.
+- [x] There is no numeric fatigue model; "feeds fatigue" reads as "can trigger status effects" everywhere.
+- [x] No activity gives a random or variable reward; determinism proven by test.
+- [x] The free day is not a rest day; resting on it is neutral, not a miss.
+- [x] All logic test-first; engine pure and unchanged in its source-agnostic behavior; no routing logic in components.
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 10 commit message.
 
 ---
 

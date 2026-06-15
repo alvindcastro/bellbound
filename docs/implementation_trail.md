@@ -658,3 +658,51 @@ Total: 316 tests
 ---
 
 *Phase 9 complete. Next: Phase 10.*
+
+---
+
+## Phase 10 — Free Day, Off-Block, and Recovery Skill Activities (2026-06-15)
+
+**Status: Complete — all tests green, pushed**
+
+### What was built
+
+| Path | Purpose |
+|------|---------|
+| `packages/engine/src/activities/activitySource.ts` | `defaultSourceForActivity(activityType): WorkoutSource` — run/pickleball/barbell → `off_block`; hike/yoga/walk/reading/cube/unknown → `recovery_skill` |
+| `packages/engine/src/activities/activityStatMap.ts` | `computeActivityStatDeltas(log): StatDeltas` — maps `log.source` + `log.category` to stat gains |
+| `packages/engine/src/__tests__/activitySource.test.ts` | 9 tests: all named activity types + unknown fallback |
+| `packages/engine/src/__tests__/activityStatMap.test.ts` | 11 tests: all source/category combinations, skipped status, determinism, signals→status-effects probe |
+| `app/src/services/buildWorkoutLog.ts` | Added optional `source?: WorkoutSource` to `WorkoutContext`; defaults to `'planned'` |
+| `app/src/__tests__/buildWorkoutLog.test.ts` | 3 new tests: source defaults to planned, off_block override, recovery_skill override |
+| `app/src/services/statService.ts` | Routes to `computeActivityStatDeltas` for `off_block`/`recovery_skill`; keeps `computeStatDeltas` for `planned` |
+| `app/src/__tests__/effectService.test.ts` | Added test proving `createStatusEffectsFromSignals` is source-agnostic (off_block breathless → Breathless Fog) |
+| `app/src/ui/log/FreeDayForm.tsx` | Activity logging form: type select, source radio (preselected from default, overrideable), status/difficulty/signals/note |
+| `app/src/ui/today/TodayScreen.tsx` | Added `onLogActivity?: () => void` prop; free day shows "Log an activity" button; updated free day message |
+| `app/src/App.tsx` | Added `'activity'` AppView; `FreeDayForm` branch; `onLogActivity={() => setView('activity')}` passed to TodayScreen |
+
+### Test results
+
+```
+packages/engine — 208 tests (20 new in Phase 10)   ✓ PASS
+app             — 133 tests (5 new in Phase 10)     ✓ PASS
+Total: 341 tests
+```
+
+### Key decisions
+
+- **`computeActivityStatDeltas` is a separate function from `computeStatDeltas`**: The planned-session rules (tied to `actualDayType === 'kb'`) and the off-block/recovery-skill rules (tied to `log.source` + `log.category`) are structurally distinct. A single merged function would have complex branching; separate functions are clearer and independently testable.
+
+- **`statService.ts` routes on `log.source`**: The routing is a two-branch switch at the service layer — no changes to the engine's Council, eligibility, or status functions. Phase 7 designed the status engine to be source-agnostic; Phase 10 simply proves the path with an assertion test.
+
+- **`pressGrindy` signal absent from FreeDayForm**: It's a KB pressing signal and meaningless for runs, yoga, or barbell. The form captures `breathless`, `gripCooked`, and `legsSore` (all applicable to off-block work).
+
+- **`saveLogAndUpdateCounter` reused in FreeDayForm**: `shouldIncrementCounter` already returns false for `source !== 'planned'`, so the counter is never inflated by free-day activities. No parallel save path needed.
+
+- **Source preselects from default but resets on activity type change**: When the user picks a different activity, the source radio reverts to the new default. A manual override is preserved only until the next activity-type change — simpler than tracking "did user explicitly override?" as separate state.
+
+- **No numeric fatigue score anywhere**: Confirmed by grep — "feeds fatigue" in the design means "can trigger a status effect" only. All fatigue modeling is via status effects (Phase 7); there is no fatigue counter.
+
+- **Determinism proof in test**: `computeActivityStatDeltas` is called twice with the same log object; both calls return equal results. This rules out hidden randomness or mutation.
+
+*Phase 10 complete. Next: Phase 11.*
