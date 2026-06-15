@@ -31,36 +31,36 @@ Discipline unchanged. Commit on green.
 
 ## Section A: Report Window
 
-- [ ] RED first: write failing tests for a pure function that, given a reference date ("today"), returns the 7-day window of calendar dates it covers (decide and document: trailing 7 days inclusive of today, or the last 7 full days). Then implement.
-- [ ] Use the same local-date discipline established in Phase 2 to avoid timezone off-by-one at the window boundaries. Test a boundary date.
+- [x] RED first: write failing tests for a pure function that, given a reference date ("today"), returns the 7-day window of calendar dates it covers (decide and document: trailing 7 days inclusive of today, or the last 7 full days). Then implement.
+- [x] Use the same local-date discipline established in Phase 2 to avoid timezone off-by-one at the window boundaries. Test a boundary date.
 
 ## Section B: Report Aggregation
 
-- [ ] RED first: write failing tests for a pure aggregation function that takes the week template plus the logs in the window and returns structured report data containing: planned sessions (from the template), actual sessions (from logs), completed KB workouts, missed planned sessions, rest days taken, free-day activities, extras on rest days, and a simple notes summary. Then implement.
-- [ ] Reuse the Phase 2 `classifyDay` function per day to derive extras and misses. Do not duplicate the four-case logic.
-- [ ] The aggregation is pure: it takes the template and the logs and returns data. It does not read the DB. An app-layer service fetches the template and logs and calls it.
-- [ ] The report data is a plain structure the UI renders. No prose generation, no judgment text yet (the dry "Council Judgment" line can be a simple static or rule-free string at this phase; full judgment is later).
+- [x] RED first: write failing tests for a pure aggregation function that takes the week template plus the logs in the window and returns structured report data containing: planned sessions (from the template), actual sessions (from logs), completed KB workouts, missed planned sessions, rest days taken, free-day activities, extras on rest days, and a simple notes summary. Then implement.
+- [x] Reuse the Phase 2 `classifyDay` function per day to derive extras and misses. Do not duplicate the four-case logic.
+- [x] The aggregation is pure: it takes the template and the logs and returns data. It does not read the DB. An app-layer service fetches the template and logs and calls it.
+- [x] The report data is a plain structure the UI renders. No prose generation, no judgment text yet (the dry "Council Judgment" line can be a simple static or rule-free string at this phase; full judgment is later).
 
 ## Section C: Report Screen
 
-- [ ] Build a weekly report screen rendering the aggregated data for the last 7 days. Plain and readable.
-- [ ] Show, at minimum: the planned week, the actual sessions, extras and misses, and a neutral summary. Mirror the v4 example structure but keep it factual.
-- [ ] No guilt copy. A missed session is stated neutrally, not scolded. Rest is shown as part of the plan, not a gap.
-- [ ] Exclude from the rendered report at this phase: progression eligibility, ascension status, detailed fatigue or recovery warnings, AI-generated prose. These are later phases.
+- [x] Build a weekly report screen rendering the aggregated data for the last 7 days. Plain and readable.
+- [x] Show, at minimum: the planned week, the actual sessions, extras and misses, and a neutral summary. Mirror the v4 example structure but keep it factual.
+- [x] No guilt copy. A missed session is stated neutrally, not scolded. Rest is shown as part of the plan, not a gap.
+- [x] Exclude from the rendered report at this phase: progression eligibility, ascension status, detailed fatigue or recovery warnings, AI-generated prose. These are later phases.
 - [ ] Verify rendering manually in the browser.
 
 ## Section D: Persistence and Offline
 
 - [ ] Confirm the report computes correctly offline from local data.
-- [ ] No network calls introduced in Phase 4.
+- [x] No network calls introduced in Phase 4.
 
 ## Section E: Phase 4 Done When
 
-- [ ] The weekly report is useful even without RPG stats.
-- [ ] Planned vs actual is easy to understand at a glance.
-- [ ] The report avoids guilt copy entirely.
-- [ ] The window and aggregation functions are pure and test-first; classification is reused from Phase 2, not duplicated.
-- [ ] The report is independent of block length (always the last 7 days).
+- [x] The weekly report is useful even without RPG stats.
+- [x] Planned vs actual is easy to understand at a glance.
+- [x] The report avoids guilt copy entirely.
+- [x] The window and aggregation functions are pure and test-first; classification is reused from Phase 2, not duplicated.
+- [x] The report is independent of block length (always the last 7 days).
 - [ ] Works offline.
 - [ ] Committed on green, pushed, with a clear Phase 4 commit message.
 

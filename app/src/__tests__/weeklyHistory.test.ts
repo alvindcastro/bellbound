@@ -46,6 +46,10 @@ function makeLog(date: string, status: string = 'completed'): WorkoutLog {
   };
 }
 
+function makeLogWithNote(date: string, note: string): WorkoutLog {
+  return { ...makeLog(date), originalNote: note };
+}
+
 describe('buildWeekSummary', () => {
   it('all KB days trained, all rest days rested: 4 planned, 4 actual, 0 extras, 0 misses, 7 entries', () => {
     const logsByDate: Record<string, WorkoutLog | null> = {
@@ -176,5 +180,85 @@ describe('buildWeekSummary', () => {
     expect(sat.date).toBe('2026-06-20');
     expect(sat.planned).toBe('free');
     expect(sat.classification).toBe('free_day_no_activity');
+  });
+
+  it('restDaysTaken: when no logs on rest days (Wed and Sun), restDaysTaken = 2', () => {
+    const logsByDate: Record<string, WorkoutLog | null> = {
+      '2026-06-15': makeLog('2026-06-15'), // Mon kb → trained
+      '2026-06-16': makeLog('2026-06-16'), // Tue kb → trained
+      '2026-06-17': null,                  // Wed rest → rested_on_rest_day
+      '2026-06-18': makeLog('2026-06-18'), // Thu kb → trained
+      '2026-06-19': makeLog('2026-06-19'), // Fri kb → trained
+      '2026-06-20': null,                  // Sat free → free_day_no_activity
+      '2026-06-21': null,                  // Sun rest → rested_on_rest_day
+    };
+
+    const summary = buildWeekSummary(weekDates, defaultTemplate, logsByDate);
+
+    expect(summary.restDaysTaken).toBe(2);
+  });
+
+  it('freeDayActivities: when Sat (free day) has a log, freeDayActivities = 1', () => {
+    const logsByDate: Record<string, WorkoutLog | null> = {
+      '2026-06-15': makeLog('2026-06-15'),
+      '2026-06-16': makeLog('2026-06-16'),
+      '2026-06-17': null,
+      '2026-06-18': makeLog('2026-06-18'),
+      '2026-06-19': makeLog('2026-06-19'),
+      '2026-06-20': makeLog('2026-06-20'), // Sat free → free_day_with_activity
+      '2026-06-21': null,
+    };
+
+    const summary = buildWeekSummary(weekDates, defaultTemplate, logsByDate);
+
+    expect(summary.freeDayActivities).toBe(1);
+  });
+
+  it('notes: non-empty originalNote from a log is included in notes array', () => {
+    const logsByDate: Record<string, WorkoutLog | null> = {
+      '2026-06-15': makeLogWithNote('2026-06-15', 'felt strong today'),
+      '2026-06-16': makeLog('2026-06-16'),
+      '2026-06-17': null,
+      '2026-06-18': makeLog('2026-06-18'),
+      '2026-06-19': makeLog('2026-06-19'),
+      '2026-06-20': null,
+      '2026-06-21': null,
+    };
+
+    const summary = buildWeekSummary(weekDates, defaultTemplate, logsByDate);
+
+    expect(summary.notes).toContain('felt strong today');
+  });
+
+  it('notes: empty originalNote is excluded from notes array', () => {
+    const logsByDate: Record<string, WorkoutLog | null> = {
+      '2026-06-15': makeLog('2026-06-15'), // originalNote: ''
+      '2026-06-16': makeLog('2026-06-16'),
+      '2026-06-17': null,
+      '2026-06-18': makeLog('2026-06-18'),
+      '2026-06-19': makeLog('2026-06-19'),
+      '2026-06-20': null,
+      '2026-06-21': null,
+    };
+
+    const summary = buildWeekSummary(weekDates, defaultTemplate, logsByDate);
+
+    expect(summary.notes).toHaveLength(0);
+  });
+
+  it('notes: multiple logs with notes are collected in date order', () => {
+    const logsByDate: Record<string, WorkoutLog | null> = {
+      '2026-06-15': makeLogWithNote('2026-06-15', 'first note'),
+      '2026-06-16': makeLog('2026-06-16'),
+      '2026-06-17': null,
+      '2026-06-18': makeLogWithNote('2026-06-18', 'second note'),
+      '2026-06-19': makeLog('2026-06-19'),
+      '2026-06-20': null,
+      '2026-06-21': null,
+    };
+
+    const summary = buildWeekSummary(weekDates, defaultTemplate, logsByDate);
+
+    expect(summary.notes).toEqual(['first note', 'second note']);
   });
 });
