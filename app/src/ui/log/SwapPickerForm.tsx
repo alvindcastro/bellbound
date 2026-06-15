@@ -7,10 +7,11 @@ interface Props {
   prescribedTemplateId: string;
   baselineTier: number;
   onPick: (chosen: ResolvedWorkout, reason: string) => void;
+  onPasteNew?: () => void;
   onCancel: () => void;
 }
 
-export default function SwapPickerForm({ prescribedTemplateId, baselineTier, onPick, onCancel }: Props) {
+export default function SwapPickerForm({ prescribedTemplateId, baselineTier, onPick, onPasteNew, onCancel }: Props) {
   const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
   const [selected, setSelected] = useState<string>('');
   const [reason, setReason] = useState('');
@@ -69,6 +70,9 @@ export default function SwapPickerForm({ prescribedTemplateId, baselineTier, onP
 
       <div className="form-actions">
         <button type="submit" className="btn-primary">Log this workout</button>
+        {onPasteNew && (
+          <button type="button" className="btn" onClick={onPasteNew}>Paste new workout</button>
+        )}
         <button type="button" className="btn" onClick={onCancel}>Cancel</button>
       </div>
     </form>

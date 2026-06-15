@@ -14,6 +14,7 @@ import { evaluateAndPersistQuests } from './services/questService.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
 import SwapPickerForm from './ui/log/SwapPickerForm.js';
+import WorkoutPasteForm from './ui/log/WorkoutPasteForm.js';
 import TestWorkoutForm from './ui/log/TestWorkoutForm.js';
 import AscensionScreen from './ui/ascension/AscensionScreen.js';
 import FreeDayForm from './ui/log/FreeDayForm.js';
@@ -27,7 +28,7 @@ import { evaluateAndApplyAscension, type AscensionOutcome } from './services/asc
 import { generateAndStoreLore } from './services/loreService.js';
 import { getAiClient } from './data/ai/index.js';
 
-type AppView = 'today' | 'log' | 'test' | 'ascension' | 'activity' | 'activity-from-kb' | 'swap' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
+type AppView = 'today' | 'log' | 'test' | 'ascension' | 'activity' | 'activity-from-kb' | 'swap' | 'paste' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
 
 function AppShell({ nav, children }: { nav: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -138,7 +139,19 @@ export default function App() {
             setSwapReason(reason);
             setView('log');
           }}
+          onPasteNew={() => setView('paste')}
           onCancel={() => setView('today')}
+        />
+      </AppShell>
+    );
+  }
+
+  if (view === 'paste') {
+    return (
+      <AppShell nav={<button onClick={() => setView('swap')}>← Back</button>}>
+        <WorkoutPasteForm
+          onSave={() => setView('swap')}
+          onCancel={() => setView('swap')}
         />
       </AppShell>
     );

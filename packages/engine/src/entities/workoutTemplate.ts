@@ -4,6 +4,7 @@ export interface Movement {
   rounds?: number;
   duration?: number;
   load?: number;
+  loadFallback?: number; // "24 or 16 kg" → load=24, loadFallback=16
 }
 
 export interface TierDefinition {

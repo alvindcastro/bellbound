@@ -8,6 +8,13 @@ export interface LogFormInputs {
   signals?: Signals;
 }
 
+export interface MovementSnapshot {
+  load?: number;
+  loadFallback?: number;
+  reps?: number;
+  duration?: number;
+}
+
 export interface WorkoutContext {
   date: string;
   blockId: string;
@@ -24,6 +31,11 @@ export interface WorkoutContext {
   // Off-block-on-training-day: explicit planned workout when source is off_block
   plannedTemplateId?: string;
   plannedTemplateName?: string;
+  // Movement snapshots for demand comparison (Phase 15)
+  prescribedRounds?: number;
+  prescribedMovements?: MovementSnapshot[];
+  actualRounds?: number;
+  actualMovements?: MovementSnapshot[];
 }
 
 export function buildWorkoutLog(inputs: LogFormInputs, context: WorkoutContext): WorkoutLog {
@@ -37,6 +49,14 @@ export function buildWorkoutLog(inputs: LogFormInputs, context: WorkoutContext):
     structuredNotes['swapReason'] = context.swapReason;
   }
 
+  const plannedWorkout: Record<string, unknown> = { templateId: plannedTemplateId, name: plannedTemplateName };
+  if (context.prescribedRounds !== undefined) plannedWorkout['rounds'] = context.prescribedRounds;
+  if (context.prescribedMovements) plannedWorkout['movements'] = context.prescribedMovements;
+
+  const actualWorkout: Record<string, unknown> = { templateId: actualTemplateId, name: actualTemplateName };
+  if (context.actualRounds !== undefined) actualWorkout['rounds'] = context.actualRounds;
+  if (context.actualMovements) actualWorkout['movements'] = context.actualMovements;
+
   return {
     id: crypto.randomUUID(),
     date: context.date,
@@ -45,8 +65,8 @@ export function buildWorkoutLog(inputs: LogFormInputs, context: WorkoutContext):
     actualDayType: context.actualDayType,
     source: context.source ?? 'planned',
     category: context.category,
-    plannedWorkout: { templateId: plannedTemplateId, name: plannedTemplateName },
-    actualWorkout: { templateId: actualTemplateId, name: actualTemplateName },
+    plannedWorkout,
+    actualWorkout,
     status: inputs.status,
     difficulty: inputs.difficulty,
     signals: inputs.signals ?? { pressGrindy: false, breathless: false, gripCooked: false, legsSore: false },

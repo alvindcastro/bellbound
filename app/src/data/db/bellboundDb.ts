@@ -42,6 +42,7 @@ interface MovementRow {
   rounds?: number;
   duration?: number;
   load?: number;
+  loadFallback?: number;
 }
 
 export interface WorkoutTemplateRow {

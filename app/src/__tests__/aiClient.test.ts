@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { validateParsedNote } from '../data/ai/parseValidator.js';
+import { validateParsedNote, validateParsedMovements } from '../data/ai/parseValidator.js';
 import { isAiEnabled, setAiEnabled, _resetAiSettings } from '../data/ai/aiSettings.js';
 import { noOpAiClient } from '../data/ai/noOpAiClient.js';
 import { getAiClient } from '../data/ai/index.js';
@@ -161,6 +161,88 @@ describe('noOpAiClient', () => {
 
   it('generateLore returns null', async () => {
     expect(await noOpAiClient.generateLore({ date: '2026-06-15', classification: 'kb' })).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// validateParsedMovements
+// ---------------------------------------------------------------------------
+
+describe('validateParsedMovements', () => {
+  it('returns empty array for empty array input', () => {
+    expect(validateParsedMovements([])).toEqual([]);
+  });
+
+  it('returns null for non-array input', () => {
+    expect(validateParsedMovements(null)).toBeNull();
+    expect(validateParsedMovements('foo')).toBeNull();
+    expect(validateParsedMovements(42)).toBeNull();
+    expect(validateParsedMovements({})).toBeNull();
+  });
+
+  it('returns valid array with all required fields', () => {
+    const raw = [{ name: 'Swing', sets: 3, eachSide: false }];
+    const result = validateParsedMovements(raw);
+    expect(result).toEqual([{ name: 'Swing', sets: 3, eachSide: false }]);
+  });
+
+  it('returns null when name is missing', () => {
+    expect(validateParsedMovements([{ sets: 3, eachSide: false }])).toBeNull();
+  });
+
+  it('returns null when name is not a string', () => {
+    expect(validateParsedMovements([{ name: 42, sets: 3, eachSide: false }])).toBeNull();
+  });
+
+  it('returns null when sets is missing', () => {
+    expect(validateParsedMovements([{ name: 'Swing', eachSide: false }])).toBeNull();
+  });
+
+  it('returns null when sets is not a positive integer', () => {
+    expect(validateParsedMovements([{ name: 'Swing', sets: 0, eachSide: false }])).toBeNull();
+    expect(validateParsedMovements([{ name: 'Swing', sets: -1, eachSide: false }])).toBeNull();
+    expect(validateParsedMovements([{ name: 'Swing', sets: 1.5, eachSide: false }])).toBeNull();
+    expect(validateParsedMovements([{ name: 'Swing', sets: 'three', eachSide: false }])).toBeNull();
+  });
+
+  it('returns null when eachSide is missing', () => {
+    expect(validateParsedMovements([{ name: 'Swing', sets: 3 }])).toBeNull();
+  });
+
+  it('returns null when eachSide is not boolean', () => {
+    expect(validateParsedMovements([{ name: 'Swing', sets: 3, eachSide: 'yes' }])).toBeNull();
+  });
+
+  it('preserves optional numeric fields', () => {
+    const raw = [{ name: 'Press', sets: 3, reps: 5, repMax: 8, duration: 30, load: 24, loadFallback: 16, eachSide: true }];
+    const result = validateParsedMovements(raw);
+    expect(result).toEqual([{ name: 'Press', sets: 3, reps: 5, repMax: 8, duration: 30, load: 24, loadFallback: 16, eachSide: true }]);
+  });
+
+  it('tolerates extra fields', () => {
+    const raw = [{ name: 'Swing', sets: 3, eachSide: false, foo: 'bar' }];
+    const result = validateParsedMovements(raw);
+    expect(result).not.toBeNull();
+    expect(result![0]!.name).toBe('Swing');
+  });
+
+  it('returns null if any item in array is invalid', () => {
+    const raw = [
+      { name: 'Swing', sets: 3, eachSide: false },
+      { name: 'Press', sets: 'bad', eachSide: true },
+    ];
+    expect(validateParsedMovements(raw)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// noOpAiClient.parseWorkoutLines
+// ---------------------------------------------------------------------------
+
+describe('noOpAiClient.parseWorkoutLines', () => {
+  it('returns null for any input', async () => {
+    expect(await noOpAiClient.parseWorkoutLines(['swing 3x10'])).toBeNull();
+    expect(await noOpAiClient.parseWorkoutLines([])).toBeNull();
   });
 });
 

@@ -19,6 +19,6 @@ export function getAiClient(options?: { online?: boolean }): AiClient {
 }
 
 export { noOpAiClient } from './noOpAiClient.js';
-export { validateParsedNote } from './parseValidator.js';
+export { validateParsedNote, validateParsedMovements } from './parseValidator.js';
 export { isAiEnabled, setAiEnabled, _resetAiSettings } from './aiSettings.js';
 export type { AiClient, ParsedNote, LoreContext } from './types.js';

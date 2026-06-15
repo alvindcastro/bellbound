@@ -1,6 +1,7 @@
 import type { StatusEffect } from '../entities/statusEffect.js';
 import type { Signals } from '../entities/signals.js';
 import { SORENESS_EFFECT_DAYS } from '../config.js';
+import { compareDemand } from '../council/compareDemand.js';
 
 export function createStatusEffectsFromSignals(signals: Signals, createdDate: string): StatusEffect[] {
   const effects: StatusEffect[] = [];
@@ -54,6 +55,23 @@ export function createStatusEffectsFromSignals(signals: Signals, createdDate: st
   }
 
   return effects;
+}
+
+export function createEffectsFromDemand(
+  actual: Record<string, unknown>,
+  prescribed: Record<string, unknown>,
+  createdDate: string,
+): StatusEffect[] {
+  if (compareDemand(actual, prescribed) !== 'harder') return [];
+  return [{
+    id: crypto.randomUUID(),
+    name: 'Overreached',
+    source: 'demand_harder',
+    recommendationEffect: 'repeat',
+    expiryType: 'after_next_session',
+    expiryParam: null,
+    createdDate,
+  }];
 }
 
 export function createPoorSleepGoblin(createdDate: string): StatusEffect {

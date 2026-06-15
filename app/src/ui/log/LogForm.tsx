@@ -50,6 +50,11 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
     e.preventDefault();
     if (rounds < 0) return;
 
+    const snap = (w: typeof workout) => ({
+      rounds: w.rounds,
+      movements: w.movements.map(m => ({ load: m.load, reps: m.reps, duration: m.duration })),
+    });
+
     const context: WorkoutContext = {
       date,
       blockId,
@@ -58,6 +63,10 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
       templateId: workout.templateId,
       templateName: workout.name,
       category: workout.category,
+      prescribedRounds: workout.rounds,
+      prescribedMovements: snap(workout).movements,
+      actualRounds: displayWorkout.rounds,
+      actualMovements: snap(displayWorkout).movements,
       ...(swapWorkout ? {
         actualTemplateId: swapWorkout.templateId,
         actualTemplateName: swapWorkout.name,

@@ -1,5 +1,6 @@
 import type { AiClient, ParsedNote, LoreContext } from './types.js';
-import { validateParsedNote } from './parseValidator.js';
+import type { ParsedMovement } from '@bellbound/engine';
+import { validateParsedNote, validateParsedMovements } from './parseValidator.js';
 
 const MODEL = 'claude-haiku-4-5-20251001';
 
@@ -88,6 +89,43 @@ export function createProxyAiClient(proxyUrl: string, authToken: string): AiClie
         }
 
         return text;
+      } catch {
+        return null;
+      }
+    },
+
+    async parseWorkoutLines(lines: string[]): Promise<ParsedMovement[] | null> {
+      if (lines.length === 0) return [];
+      try {
+        const linesText = lines.join('\n');
+        const response = await fetch(`${proxyUrl}/api/ai`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            max_tokens: 1024,
+            system:
+              'You are a kettlebell workout text parser. Given lines of workout text that a simple parser could not understand, respond with ONLY valid JSON: an array of movement objects. Each object must have: "name" (string), "sets" (positive integer), "eachSide" (boolean). Optional fields: "reps" (number), "repMax" (number), "duration" (number, seconds), "load" (number, kg), "loadFallback" (number, kg). If you cannot parse a line, omit it. No explanation, no markdown, no code fences — just the JSON array.',
+            messages: [{ role: 'user', content: linesText }],
+          }),
+        });
+
+        if (!response.ok) return null;
+
+        const data = (await response.json()) as unknown;
+        const text =
+          data &&
+          typeof data === 'object' &&
+          'content' in data &&
+          Array.isArray((data as Record<string, unknown>)['content']) &&
+          (data as { content: Array<{ text?: unknown }> }).content[0]?.text;
+
+        if (typeof text !== 'string') return null;
+
+        return validateParsedMovements(JSON.parse(text));
       } catch {
         return null;
       }

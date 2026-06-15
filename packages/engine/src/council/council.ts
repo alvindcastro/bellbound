@@ -3,6 +3,7 @@ import type { Recommendation } from '../entities/recommendation.js';
 import type { StatusEffect } from '../entities/statusEffect.js';
 import { isProgressionEligible } from './eligibility.js';
 import { resolveActiveEffects } from '../recovery/stacking.js';
+import { compareDemand } from './compareDemand.js';
 
 export function getCouncilRecommendation(
   recentLogs: WorkoutLog[],
@@ -69,6 +70,16 @@ export function getCouncilRecommendation(
     };
   }
 
-  // PRIORITY 7: Maintain
+  // PRIORITY 7: Maintain — with demand-aware explanation when recent session was a lighter substitute
+  const demand = compareDemand(mostRecent.actualWorkout, mostRecent.plannedWorkout);
+  if (demand === 'easier') {
+    return {
+      kind: 'maintain',
+      explanation:
+        'The substituted workout was lighter than the prescribed baseline. ' +
+        'It counts as training and as a smart regression, but not toward progressing the baseline.',
+    };
+  }
+
   return { kind: 'maintain', explanation: 'Keep training at this baseline.' };
 }

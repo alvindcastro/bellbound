@@ -4,4 +4,5 @@ export const noOpAiClient: AiClient = {
   isEnabled: () => false,
   parseNote: async () => null,
   generateLore: async () => null,
+  parseWorkoutLines: async () => null,
 };

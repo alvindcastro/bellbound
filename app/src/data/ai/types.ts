@@ -1,4 +1,4 @@
-import type { Difficulty } from '@bellbound/engine';
+import type { Difficulty, ParsedMovement } from '@bellbound/engine';
 
 export interface ParsedNote {
   difficulty: Difficulty;
@@ -18,4 +18,5 @@ export interface AiClient {
   isEnabled(): boolean;
   parseNote(note: string): Promise<ParsedNote | null>;
   generateLore(context: LoreContext): Promise<string | null>;
+  parseWorkoutLines(lines: string[]): Promise<ParsedMovement[] | null>;
 }

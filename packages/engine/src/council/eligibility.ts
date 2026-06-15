@@ -1,8 +1,16 @@
 import type { WorkoutLog } from '../entities/workoutLog.js';
 import type { Signals } from '../entities/signals.js';
+import { compareDemand } from './compareDemand.js';
+
+function demandMet(log: WorkoutLog): boolean {
+  const result = compareDemand(log.actualWorkout, log.plannedWorkout);
+  // Only equivalent demand counts toward progression.
+  // Easier, harder, and uncertain are all conservative non-advancing.
+  return result === 'equivalent';
+}
 
 // Returns true when: the last 2 logs are both normal/easy difficulty,
-// AND neither log has any blocking signal set.
+// neither has any blocking signal, AND both had demand equivalent to prescribed.
 export function isProgressionEligible(recentLogs: WorkoutLog[]): boolean {
   if (recentLogs.length < 2) return false;
   const last2 = recentLogs.slice(0, 2);
@@ -13,7 +21,8 @@ export function isProgressionEligible(recentLogs: WorkoutLog[]): boolean {
       !l.signals.breathless &&
       !l.signals.gripCooked &&
       !l.signals.legsSore,
-    )
+    ) &&
+    last2.every(demandMet)
   );
 }
 

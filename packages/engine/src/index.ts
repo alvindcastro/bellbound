@@ -28,3 +28,8 @@ export { computeBlockTransition } from './ascension/blockTransition.js';
 export type { ChallengePathDefinition } from './entities/challengePath.js';
 export { CHALLENGE_PATH_DEFINITIONS } from './entities/challengePath.js';
 export { applyChallengePath } from './challenges/applyChallengePath.js';
+export { parseWorkoutText } from './parser/parseWorkoutText.js';
+export type { ParsedMovement, ParseResult } from './parser/parseWorkoutText.js';
+export { compareDemand } from './council/compareDemand.js';
+export type { DemandResult } from './council/compareDemand.js';
+export { createEffectsFromDemand } from './recovery/statusEffects.js';
