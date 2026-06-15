@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { isAiEnabled } from './aiSettings.js';
 import { noOpAiClient } from './noOpAiClient.js';
 import { createProxyAiClient } from './proxyAiClient.js';
@@ -11,14 +12,8 @@ export function getAiClient(options?: { online?: boolean }): AiClient {
     return noOpAiClient;
   }
 
-  const proxyUrl =
-    typeof import.meta !== 'undefined' && import.meta.env
-      ? (import.meta.env['VITE_AI_PROXY_URL'] ?? '')
-      : '';
-  const authToken =
-    typeof import.meta !== 'undefined' && import.meta.env
-      ? (import.meta.env['VITE_AI_AUTH_TOKEN'] ?? '')
-      : '';
+  const proxyUrl = import.meta.env.VITE_AI_PROXY_URL ?? '';
+  const authToken = import.meta.env.VITE_AI_AUTH_TOKEN ?? '';
 
   return createProxyAiClient(proxyUrl, authToken);
 }

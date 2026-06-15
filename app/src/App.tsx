@@ -139,7 +139,7 @@ export default function App() {
               await createAndPersistEffectsFromLog(log);
               await applyStatGainsFromLog(log);
               await evaluateAndPersistQuests(today);
-              await generateAndStoreLore(log, getAiClient({ online: typeof navigator !== 'undefined' ? navigator.onLine : false }));
+              await generateAndStoreLore(log, getAiClient());
             }
             await loadActiveEffects();
             if (resolvedWorkout) {

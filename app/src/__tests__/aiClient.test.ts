@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { validateParsedNote } from '../data/ai/parseValidator.js';
 import { isAiEnabled, setAiEnabled, _resetAiSettings } from '../data/ai/aiSettings.js';
 import { noOpAiClient } from '../data/ai/noOpAiClient.js';

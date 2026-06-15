@@ -813,3 +813,75 @@ Total: 401 tests
 - **Path selection defaults to null (no path)**: "No path — standard block" is the first and default-selected radio. The user must affirmatively choose a path; they are not pushed into one.
 
 *Phase 12 complete. Next: Phase 13.*
+
+---
+
+## Phase 13 — AI Scribe Layer and Go Backend
+
+### What was built
+
+#### server/ — Go proxy
+
+| File | Purpose |
+|------|---------|
+| `server/handler/proxy.go` | `ProxyHandler` struct: verifies `Authorization: Bearer <APP_TOKEN>`, forwards body to Anthropic API with `x-api-key` from env, copies response back |
+| `server/handler/proxy_test.go` | 5 Go tests: unauthorized rejection, request forwarding to mock server, key-in-header-not-body, key-never-logged, health endpoint |
+| `server/main.go` | Reads `ANTHROPIC_API_KEY` and `APP_TOKEN` from env (fatal if missing), listens on `:8080` |
+| `server/Dockerfile` | Multi-stage build: `golang:1.21-alpine` → `alpine:latest`, exposes 8080 |
+| `server/fly.toml` | Fly.io config: `bellbound-server`, region `lax`, 256mb shared VM, HTTPS enforced |
+
+#### app/src/data/ai/ — Frontend AI client
+
+| File | Purpose |
+|------|---------|
+| `types.ts` | `AiClient`, `ParsedNote`, `LoreContext` interfaces |
+| `noOpAiClient.ts` | Always returns `false`/`null`; used when AI disabled or offline |
+| `parseValidator.ts` | `validateParsedNote(raw: unknown): ParsedNote \| null`; validates difficulty enum + 4 boolean signals; rejects anything off-schema |
+| `aiSettings.ts` | `isAiEnabled`/`setAiEnabled`; module-level state with `localStorage` persistence when available (node-safe for tests) |
+| `proxyAiClient.ts` | `createProxyAiClient(proxyUrl, authToken)`: `POST {url}/api/ai`; model `claude-haiku-4-5-20251001`; catches all errors and returns null |
+| `index.ts` | `getAiClient(options?)` factory: returns no-op when disabled/offline, otherwise proxy client with `VITE_AI_PROXY_URL`/`VITE_AI_AUTH_TOKEN` |
+
+#### Lore system
+
+| File | Purpose |
+|------|---------|
+| `app/src/data/db/bellboundDb.ts` | `LoreRow` type; `lore` table at version 4 (index: `id, logId`) |
+| `app/src/data/repositories/loreRepository.ts` | `put` (upsert) + `getForLog` |
+| `app/src/services/loreService.ts` | `generateAndStoreLore(log, aiClient)`: calls `aiClient.generateLore` when enabled; falls back to `getCompletionMessage` (Phase 5 flavour) when not; stores lore entry with `source: 'ai' \| 'deterministic'` |
+
+#### App integration
+
+- `App.tsx`: `generateAndStoreLore(log, getAiClient())` called after every regular log save
+- `LogForm.tsx`: "Parse note with AI" button + suggestion review step (UI only; disabled by default)
+
+### Test results
+
+```
+packages/engine — 246 tests (unchanged from Phase 12)   ✓ PASS
+app             — 190 tests (35 new in Phase 13)         ✓ PASS
+Total: 436 tests
+```
+
+New test files:
+- `app/src/__tests__/aiClient.test.ts` — 21 tests (parseValidator, aiSettings, noOpAiClient, factory)
+- `app/src/__tests__/loreRepository.test.ts` — 3 tests
+- `app/src/__tests__/loreService.test.ts` — 5 tests (immutability, deterministic fallback, storage, idempotency)
+- `app/src/__tests__/guardrails.test.ts` — 5 tests
+
+### Key decisions
+
+- **Key never in client**: The Anthropic key lives only in the Go proxy's `ANTHROPIC_API_KEY` env var. The client sends an `APP_TOKEN` to authenticate to the proxy. The proxy never forwards the client's auth token to Anthropic, and never logs either key. Tested by inspecting the forwarded request in a mock Anthropic server.
+
+- **AI disabled by default**: `isAiEnabled()` defaults to `false`. All phases 0–12 behavior is unchanged. The app is fully functional without the backend running.
+
+- **Guardrails are structural**: `getCouncilRecommendation`, `computeStatDeltas`, `createAndPersistEffectsFromLog`, and `evaluateAndApplyAscension` have no `AiClient` parameter. AI output physically cannot reach these code paths. `guardrails.test.ts` proves this by calling recommendation logic without any AI involvement.
+
+- **Lore is stored separately**: `LoreEntry` is in its own Dexie table (`lore`), linked to the log by `logId`. It has a `source` field (`'ai' | 'deterministic'`). It never mutates the `WorkoutLog` record. Tested explicitly in `loreService.test.ts`.
+
+- **Parse validator is strict**: `validateParsedNote` rejects anything with an unrecognized difficulty, missing signal fields, or non-boolean signals. Extra fields are tolerated. Invalid AI output falls back to manual form values — the user is never silently committed to AI-parsed values.
+
+- **Node-safe AI settings**: The `aiSettings.ts` module uses a module-level `_enabled` variable as the true state, with `localStorage` as an optional persistence layer. Tests run in Node (no `localStorage`) and reset state with `_resetAiSettings()` in `beforeEach`.
+
+- **`import.meta.env` with vite/client reference**: `index.ts` uses `/// <reference types="vite/client" />` so TypeScript knows about `import.meta.env`. The `typeof import.meta` guard is unnecessary in a Vite project and was removed.
+
+*Phase 13 complete.*
