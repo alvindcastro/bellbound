@@ -761,3 +761,55 @@ Total: 382 tests
 - **AscensionScreen has no nav header**: The ascension outcome is a terminal screen — only the "Continue" button exits. No back button prevents the user from navigating away before seeing the result.
 
 *Phase 11 complete. Next: Phase 12.*
+
+---
+
+## Phase 12 — Challenge Paths (2026-06-15)
+
+**Status: Complete — all tests green, pushed**
+
+### What was built
+
+| Path | Purpose |
+|------|---------|
+| `packages/engine/src/entities/enums.ts` | Added `ChallengePath` union type (5 path IDs) |
+| `packages/engine/src/entities/block.ts` | Added optional `challengePath?: ChallengePath \| null` (backward-compatible) |
+| `packages/engine/src/entities/challengePath.ts` | `ChallengePathDefinition` interface + `CHALLENGE_PATH_DEFINITIONS` array (5 paths with name/description) |
+| `packages/engine/src/challenges/applyChallengePath.ts` | Pure modifier: Minimalist → Tuesday rest (3 KB days); all other paths → template unchanged (emphasis only at Phase 12) |
+| `packages/engine/src/__tests__/applyChallengePath.test.ts` | 12 tests: all paths, null/undefined passthrough, immutability, exact KB-day count |
+| `packages/engine/src/__tests__/council.test.ts` | Added test proving council signature cannot be influenced by a path (conservative-wins rule preserved) |
+| `packages/engine/src/ascension/blockTransition.ts` | `nextBlock` now explicitly sets `challengePath: null` |
+| `app/src/data/db/bellboundDb.ts` | Added `challengePath?: string \| null` to `BlockRow` (no Dexie version bump needed) |
+| `app/src/data/repositories/blockRepository.ts` | Updated `fromRow` to map `challengePath`; added `setChallengePath(blockId, path)` |
+| `app/src/services/todayService.ts` | Refactored to fetch block upfront; applies `applyChallengePath(weekTemplate, block.challengePath)` before day-type check |
+| `app/src/__tests__/repositories.test.ts` | 3 new tests: path persists, null clears, absent field reads as null |
+| `app/src/__tests__/todayService.test.ts` | 3 new tests: Tuesday rest under Minimalist, Monday still KB under Minimalist, Tuesday KB with no path |
+| `app/src/ui/ascension/AscensionScreen.tsx` | Path selection UI on `ascended` outcome; `onDismiss` → `onComplete(selectedPath)` |
+| `app/src/ui/today/TodayScreen.tsx` | Optional `challengePathName` prop; shows path label on KB days |
+| `app/src/App.tsx` | `onComplete` wiring: persists selected path via `setChallengePath`, reloads active block |
+
+### Test results
+
+```
+packages/engine — 246 tests (13 new in Phase 12)   ✓ PASS
+app             — 155 tests (6 new in Phase 12)     ✓ PASS
+Total: 401 tests
+```
+
+### Key decisions
+
+- **`challengePath` is optional on Block**: Making the field `?: ChallengePath | null` means all existing code that constructs Block objects (seed, ascension tests, repository helpers) continues to compile without changes. Absent field reads as `null` via `?? null` in `fromRow`.
+
+- **Minimalist is the only path that changes day types**: The Minimalist Path removes Tuesday's KB session (4→3 KB days). Clean Press, Swing Marsh, Recovery Rogue, and Double Bell are emphasis modifiers — their effect on workout selection is deferred to a future phase when per-workout template variation exists. This is documented in the implementation and the function comment.
+
+- **`todayService` refactored to fetch block upfront**: Previously, `resolveToday` fetched block only when the day was KB. Now it fetches block and weekTemplate in parallel upfront so `applyChallengePath` can be called before the day-type check. The behavior is unchanged when `challengePath` is null.
+
+- **Counter correctness under Minimalist proven by construction**: `shouldIncrementCounter` checks `plannedDayType === 'kb'`. Under Minimalist, Tuesday becomes rest, so no KB log is produced on Tuesday → counter unaffected. Monday/Thursday/Friday remain KB → counter increments normally. No new counter test needed beyond the existing `shouldIncrementCounter` tests.
+
+- **Council function signature proves no-path-override**: `getCouncilRecommendation(recentLogs, activeEffects)` has no `block` or `path` parameter. A challenge path cannot reach the council function — the conservative-wins rule is structurally unoverrideable. Explicit test added.
+
+- **Path selection is a one-time per-block choice**: Selection happens on the AscensionScreen after a successful test. There is no mid-block path change (documented as out of scope). The path is stored on the block and applies for the block's entire life.
+
+- **Path selection defaults to null (no path)**: "No path — standard block" is the first and default-selected radio. The user must affirmatively choose a path; they are not pushed into one.
+
+*Phase 12 complete. Next: Phase 13.*

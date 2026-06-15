@@ -32,49 +32,49 @@ Discipline unchanged. Commit on green.
 
 ## Section A: Challenge Path Model
 
-- [ ] Add a `challengePath` field (nullable) on the Block. A block with no path is the default block. A block with a path carries a modifier.
-- [ ] Define the paths from the concept as data:
+- [x] Add a `challengePath` field (nullable) on the Block. A block with no path is the default block. A block with a path carries a modifier.
+- [x] Define the paths from the concept as data:
     - The Clean Press Path: more emphasis on clean and press.
     - The Swing Marsh Path: more conditioning focus.
     - The Recovery Rogue Path: mandatory light day after hard conditioning.
     - The Minimalist Path: only 3 workouts per week.
     - The Double-Bell Path: two double-bell days per week.
-- [ ] RED first: write failing repository tests (fake-indexeddb) that a path selected on a block persists and reads back, and that a block can have no path. Then implement.
+- [x] RED first: write failing repository tests (fake-indexeddb) that a path selected on a block persists and reads back, and that a block can have no path. Then implement.
 
 ## Section B: Path Modifiers (Deterministic Emphasis Only)
 
-- [ ] RED first: write failing tests for a pure function that, given a base week template and a challenge path, returns the modified emphasis (e.g. Minimalist reduces to 3 training days; Double-Bell marks two days as double-bell; Recovery Rogue inserts a mandatory light day after hard conditioning). Then implement.
-- [ ] A path modifies emphasis or the week template's day types for the block; it does not generate new random workouts and does not change the tier system.
-- [ ] Critical: a path never overrides recovery. RED first: write a test that with the Recovery Rogue Path active, the mandatory light day is additive to (not a replacement for) status-effect restrictions; and that no path can cause the Council to recommend progression while a blocking status effect is active. A path changes emphasis; it cannot defeat the conservative-wins rule. Then confirm.
+- [x] RED first: write failing tests for a pure function that, given a base week template and a challenge path, returns the modified emphasis (e.g. Minimalist reduces to 3 training days; Double-Bell marks two days as double-bell; Recovery Rogue inserts a mandatory light day after hard conditioning). Then implement.
+- [x] A path modifies emphasis or the week template's day types for the block; it does not generate new random workouts and does not change the tier system.
+- [x] Critical: a path never overrides recovery. RED first: write a test that with the Recovery Rogue Path active, the mandatory light day is additive to (not a replacement for) status-effect restrictions; and that no path can cause the Council to recommend progression while a blocking status effect is active. A path changes emphasis; it cannot defeat the conservative-wins rule. Then confirm.
 
 ## Section C: Selection at Ascension
 
-- [ ] On the post-ascension screen (Phase 11), offer an optional challenge path for the new block. Default is no path (the standard block).
-- [ ] Persist the selected path on the newly opened block.
-- [ ] A path is chosen per block, at block open. Changing path mid-block is out of scope (decide and document; simplest is path is fixed for the block's life).
-- [ ] Verify selection UI manually.
+- [x] On the post-ascension screen (Phase 11), offer an optional challenge path for the new block. Default is no path (the standard block).
+- [x] Persist the selected path on the newly opened block.
+- [x] A path is chosen per block, at block open. Changing path mid-block is out of scope (decide and document; simplest is path is fixed for the block's life).
+- [x] Verify selection UI manually.
 
 ## Section D: Applying the Path
 
-- [ ] The Today screen and the weekly report reflect the path's emphasis (e.g. Minimalist shows 3 training days; the report's planned sessions match the modified template).
-- [ ] The classification (Phase 2) and counter still work under a modified template: confirm a planned KB session under a Minimalist week still counts toward the guard correctly. RED first: write a test for the counter under a modified template. Then confirm.
-- [ ] The tier resolver (Phase 3) is unaffected; a path changes which workouts appear, not how a tier resolves.
+- [x] The Today screen and the weekly report reflect the path's emphasis (e.g. Minimalist shows 3 training days; the report's planned sessions match the modified template).
+- [x] The classification (Phase 2) and counter still work under a modified template: confirm a planned KB session under a Minimalist week still counts toward the guard correctly. RED first: write a test for the counter under a modified template. Then confirm.
+- [x] The tier resolver (Phase 3) is unaffected; a path changes which workouts appear, not how a tier resolves.
 
 ## Section E: Persistence and Offline
 
-- [ ] Confirm path selection and its effects persist and compute offline.
-- [ ] No network calls introduced in Phase 12.
+- [x] Confirm path selection and its effects persist and compute offline.
+- [x] No network calls introduced in Phase 12.
 
 ## Section F: Phase 12 Done When
 
-- [ ] After ascension, the user can optionally select a challenge path for the new block; no path is the default.
-- [ ] A selected path modifies block emphasis deterministically (day types / template), persisted on the block.
-- [ ] No path overrides recovery rules or lets progression happen while a blocking status effect is active, proven by test.
-- [ ] Classification and the KB counter work correctly under a modified template, proven by test.
-- [ ] No path generates random workouts or changes the tier system.
-- [ ] All logic test-first; engine pure; no path logic in components.
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 12 commit message.
+- [x] After ascension, the user can optionally select a challenge path for the new block; no path is the default.
+- [x] A selected path modifies block emphasis deterministically (day types / template), persisted on the block.
+- [x] No path overrides recovery rules or lets progression happen while a blocking status effect is active, proven by test.
+- [x] Classification and the KB counter work correctly under a modified template, proven by test.
+- [x] No path generates random workouts or changes the tier system.
+- [x] All logic test-first; engine pure; no path logic in components.
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 12 commit message.
 
 ---
 
