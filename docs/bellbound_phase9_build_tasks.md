@@ -32,49 +32,49 @@ Discipline unchanged. Commit on green.
 
 ## Section A: Quest Model
 
-- [ ] Add Dexie tables (or fields) for quests, items, and titles. A quest carries: id, name, objective, progress (current/required), reward (item and/or title and/or a cosmetic stat note), and completion state.
-- [ ] RED first: write failing repository tests (fake-indexeddb) for quest read/write and completion state persistence. Then implement.
+- [x] Add Dexie tables (or fields) for quests, items, and titles. A quest carries: id, name, objective, progress (current/required), reward (item and/or title and/or a cosmetic stat note), and completion state.
+- [x] RED first: write failing repository tests (fake-indexeddb) for quest read/write and completion state persistence. Then implement.
 
 ## Section B: Quest Progress Evaluation
 
-- [ ] RED first: write failing tests for a pure progress function per quest, then implement. Suggested quests from the concept:
+- [x] RED first: write failing tests for a pure progress function per quest, then implement. Suggested quests from the concept:
     - Survive the Baseline: complete the current-tier Double KB Strength twice → unlocks progression suggestion (note: the suggestion already comes from the Council; the quest reward is the cosmetic acknowledgment, not a new mechanic) and a cosmetic item.
-    - Enter the Armor Foundry: complete 10 ABC sets → cosmetic item.
-    - The Hundred Swings: 100 total swings at 24 kg → cosmetic item, optional swing-volume display.
-    - The Push-up Bureaucracy: 100 total push-ups in a workout → cosmetic title.
+    - Enter the Armor Foundry: complete 10 ABC sets → cosmetic item. *(deferred — needs structured actualWorkout data)*
+    - The Hundred Swings: 100 total swings at 24 kg → cosmetic item, optional swing-volume display. *(deferred — needs swing count in actualWorkout)*
+    - The Push-up Bureaucracy: 100 total push-ups in a workout → cosmetic title. *(deferred — needs push-up count in actualWorkout)*
     - The Good Swap: swap a workout due to fatigue/sleep/soreness/schedule and still train appropriately → Judgment-themed cosmetic reward.
     - The Wise Regression: use a lighter bell or lower volume to protect form → Control/Judgment-themed cosmetic reward.
-- [ ] Progress functions are pure: they take the relevant logs/behavior and return progress. They do not read the DB.
-- [ ] Quests reward judgment and repeatable behavior, not volume escalation. Confirm no quest rewards simply "more": e.g. there is no "do 500 swings" arms race quest. Judgment quests (good swap, wise regression) are first-class.
+- [x] Progress functions are pure: they take the relevant logs/behavior and return progress. They do not read the DB.
+- [x] Quests reward judgment and repeatable behavior, not volume escalation. Confirm no quest rewards simply "more": e.g. there is no "do 500 swings" arms race quest. Judgment quests (good swap, wise regression) are first-class.
 
 ## Section C: Unlocks (Cosmetic Only)
 
-- [ ] RED first: write failing tests that completing a quest grants its reward (item/title) exactly once and persists. Then implement.
-- [ ] Items and titles are cosmetic: a name, optional flavour text, optional small art. They have NO mechanical effect, no stat bonus that gates anything, no currency cost (there is no currency).
-- [ ] Confirm a granted reward cannot be re-granted (idempotent unlock), tested.
+- [x] RED first: write failing tests that completing a quest grants its reward (item/title) exactly once and persists. Then implement.
+- [x] Items and titles are cosmetic: a name, optional flavour text, optional small art. They have NO mechanical effect, no stat bonus that gates anything, no currency cost (there is no currency).
+- [x] Confirm a granted reward cannot be re-granted (idempotent unlock), tested.
 
 ## Section D: UI
 
-- [ ] Build a view listing active quests with progress, completed quests, unlocked items, and earned titles.
-- [ ] Allow displaying an earned title on the character view (cosmetic).
-- [ ] Keep the tone dry. Quest and item flavour follows the tone guide; no motivational copy.
-- [ ] Verify rendering manually.
+- [x] Build a view listing active quests with progress, completed quests, unlocked items, and earned titles.
+- [x] Allow displaying an earned title on the character view (cosmetic).
+- [x] Keep the tone dry. Quest and item flavour follows the tone guide; no motivational copy.
+- [x] Verify rendering manually.
 
 ## Section E: Persistence and Offline
 
-- [ ] Confirm quest progress, completions, items, and titles persist and evaluate offline.
-- [ ] No network calls introduced in Phase 9.
+- [x] Confirm quest progress, completions, items, and titles persist and evaluate offline.
+- [x] No network calls introduced in Phase 9.
 
 ## Section F: Phase 9 Done When
 
-- [ ] Quests track progress from real logged behavior via pure, tested functions.
-- [ ] Completing a quest grants a cosmetic item or title exactly once, persisted.
-- [ ] No quest, item, or title has any mechanical effect on training, progression, recovery, or recommendations.
-- [ ] No quest rewards raw volume escalation; judgment quests exist and are first-class.
-- [ ] There is no currency and no random drop.
-- [ ] All logic test-first; engine pure; no quest logic in components.
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 9 commit message.
+- [x] Quests track progress from real logged behavior via pure, tested functions.
+- [x] Completing a quest grants a cosmetic item or title exactly once, persisted.
+- [x] No quest, item, or title has any mechanical effect on training, progression, recovery, or recommendations.
+- [x] No quest rewards raw volume escalation; judgment quests exist and are first-class.
+- [x] There is no currency and no random drop.
+- [x] All logic test-first; engine pure; no quest logic in components.
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 9 commit message.
 
 ---
 

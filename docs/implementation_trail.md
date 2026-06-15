@@ -609,3 +609,52 @@ Total: 285 tests
 ---
 
 *Phase 8 complete. Next: Phase 9 (Quests and Items).*
+
+---
+
+## Phase 9 — Quests, Items, and Titles (2026-06-15)
+
+**Status: Complete — all tests green, pushed**
+
+### What was built
+
+| Path | Purpose |
+|------|---------|
+| `packages/engine/src/entities/quest.ts` | `QuestDefinition`, `QuestRewardDefinition` types |
+| `packages/engine/src/quests/questDefinitions.ts` | 3 quest definitions (`survive_baseline`, `wise_regression`, `good_swap`); 3 deferred with comment |
+| `packages/engine/src/quests/questProgress.ts` | `evaluateQuestProgress(questId, logs): number` — pure switch over quest IDs |
+| `packages/engine/src/quests/questUnlock.ts` | `shouldGrantReward(progress, required, alreadyCompleted): boolean` |
+| `packages/engine/src/__tests__/questProgress.test.ts` | 19 tests covering all three quests, skipped/off-block exclusions, unknown ID, idempotency |
+| `app/src/data/db/bellboundDb.ts` | `QuestRow`, `ItemRow`, `TitleRow`; Dexie version(2) with `quests`, `items`, `titles` tables |
+| `app/src/data/repositories/questRepository.ts` | `upsertProgress`, `getAll`, `getById` |
+| `app/src/data/repositories/rewardRepository.ts` | `grantItem`, `grantTitle`, `listItems`, `listTitles` (all idempotent) |
+| `app/src/__tests__/questRepositories.test.ts` | 10 tests: quest upsert/read, reward idempotency, list operations |
+| `app/src/services/questService.ts` | `evaluateAndPersistQuests(today)`, `getQuestDisplayState()` |
+| `app/src/ui/quests/QuestsView.tsx` | Quest list with progress fractions, completed state, reward name; items + titles sections |
+| `app/src/App.tsx` | `'quests'` view; `evaluateAndPersistQuests` called on log save; Quests nav button |
+
+### Test results
+
+```
+packages/engine — 188 tests (19 new in Phase 9)   ✓ PASS
+app             — 128 tests (10 new in Phase 9)    ✓ PASS
+Total: 316 tests
+```
+
+### Key decisions
+
+- **3 quests implemented, 3 deferred**: `survive_baseline`, `wise_regression`, and `good_swap` are all evaluable from existing `WorkoutLog` fields (source, actualDayType, status, difficulty). The three exercise-count quests (Enter the Armor Foundry/10 ABC sets, The Hundred Swings/100 swings at 24 kg, The Push-up Bureaucracy/100 push-ups) require structured `actualWorkout` data that doesn't exist yet — deferred with a comment in `questDefinitions.ts`.
+
+- **Quest evaluation as a pure switch over IDs**: `evaluateQuestProgress(questId, logs)` uses a switch rather than storing evaluation logic on the definition object. This keeps the definition data-only and the evaluation behavior centrally located — easier to test, easier to add new quests.
+
+- **Idempotent grants via existence check**: `rewardRepository.grantItem/grantTitle` checks `db.items.get(id)` before `add`. If a reward already exists it's silently ignored. The idempotency guard is in the repository, not the service — the service-level `alreadyCompleted` flag prevents re-triggering, but the repo guard is the final safety net.
+
+- **Dexie version(2) with version(1) preserved**: Adding `.version(2).stores({quests:'id', items:'id', titles:'id'})` alongside the unchanged version(1) block is required for Dexie's migration machinery. The db test was updated to reflect version 2 and 10 tables.
+
+- **questService fetches its own logs**: `evaluateAndPersistQuests(today)` calls `workoutLogRepository.listRecent(500)` internally. This keeps the App.tsx call site simple (just passes `today`) and avoids threading logs through the call chain.
+
+- **No cosmetic rewards have mechanical effects**: Verified by function signatures — `getQuestDisplayState()` returns display-only data; nothing in `questService` calls into the council, eligibility, or stat gain functions.
+
+---
+
+*Phase 9 complete. Next: Phase 10.*
