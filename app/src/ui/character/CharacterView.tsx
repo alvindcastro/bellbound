@@ -38,6 +38,17 @@ export default function CharacterView() {
         </select>
       </p>
       <p className="flavour-message">{cls.flavourMessage}</p>
+      <section>
+        <h3>Stats</h3>
+        <ul>
+          <li>Strength: {character.stats.strength}</li>
+          <li>Conditioning: {character.stats.conditioning}</li>
+          <li>Control: {character.stats.control}</li>
+          <li>Consistency: {character.stats.consistency}</li>
+          <li>Recovery: {character.stats.recovery}</li>
+          <li>Judgment: {character.stats.judgment}</li>
+        </ul>
+      </section>
     </div>
   );
 }

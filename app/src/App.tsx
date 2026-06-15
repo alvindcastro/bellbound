@@ -9,6 +9,7 @@ import { workoutTemplateRepository } from './data/repositories/workoutTemplateRe
 import { workoutLogRepository } from './data/repositories/workoutLogRepository.js';
 import { statusEffectRepository } from './data/repositories/statusEffectRepository.js';
 import { createAndPersistEffectsFromLog } from './services/effectService.js';
+import { applyStatGainsFromLog } from './services/statService.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
 import RecentLogs from './ui/log/RecentLogs.js';
@@ -78,6 +79,7 @@ export default function App() {
             setTodayLog(log);
             if (log) {
               await createAndPersistEffectsFromLog(log);
+              await applyStatGainsFromLog(log);
             }
             await loadActiveEffects();
             if (resolvedWorkout) {

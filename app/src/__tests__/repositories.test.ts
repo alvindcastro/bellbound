@@ -256,4 +256,28 @@ describe('characterRepository', () => {
     const character = await characterRepository.getPlayer();
     expect(character?.className).toBe('pressomancer');
   });
+
+  it('applyStatDeltas adds deltas to existing stats', async () => {
+    await db.characters.add(sampleCharacterRow);
+    await characterRepository.applyStatDeltas('player-1', { strength: 2, consistency: 1 });
+    const after = await characterRepository.getPlayer();
+    expect(after?.stats.strength).toBe(2);
+    expect(after?.stats.consistency).toBe(1);
+    expect(after?.stats.conditioning).toBe(0); // unchanged
+    expect(after?.stats.judgment).toBe(0);     // unchanged
+  });
+
+  it('applyStatDeltas is additive across multiple calls', async () => {
+    await db.characters.add(sampleCharacterRow);
+    await characterRepository.applyStatDeltas('player-1', { strength: 1 });
+    await characterRepository.applyStatDeltas('player-1', { strength: 1, recovery: 3 });
+    const after = await characterRepository.getPlayer();
+    expect(after?.stats.strength).toBe(2);
+    expect(after?.stats.recovery).toBe(3);
+  });
+
+  it('applyStatDeltas does nothing when userId not found', async () => {
+    // no character in DB
+    await expect(characterRepository.applyStatDeltas('nobody', { strength: 1 })).resolves.not.toThrow();
+  });
 });
