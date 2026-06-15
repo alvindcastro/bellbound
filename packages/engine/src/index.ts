@@ -9,3 +9,5 @@ export * from './flavour/zones.js';
 export * from './flavour/encounterText.js';
 export * from './flavour/completionMessages.js';
 export * from './flavour/characterClasses.js';
+export * from './council/eligibility.js';
+export * from './council/council.js';
