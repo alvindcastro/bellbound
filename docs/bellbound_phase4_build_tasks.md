@@ -47,11 +47,11 @@ Discipline unchanged. Commit on green.
 - [x] Show, at minimum: the planned week, the actual sessions, extras and misses, and a neutral summary. Mirror the v4 example structure but keep it factual.
 - [x] No guilt copy. A missed session is stated neutrally, not scolded. Rest is shown as part of the plan, not a gap.
 - [x] Exclude from the rendered report at this phase: progression eligibility, ascension status, detailed fatigue or recovery warnings, AI-generated prose. These are later phases.
-- [ ] Verify rendering manually in the browser.
+- [x] Verify rendering manually in the browser.
 
 ## Section D: Persistence and Offline
 
-- [ ] Confirm the report computes correctly offline from local data.
+- [x] Confirm the report computes correctly offline from local data.
 - [x] No network calls introduced in Phase 4.
 
 ## Section E: Phase 4 Done When
@@ -61,8 +61,8 @@ Discipline unchanged. Commit on green.
 - [x] The report avoids guilt copy entirely.
 - [x] The window and aggregation functions are pure and test-first; classification is reused from Phase 2, not duplicated.
 - [x] The report is independent of block length (always the last 7 days).
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 4 commit message.
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 4 commit message.
 
 ---
 
