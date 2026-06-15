@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { Block, WorkoutLog, ResolvedWorkout, Recommendation } from '@bellbound/engine';
+import type { Block, WorkoutLog, ResolvedWorkout, Recommendation, StatusEffect } from '@bellbound/engine';
 import { resolveWorkoutAtTier } from '@bellbound/engine';
 import { getRecommendationForTemplate } from './services/councilService.js';
 import { resolveToday } from './services/todayService.js';
@@ -7,14 +7,17 @@ import type { TodayResult } from './services/todayService.js';
 import { blockRepository } from './data/repositories/blockRepository.js';
 import { workoutTemplateRepository } from './data/repositories/workoutTemplateRepository.js';
 import { workoutLogRepository } from './data/repositories/workoutLogRepository.js';
+import { statusEffectRepository } from './data/repositories/statusEffectRepository.js';
+import { createAndPersistEffectsFromLog } from './services/effectService.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
 import RecentLogs from './ui/log/RecentLogs.js';
 import WeeklyHistory from './ui/history/WeeklyHistory.js';
 import WeeklyReportScreen from './ui/review/WeeklyReportScreen.js';
 import CharacterView from './ui/character/CharacterView.js';
+import DailyContextForm from './ui/daily/DailyContextForm.js';
 
-type AppView = 'today' | 'log' | 'recent' | 'history' | 'review' | 'character';
+type AppView = 'today' | 'log' | 'recent' | 'history' | 'review' | 'character' | 'daily';
 
 export default function App() {
   const today = new Date().toISOString().slice(0, 10);
@@ -24,6 +27,13 @@ export default function App() {
   const [resolvedWorkout, setResolvedWorkout] = useState<ResolvedWorkout | null>(null);
   const [todayLog, setTodayLog] = useState<WorkoutLog | null>(null);
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
+  const [activeEffects, setActiveEffects] = useState<StatusEffect[]>([]);
+
+  async function loadActiveEffects() {
+    // UI shows stored effects; expiry evaluation is handled in councilService
+    const effects = await statusEffectRepository.listAll();
+    setActiveEffects(effects);
+  }
 
   useEffect(() => {
     Promise.all([
@@ -31,13 +41,15 @@ export default function App() {
       blockRepository.getActiveBlock(),
       workoutTemplateRepository.getById('dkbs'),
       workoutLogRepository.getByDate(today),
-    ]).then(([result, block, template, log]) => {
+      statusEffectRepository.listAll(),
+    ]).then(([result, block, template, log, effects]) => {
       setTodayResult(result);
       setActiveBlock(block);
       if (block && template) {
         setResolvedWorkout(resolveWorkoutAtTier(template, block.baselineTier));
       }
       setTodayLog(log);
+      setActiveEffects(effects);
     });
   }, [today]);
 
@@ -57,10 +69,35 @@ export default function App() {
             onSave={async () => {
               const log = await workoutLogRepository.getByDate(today);
               setTodayLog(log);
+              if (log) {
+                await createAndPersistEffectsFromLog(log);
+              }
+              await loadActiveEffects();
               if (resolvedWorkout) {
                 const rec = await getRecommendationForTemplate(resolvedWorkout.templateId);
                 setRecommendation(rec);
               }
+              setView('today');
+            }}
+            onCancel={() => setView('today')}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  if (view === 'daily') {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <span className="app-title">Bellbound</span>
+          <button onClick={() => setView('today')}>Cancel</button>
+        </header>
+        <main>
+          <DailyContextForm
+            date={today}
+            onSave={async () => {
+              await loadActiveEffects();
               setView('today');
             }}
             onCancel={() => setView('today')}
@@ -131,6 +168,7 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <span className="app-title">Bellbound</span>
+        <button onClick={() => setView('daily')}>Daily</button>
         <button onClick={() => setView('recent')}>Log History</button>
         <button onClick={() => setView('history')}>Week</button>
         <button onClick={() => setView('review')}>Report</button>
@@ -142,6 +180,7 @@ export default function App() {
           todayResult={todayResult}
           todayLog={todayLog}
           recommendation={recommendation}
+          activeEffects={activeEffects}
           onLogWorkout={() => setView('log')}
         />
       </main>

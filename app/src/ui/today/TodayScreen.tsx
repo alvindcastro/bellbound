@@ -1,5 +1,5 @@
 import type { TodayResult } from '../../services/todayService.js';
-import type { ResolvedMovement, WorkoutLog, Recommendation, RecommendationKind } from '@bellbound/engine';
+import type { ResolvedMovement, WorkoutLog, Recommendation, RecommendationKind, StatusEffect } from '@bellbound/engine';
 import { classifyDay, getEncounterText, getCompletionMessage } from '@bellbound/engine';
 
 const RECOMMENDATION_LABEL: Record<RecommendationKind, string> = {
@@ -18,6 +18,7 @@ interface Props {
   todayResult: TodayResult | null;
   todayLog: WorkoutLog | null;
   recommendation: Recommendation | null;
+  activeEffects: StatusEffect[];
   onLogWorkout: () => void;
 }
 
@@ -47,7 +48,7 @@ const DAY_MESSAGE: Record<string, string> = {
   test: 'Test day — logging coming in a later phase.',
 };
 
-export default function TodayScreen({ date, todayResult, todayLog, recommendation, onLogWorkout }: Props) {
+export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, onLogWorkout }: Props) {
   if (todayResult === null) {
     return <p className="loading">Loading…</p>;
   }
@@ -80,6 +81,14 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
         <p className="completion-message">
           {getCompletionMessage('kb', todayLog!.status)}
         </p>
+      )}
+      {activeEffects.length > 0 && (
+        <div className="active-effects">
+          <p className="section-label">Recovery effects active:</p>
+          <ul>
+            {activeEffects.map(e => <li key={e.id}>{e.name}</li>)}
+          </ul>
+        </div>
       )}
       {alreadyLogged && recommendation && (
         <div className="council-recommendation">

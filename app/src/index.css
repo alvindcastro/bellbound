@@ -212,3 +212,17 @@ body {
   gap: 6px;
   font-size: 0.9rem;
 }
+
+.active-effects {
+  margin: 0.5rem 0;
+  font-size: 0.9em;
+  color: #5a4a3a;
+}
+.active-effects ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.25rem 0 0 0;
+}
+.active-effects li::before {
+  content: '– ';
+}
