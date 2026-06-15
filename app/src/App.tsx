@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import type { Block, WorkoutLog } from '@bellbound/engine';
-import { resolveToday, resolveTierWorkout } from './services/todayService.js';
-import type { TodayResult, ResolvedWorkout } from './services/todayService.js';
+import type { Block, WorkoutLog, ResolvedWorkout } from '@bellbound/engine';
+import { resolveWorkoutAtTier } from '@bellbound/engine';
+import { resolveToday } from './services/todayService.js';
+import type { TodayResult } from './services/todayService.js';
 import { blockRepository } from './data/repositories/blockRepository.js';
 import { workoutTemplateRepository } from './data/repositories/workoutTemplateRepository.js';
 import { workoutLogRepository } from './data/repositories/workoutLogRepository.js';
@@ -30,7 +31,7 @@ export default function App() {
       setTodayResult(result);
       setActiveBlock(block);
       if (block && template) {
-        setResolvedWorkout(resolveTierWorkout(template, block.baselineTier));
+        setResolvedWorkout(resolveWorkoutAtTier(template, block.baselineTier));
       }
       setTodayLog(log);
     });

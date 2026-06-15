@@ -78,13 +78,52 @@ describe('seed', () => {
     expect(tmpl?.movements[4]?.load).toBe(20);
   });
 
+  it('seeds Armor Building Complex with 4 tiers and 3 movements', async () => {
+    await seed();
+    const t = await db.workoutTemplates.get('abc');
+    expect(t).toBeDefined();
+    expect(Object.keys(t!.tiers)).toHaveLength(4);
+    expect(t!.movements).toHaveLength(3);
+  });
+
+  it('seeds Single KB Strength with 3 tiers and 4 movements', async () => {
+    await seed();
+    const t = await db.workoutTemplates.get('skbs');
+    expect(t).toBeDefined();
+    expect(Object.keys(t!.tiers)).toHaveLength(3);
+    expect(t!.movements).toHaveLength(4);
+  });
+
+  it('seeds Swing / Push-up Conditioning with 4 tiers and 2 movements', async () => {
+    await seed();
+    const t = await db.workoutTemplates.get('swing-conditioning');
+    expect(t).toBeDefined();
+    expect(Object.keys(t!.tiers)).toHaveLength(4);
+    expect(t!.movements).toHaveLength(2);
+  });
+
+  it('seeds Rest / Recovery with empty tiers and no movements', async () => {
+    await seed();
+    const t = await db.workoutTemplates.get('recovery');
+    expect(t).toBeDefined();
+    expect(Object.keys(t!.tiers)).toHaveLength(0);
+    expect(t!.movements).toHaveLength(0);
+  });
+
+  it('re-seeding does not duplicate templates', async () => {
+    await seed();
+    await seed();
+    const all = await db.workoutTemplates.toArray();
+    expect(all).toHaveLength(5); // dkbs, abc, skbs, swing-conditioning, recovery
+  });
+
   it('is idempotent: calling seed twice does not duplicate records', async () => {
     await seed('2026-06-14');
     await seed('2026-06-14');
     expect(await db.characters.count()).toBe(1);
     expect(await db.weekTemplates.count()).toBe(1);
     expect(await db.blocks.count()).toBe(1);
-    expect(await db.workoutTemplates.count()).toBe(1);
+    expect(await db.workoutTemplates.count()).toBe(5);
   });
 
   it('does not overwrite data that already exists', async () => {

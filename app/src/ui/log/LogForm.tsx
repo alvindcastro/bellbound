@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import type { Difficulty, DayType } from '@bellbound/engine';
-import type { ResolvedWorkout } from '../../services/todayService.js';
+import type { Difficulty, DayType, ResolvedWorkout } from '@bellbound/engine';
 import type { WorkoutContext, LogFormInputs } from '../../services/buildWorkoutLog.js';
 import { buildWorkoutLog } from '../../services/buildWorkoutLog.js';
 import { saveLogAndUpdateCounter } from '../../services/sessionCounterService.js';

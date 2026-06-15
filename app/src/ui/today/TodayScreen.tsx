@@ -1,5 +1,5 @@
-import type { TodayResult, ResolvedMovement } from '../../services/todayService.js';
-import type { WorkoutLog } from '@bellbound/engine';
+import type { TodayResult } from '../../services/todayService.js';
+import type { ResolvedMovement, WorkoutLog } from '@bellbound/engine';
 import { classifyDay } from '@bellbound/engine';
 
 interface Props {

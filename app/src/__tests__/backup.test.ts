@@ -43,8 +43,9 @@ describe('serializeDb', () => {
     expect(backup.tables.blocks).toHaveLength(1);
     expect(backup.tables.blocks[0]?.status).toBe('active');
     expect(backup.tables.weekTemplates).toHaveLength(1);
-    expect(backup.tables.workoutTemplates).toHaveLength(1);
-    expect(backup.tables.workoutTemplates[0]?.name).toBe('Double KB Strength');
+    expect(backup.tables.workoutTemplates).toHaveLength(5);
+    const dkbs = backup.tables.workoutTemplates.find((t: { name: string }) => t.name === 'Double KB Strength');
+    expect(dkbs).toBeDefined();
   });
 
   it('exports empty tables as empty arrays', async () => {
@@ -69,7 +70,7 @@ describe('deserializeAndRestore', () => {
     expect(await db.characters.count()).toBe(1);
     expect(await db.blocks.count()).toBe(1);
     expect(await db.weekTemplates.count()).toBe(1);
-    expect(await db.workoutTemplates.count()).toBe(1);
+    expect(await db.workoutTemplates.count()).toBe(5);
     expect((await db.characters.get('player-1'))?.characterName).toBe('Adventurer');
     expect((await db.workoutTemplates.get('dkbs'))?.tiers['1']?.rounds).toBe(4);
   });

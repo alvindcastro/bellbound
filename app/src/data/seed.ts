@@ -65,5 +65,75 @@ export async function seed(today = new Date().toISOString().slice(0, 10)): Promi
         { name: 'Farmer Carry', duration: 30, load: 20 },
       ],
     });
+
+    await db.workoutTemplates.add({
+      id: 'abc',
+      name: 'Armor Building Complex',
+      zoneName: 'Strength-Conditioning Zone',
+      category: 'kettlebell',
+      defaultRest: 60,
+      tierStep: '+2 sets per tier',
+      tiers: {
+        '1': { rounds: 10 },
+        '2': { rounds: 12 },
+        '3': { rounds: 15 },
+        '4': { rounds: 20 },
+      },
+      movements: [
+        { name: 'Double Clean', reps: 1 },
+        { name: 'Press', reps: 1 },
+        { name: 'Front Squat', reps: 1 },
+      ],
+    });
+
+    await db.workoutTemplates.add({
+      id: 'skbs',
+      name: 'Single KB Strength',
+      zoneName: 'Strength Zone',
+      category: 'kettlebell',
+      defaultRest: 90,
+      tierStep: '+1 round per tier',
+      tiers: {
+        '1': { rounds: 3 },
+        '2': { rounds: 4 },
+        '3': { rounds: 5 },
+      },
+      movements: [
+        { name: 'Clean', reps: 5, load: 16 },
+        { name: 'Press', reps: 3, load: 16 },
+        { name: 'Front Squat', reps: 5, load: 16 },
+        { name: 'Push-ups', reps: 10 },
+      ],
+    });
+
+    await db.workoutTemplates.add({
+      id: 'swing-conditioning',
+      name: 'Swing / Push-up Conditioning',
+      zoneName: 'Conditioning Zone',
+      category: 'kettlebell',
+      defaultRest: 30,
+      tierStep: '+1 set per tier',
+      tiers: {
+        '1': { rounds: 5 },
+        '2': { rounds: 6 },
+        '3': { rounds: 7 },
+        '4': { rounds: 8 },
+      },
+      movements: [
+        { name: 'Two-hand Swing', reps: 10, load: 24 },
+        { name: 'Push-up', reps: 10 },
+      ],
+    });
+
+    await db.workoutTemplates.add({
+      id: 'recovery',
+      name: 'Rest / Recovery',
+      zoneName: 'Recovery',
+      category: 'recovery',
+      defaultRest: 0,
+      tierStep: 'no progression',
+      tiers: {},
+      movements: [],
+    });
   });
 }

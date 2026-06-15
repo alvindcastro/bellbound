@@ -7,3 +7,4 @@ export type { Signals } from './signals.js';
 export type { WorkoutLog } from './workoutLog.js';
 export type { DailyContext } from './dailyContext.js';
 export type { StatusEffect } from './statusEffect.js';
+export type { ResolvedMovement, ResolvedWorkout } from './resolvedWorkout.js';
