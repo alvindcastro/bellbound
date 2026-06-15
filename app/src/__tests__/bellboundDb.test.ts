@@ -6,12 +6,12 @@ afterEach(async () => {
 });
 
 describe('bellboundDb schema', () => {
-  it('opens at version 3', async () => {
+  it('opens at version 4', async () => {
     await db.open();
-    expect(db.verno).toBe(3);
+    expect(db.verno).toBe(4);
   });
 
-  it('exposes all eleven tables', async () => {
+  it('exposes all twelve tables', async () => {
     await db.open();
     const names = db.tables.map((t) => t.name).sort();
     expect(names).toEqual([
@@ -20,6 +20,7 @@ describe('bellboundDb schema', () => {
       'dailyContext',
       'items',
       'lessons',
+      'lore',
       'quests',
       'statusEffects',
       'titles',
@@ -86,5 +87,13 @@ describe('bellboundDb schema', () => {
   it('lessons keyed by id', async () => {
     await db.open();
     expect(db.table('lessons').schema.primKey.name).toBe('id');
+  });
+
+  it('lore keyed by id, indexed by logId', async () => {
+    await db.open();
+    const schema = db.table('lore').schema;
+    expect(schema.primKey.name).toBe('id');
+    const indexNames = schema.indexes.map((i) => i.name);
+    expect(indexNames).toContain('logId');
   });
 });

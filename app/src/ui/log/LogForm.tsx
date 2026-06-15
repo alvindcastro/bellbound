@@ -3,6 +3,8 @@ import type { Difficulty, DayType, ResolvedWorkout } from '@bellbound/engine';
 import type { WorkoutContext, LogFormInputs } from '../../services/buildWorkoutLog.js';
 import { buildWorkoutLog } from '../../services/buildWorkoutLog.js';
 import { saveLogAndUpdateCounter } from '../../services/sessionCounterService.js';
+import { isAiEnabled, getAiClient } from '../../data/ai/index.js';
+import type { ParsedNote } from '../../data/ai/index.js';
 
 interface Props {
   date: string;
@@ -38,6 +40,7 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
   const [breathless, setBreathless] = useState(false);
   const [gripCooked, setGripCooked] = useState(false);
   const [legsSore, setLegsSore] = useState(false);
+  const [parsedSuggestion, setParsedSuggestion] = useState<ParsedNote | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +72,24 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleAiParse() {
+    const client = getAiClient({ online: navigator.onLine });
+    const result = await client.parseNote(note);
+    if (result !== null) {
+      setParsedSuggestion(result);
+    }
+  }
+
+  function acceptParsedSuggestion() {
+    if (!parsedSuggestion) return;
+    setDifficulty(parsedSuggestion.difficulty);
+    setPressGrindy(parsedSuggestion.pressGrindy);
+    setBreathless(parsedSuggestion.breathless);
+    setGripCooked(parsedSuggestion.gripCooked);
+    setLegsSore(parsedSuggestion.legsSore);
+    setParsedSuggestion(null);
   }
 
   return (
@@ -158,7 +179,24 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
           onChange={(e) => setNote(e.target.value)}
           placeholder="How did it feel?"
         />
+        {isAiEnabled() && note.trim().length > 0 && (
+          <button type="button" className="btn" onClick={handleAiParse}>Parse note with AI</button>
+        )}
       </div>
+
+      {parsedSuggestion && (
+        <div className="form-group">
+          <p>AI suggestion: Difficulty: {parsedSuggestion.difficulty}, Signals: {[
+            parsedSuggestion.pressGrindy && 'press grindy',
+            parsedSuggestion.breathless && 'breathless',
+            parsedSuggestion.gripCooked && 'grip cooked',
+            parsedSuggestion.legsSore && 'legs sore',
+          ].filter(Boolean).join(', ') || 'none'}</p>
+          <button type="button" className="btn-primary" onClick={acceptParsedSuggestion}>Accept</button>
+          {' '}
+          <button type="button" className="btn" onClick={() => setParsedSuggestion(null)}>Dismiss</button>
+        </div>
+      )}
 
       <div className="form-actions">
         <button type="submit" className="btn-primary" disabled={saving}>

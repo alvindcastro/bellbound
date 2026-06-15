@@ -23,6 +23,8 @@ import CharacterView from './ui/character/CharacterView.js';
 import DailyContextForm from './ui/daily/DailyContextForm.js';
 import QuestsView from './ui/quests/QuestsView.js';
 import { evaluateAndApplyAscension, type AscensionOutcome } from './services/ascensionService.js';
+import { generateAndStoreLore } from './services/loreService.js';
+import { getAiClient } from './data/ai/index.js';
 
 type AppView = 'today' | 'log' | 'test' | 'ascension' | 'activity' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
 
@@ -137,6 +139,7 @@ export default function App() {
               await createAndPersistEffectsFromLog(log);
               await applyStatGainsFromLog(log);
               await evaluateAndPersistQuests(today);
+              await generateAndStoreLore(log, getAiClient({ online: typeof navigator !== 'undefined' ? navigator.onLine : false }));
             }
             await loadActiveEffects();
             if (resolvedWorkout) {

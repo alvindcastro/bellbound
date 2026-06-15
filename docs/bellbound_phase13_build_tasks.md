@@ -37,62 +37,62 @@ Discipline: TDD applies to the Go backend too (it is logic, and Go has first-cla
 
 ## Section A: Go Backend Proxy (server/)
 
-- [ ] Create the `server/` directory as a Go module (the sibling reserved since Phase 0). Open it in GoLand.
-- [ ] RED first: write failing Go tests for an HTTP handler that accepts a chat/parse request from the client, attaches the Anthropic key from a server-side env var, forwards to the Anthropic API, and returns the response. Then implement.
-- [ ] The key lives only on the server, in an env var (`.env` for local, Fly secret in production). It is never sent to or stored in the client. Test that the handler reads the key from env and that the key never appears in logs.
-- [ ] Add minimal auth on the proxy endpoint (a token the client sends) so the proxy is not an open relay. Test unauthorized requests are rejected.
-- [ ] Add a health endpoint. Keep the service small and single-purpose: it proxies AI calls and (optionally, later) accepts backup pushes. It is not a data backend; the source of truth stays in the client's IndexedDB.
-- [ ] Write a Dockerfile / Fly config for deployment to Fly.io (matching the CiteSearch adapter / ask-banner.fly.dev pattern). Deployment itself can be verified manually.
+- [x] Create the `server/` directory as a Go module (the sibling reserved since Phase 0). Open it in GoLand.
+- [x] RED first: write failing Go tests for an HTTP handler that accepts a chat/parse request from the client, attaches the Anthropic key from a server-side env var, forwards to the Anthropic API, and returns the response. Then implement.
+- [x] The key lives only on the server, in an env var (`.env` for local, Fly secret in production). It is never sent to or stored in the client. Test that the handler reads the key from env and that the key never appears in logs.
+- [x] Add minimal auth on the proxy endpoint (a token the client sends) so the proxy is not an open relay. Test unauthorized requests are rejected.
+- [x] Add a health endpoint. Keep the service small and single-purpose: it proxies AI calls and (optionally, later) accepts backup pushes. It is not a data backend; the source of truth stays in the client's IndexedDB.
+- [x] Write a Dockerfile / Fly config for deployment to Fly.io (matching the CiteSearch adapter / ask-banner.fly.dev pattern). Deployment itself can be verified manually.
 
 ## Section B: AI Client (frontend)
 
-- [ ] Replace the Phase 0 no-op AI implementation's online path with a real client that calls the Go proxy (not the Anthropic API directly; the client has no key).
-- [ ] RED first: write failing tests that the client selects the online implementation when online and the no-op when offline or when AI is disabled by a setting. Then implement.
-- [ ] Add an AI on/off setting (default off or user-controlled). When off, the app uses manual toggles and deterministic logic exclusively, exactly as Phases 6 to 12 do.
-- [ ] The client never holds the Anthropic key. Confirm by inspection and a test that no key is referenced client-side.
+- [x] Replace the Phase 0 no-op AI implementation's online path with a real client that calls the Go proxy (not the Anthropic API directly; the client has no key).
+- [x] RED first: write failing tests that the client selects the online implementation when online and the no-op when offline or when AI is disabled by a setting. Then implement.
+- [x] Add an AI on/off setting (default off or user-controlled). When off, the app uses manual toggles and deterministic logic exclusively, exactly as Phases 6 to 12 do.
+- [x] The client never holds the Anthropic key. Confirm by inspection and a test that no key is referenced client-side.
 
 ## Section C: Note Parsing Into the Fixed Schema
 
-- [ ] The AI parses a freeform workout note into the SAME fixed schema captured manually since Phase 6: the difficulty enum (easy/normal/hard/failed) and the four signal flags (pressGrindy, breathless, gripCooked, legsSore).
-- [ ] RED first: write failing tests for the parse-result validator: given the AI's structured output, validate it strictly against the enum and the four booleans; reject anything off-schema; on rejection, fall back to manual/default values. Then implement.
-- [ ] The parsed values are a suggestion the user confirms before saving. RED first: test that parsed values populate the log form for review and are not silently committed. Then implement the review step.
-- [ ] The parser's target is fixed and small (one enum plus four booleans), which is why the deterministic engine never depends on it. Confirm the engine still receives the same schema whether the values came from manual toggles or AI parsing.
+- [x] The AI parses a freeform workout note into the SAME fixed schema captured manually since Phase 6: the difficulty enum (easy/normal/hard/failed) and the four signal flags (pressGrindy, breathless, gripCooked, legsSore).
+- [x] RED first: write failing tests for the parse-result validator: given the AI's structured output, validate it strictly against the enum and the four booleans; reject anything off-schema; on rejection, fall back to manual/default values. Then implement.
+- [x] The parsed values are a suggestion the user confirms before saving. RED first: test that parsed values populate the log form for review and are not silently committed. Then implement the review step.
+- [x] The parser's target is fixed and small (one enum plus four booleans), which is why the deterministic engine never depends on it. Confirm the engine still receives the same schema whether the values came from manual toggles or AI parsing.
 
 ## Section D: Lore Prose From Structured Facts
 
-- [ ] The AI generates lore/flavour prose from structured facts (the log, the classification, the recommendation), never inventing facts or advice.
-- [ ] RED first: write tests that lore generation is fed only structured data and that its output is stored as a LoreEntry linked to the log, separate from the factual record. Then implement.
-- [ ] Lore is cosmetic. It does not change any number, recommendation, stat, or status effect. Confirm by test that generating lore does not mutate the log, stats, or recommendations.
-- [ ] If offline or AI disabled, lore falls back to the deterministic/templated flavour from Phase 5. The app never blocks on lore.
+- [x] The AI generates lore/flavour prose from structured facts (the log, the classification, the recommendation), never inventing facts or advice.
+- [x] RED first: write tests that lore generation is fed only structured data and that its output is stored as a LoreEntry linked to the log, separate from the factual record. Then implement.
+- [x] Lore is cosmetic. It does not change any number, recommendation, stat, or status effect. Confirm by test that generating lore does not mutate the log, stats, or recommendations.
+- [x] If offline or AI disabled, lore falls back to the deterministic/templated flavour from Phase 5. The app never blocks on lore.
 
 ## Section E: Guardrails (AI Is a Scribe, Never an Authority)
 
-- [ ] The AI must not: generate workouts, recommend progression, override the Council, give medical advice, invent recovery certainty, or apply guilt. RED first: structure the integration so the AI's output is confined to (a) parsed schema values for user confirmation and (b) cosmetic lore. It is never wired into the recommendation, progression, stat, or status logic. Add tests asserting these paths do not consume AI output.
-- [ ] The deterministic engine remains the source of truth. The AI annotates and flavors; it does not decide.
-- [ ] Verify the full app works with AI disabled (toggle off, or offline): logging, recommendations, recovery, stats, ascension, all function exactly as before. This is a release gate, tested and manually confirmed.
+- [x] The AI must not: generate workouts, recommend progression, override the Council, give medical advice, invent recovery certainty, or apply guilt. RED first: structure the integration so the AI's output is confined to (a) parsed schema values for user confirmation and (b) cosmetic lore. It is never wired into the recommendation, progression, stat, or status logic. Add tests asserting these paths do not consume AI output.
+- [x] The deterministic engine remains the source of truth. The AI annotates and flavors; it does not decide.
+- [x] Verify the full app works with AI disabled (toggle off, or offline): logging, recommendations, recovery, stats, ascension, all function exactly as before. This is a release gate, tested and manually confirmed.
 
 ## Section F: README and Env Updates
 
-- [ ] Update the README: add a Configuration section for the backend `.env` (Anthropic key, proxy auth token) and a server run mode (run the Go proxy locally, deploy to Fly.io). The frontend remains client-only; only the new backend has secrets.
-- [ ] Document that the Anthropic key lives server-side only, never in the client, and that the app is fully usable with AI disabled and no backend running.
-- [ ] Add the `server/` directory to the documented repo layout (it now exists).
+- [x] Update the README: add a Configuration section for the backend `.env` (Anthropic key, proxy auth token) and a server run mode (run the Go proxy locally, deploy to Fly.io). The frontend remains client-only; only the new backend has secrets.
+- [x] Document that the Anthropic key lives server-side only, never in the client, and that the app is fully usable with AI disabled and no backend running.
+- [x] Add the `server/` directory to the documented repo layout (it now exists).
 
 ## Section G: Persistence and Offline
 
-- [ ] Confirm the app is fully functional offline with AI disabled (the default path).
-- [ ] Confirm AI features degrade gracefully: offline or proxy-unreachable falls back to manual toggles and templated lore with no errors blocking the user.
-- [ ] The source of truth remains the client's IndexedDB; the backend does not become a data dependency.
+- [x] Confirm the app is fully functional offline with AI disabled (the default path).
+- [x] Confirm AI features degrade gracefully: offline or proxy-unreachable falls back to manual toggles and templated lore with no errors blocking the user.
+- [x] The source of truth remains the client's IndexedDB; the backend does not become a data dependency.
 
 ## Section H: Phase 13 Done When
 
-- [ ] A Go proxy on Fly.io forwards AI calls with the key server-side; the client never holds the key; unauthorized requests are rejected; the key never appears in logs. All tested.
-- [ ] The AI parses notes into the fixed difficulty+signals schema; output is validated and confirmed by the user before saving; invalid output falls back to manual values.
-- [ ] The AI generates cosmetic lore from structured facts only and never mutates logs, stats, recommendations, or status effects.
-- [ ] The AI is confined to parsing-for-confirmation and lore; it is never wired into recommendation, progression, stat, or status logic, proven by tests.
-- [ ] The app is fully functional with AI disabled or offline, verified as a release gate.
-- [ ] The README documents the backend env, the server run mode, and the key-server-side-only rule.
-- [ ] Backend and frontend logic both test-first; the deterministic engine unchanged and still pure.
-- [ ] Committed on green, pushed, with a clear Phase 13 commit message.
+- [x] A Go proxy on Fly.io forwards AI calls with the key server-side; the client never holds the key; unauthorized requests are rejected; the key never appears in logs. All tested.
+- [x] The AI parses notes into the fixed difficulty+signals schema; output is validated and confirmed by the user before saving; invalid output falls back to manual values.
+- [x] The AI generates cosmetic lore from structured facts only and never mutates logs, stats, recommendations, or status effects.
+- [x] The AI is confined to parsing-for-confirmation and lore; it is never wired into recommendation, progression, stat, or status logic, proven by tests.
+- [x] The app is fully functional with AI disabled or offline, verified as a release gate.
+- [x] The README documents the backend env, the server run mode, and the key-server-side-only rule.
+- [x] Backend and frontend logic both test-first; the deterministic engine unchanged and still pure.
+- [x] Committed on green, pushed, with a clear Phase 13 commit message.
 
 ---
 

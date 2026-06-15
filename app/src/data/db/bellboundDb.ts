@@ -124,6 +124,14 @@ export interface LessonRow {
   blockId: string;
 }
 
+export interface LoreRow {
+  id: string;
+  logId: string;
+  text: string;
+  generatedAt: string;
+  source: 'ai' | 'deterministic';
+}
+
 class BellboundDb extends Dexie {
   characters!: Table<CharacterRow, string>;
   blocks!: Table<BlockRow, string>;
@@ -136,6 +144,7 @@ class BellboundDb extends Dexie {
   items!: Table<ItemRow, string>;
   titles!: Table<TitleRow, string>;
   lessons!: Table<LessonRow, string>;
+  lore!: Table<LoreRow, string>;
 
   constructor() {
     super('bellbound');
@@ -155,6 +164,9 @@ class BellboundDb extends Dexie {
     });
     this.version(3).stores({
       lessons: 'id',
+    });
+    this.version(4).stores({
+      lore: 'id, logId',
     });
   }
 }

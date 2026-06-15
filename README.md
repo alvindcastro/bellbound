@@ -53,7 +53,34 @@ No native iOS or Android build. The app is installed to the home screen as a PWA
 
 ### 📋 Configuration
 
-There is no `.env` file in the early phases. The app is client-only and has no secrets to manage until the AI phase, when a Go proxy will hold the Anthropic key server-side (never in the client).
+#### Frontend
+
+No secrets in the frontend. Two optional Vite env vars tell the app where the Go proxy lives:
+
+```bash
+# app/.env.local  (create locally; never commit)
+VITE_AI_PROXY_URL=http://localhost:8080   # Go proxy URL (omit to keep AI disabled)
+VITE_AI_AUTH_TOKEN=your-app-token         # shared token the proxy checks; see server/.env
+```
+
+The Anthropic key is never in the frontend. AI is **disabled by default** and the app is fully usable without these vars.
+
+#### Backend (server/)
+
+The Go proxy reads secrets from environment variables. For local dev, create `server/.env` (not committed):
+
+```bash
+# server/.env
+ANTHROPIC_API_KEY=sk-ant-...   # Anthropic API key — server-side only, never sent to the client
+APP_TOKEN=your-app-token        # Auth token the frontend sends; must match VITE_AI_AUTH_TOKEN
+```
+
+For production on Fly.io, set these as Fly secrets:
+```bash
+fly secrets set ANTHROPIC_API_KEY=sk-ant-... APP_TOKEN=your-app-token
+```
+
+The Anthropic key lives **only on the server**. It is read from the env var, never logged, never returned to the client, and never committed to the repository.
 
 Tunable behaviour lives in one place, `packages/engine/src/config.ts`, the single source of truth for the engine:
 
@@ -87,7 +114,23 @@ Runs Vitest across the workspaces. All logic and data code is written test-first
 npm test
 ```
 
-#### 3. Production Build
+#### 3. Go Proxy (AI features)
+The Go proxy holds the Anthropic key server-side. It is optional — the app runs fully without it.
+
+```bash
+# Run locally
+cd server
+ANTHROPIC_API_KEY=sk-ant-... APP_TOKEN=your-token go run .
+
+# Deploy to Fly.io (after fly auth login and fly apps create)
+fly deploy --config server/fly.toml
+```
+
+The proxy exposes:
+- `POST /api/ai` — forwards requests to the Anthropic API; requires `Authorization: Bearer <APP_TOKEN>`
+- `GET /health` — returns `{"status":"ok"}`
+
+#### 4. Production Build
 Builds the static PWA assets for hosting.
 ```bash
 npm run build
@@ -105,10 +148,11 @@ bellbound/
         db/            # Dexie schema
         repositories/  # map Dexie rows <-> engine entities (only boundary that knows both)
         backup/        # export / import
+        ai/            # AI client: interface, no-op, proxy implementation, parse validator
         seed.ts        # first-run seed data
-      services/        # app-layer logic with I/O (e.g. todayService)
+      services/        # app-layer logic with I/O (e.g. todayService, loreService)
       ui/              # React components: today, log, review, character
-  server/              # reserved for the Go backend; not present yet
+  server/              # Go proxy: forwards AI calls server-side so the key never ships in the client
   docs/                # planning and design documents
 ```
 
