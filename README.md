@@ -176,7 +176,7 @@ Planning and design documents live in `docs/`.
 *   [bellbound_feature_build_plan_v1.md](./docs/bellbound_feature_build_plan_v1.md) - Phase-by-phase feature build plan (Phases 0 to 13).
 *   [bellbound_build_plan_updates_v1.md](./docs/bellbound_build_plan_updates_v1.md) - Corrections to the build plan.
 *   [bellbound_tech_stack_committed_pwa_v1.md](./docs/bellbound_tech_stack_committed_pwa_v1.md) - The committed tech stack and the backend deferral.
-*   [bellbound_phase0_build_tasks.md](./docs/bellbound_phase0_build_tasks.md) - Tickable Phase 0 tasks: foundation, data model, persistence.
-*   [bellbound_phase1_build_tasks.md](./docs/bellbound_phase1_build_tasks.md) - Tickable Phase 1 tasks: today's workout and logging.
+*   [bellbound_phase0_build_tasks.md](docs/builds/bellbound_phase0_build_tasks.md) - Tickable Phase 0 tasks: foundation, data model, persistence.
+*   [bellbound_phase1_build_tasks.md](docs/builds/bellbound_phase1_build_tasks.md) - Tickable Phase 1 tasks: today's workout and logging.
 *   [CLAUDE.md](./CLAUDE.md) - Guidance for Claude Code in this repo.
 *   [AGENTS.md](./AGENTS.md) - Instructions for coding agents.
