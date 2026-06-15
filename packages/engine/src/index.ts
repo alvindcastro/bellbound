@@ -25,3 +25,6 @@ export type { PermanentLesson } from './entities/lesson.js';
 export type { BlockTransitionResult } from './ascension/blockTransition.js';
 export { isTestEligibleForAscension } from './ascension/ascensionGuard.js';
 export { computeBlockTransition } from './ascension/blockTransition.js';
+export type { ChallengePathDefinition } from './entities/challengePath.js';
+export { CHALLENGE_PATH_DEFINITIONS } from './entities/challengePath.js';
+export { applyChallengePath } from './challenges/applyChallengePath.js';

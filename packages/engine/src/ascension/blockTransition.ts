@@ -37,6 +37,7 @@ export function computeBlockTransition(
     status: 'active',
     testGuardMinSessions: TEST_GUARD_MIN_SESSIONS,
     completedPlannedKbSessions: 0,
+    challengePath: null,
   };
 
   const lessonTemplate = LESSONS[(closingBlock.baselineTier - 1) % LESSONS.length]!;

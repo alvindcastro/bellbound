@@ -1,4 +1,4 @@
-export type { DayType, Difficulty, WorkoutSource, ExpiryType, BlockStatus } from './enums.js';
+export type { DayType, Difficulty, WorkoutSource, ExpiryType, BlockStatus, ChallengePath } from './enums.js';
 export type { CharacterStats, Character } from './character.js';
 export type { Block } from './block.js';
 export type { Weekday, WeekTemplate } from './weekTemplate.js';
@@ -11,3 +11,5 @@ export type { ResolvedMovement, ResolvedWorkout } from './resolvedWorkout.js';
 export type { RecommendationKind, Recommendation } from './recommendation.js';
 export type { QuestDefinition, QuestRewardDefinition } from './quest.js';
 export type { PermanentLesson } from './lesson.js';
+export type { ChallengePathDefinition } from './challengePath.js';
+export { CHALLENGE_PATH_DEFINITIONS } from './challengePath.js';

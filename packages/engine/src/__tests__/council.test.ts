@@ -202,6 +202,31 @@ describe('getCouncilRecommendation', () => {
 });
 
 // ---------------------------------------------------------------------------
+// challenge path has no effect on conservative-wins rule
+// ---------------------------------------------------------------------------
+describe('challenge path has no effect on conservative-wins rule', () => {
+  it('recovery blocker wins even when a challenge path is conceptually active — the council does not read the path', () => {
+    // The Council function signature does not accept a challengePath.
+    // This test proves by construction that the path cannot influence the outcome.
+    const logsWithGoodHistory = [makeLog('normal'), makeLog('easy')];
+    const activeEffects: StatusEffect[] = [
+      {
+        id: 'e1',
+        name: 'Breathless Fog',
+        source: 'breathless',
+        recommendationEffect: 'hold_conditioning',
+        expiryType: 'after_n_days',
+        expiryParam: 3,
+        createdDate: '2026-06-15',
+      },
+    ];
+    const result = getCouncilRecommendation(logsWithGoodHistory, activeEffects);
+    expect(result.kind).toBe('hold_conditioning');
+    // Path is irrelevant — the council function doesn't receive it and cannot see it.
+  });
+});
+
+// ---------------------------------------------------------------------------
 // getCouncilRecommendation — Priority 2: active status effects (slot 2)
 // ---------------------------------------------------------------------------
 describe('getCouncilRecommendation — slot 2 active effects', () => {

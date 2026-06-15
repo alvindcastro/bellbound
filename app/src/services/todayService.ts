@@ -1,5 +1,5 @@
 import type { Weekday, ResolvedMovement, ResolvedWorkout } from '@bellbound/engine';
-import { resolveWorkoutAtTier } from '@bellbound/engine';
+import { resolveWorkoutAtTier, applyChallengePath } from '@bellbound/engine';
 import { blockRepository } from '../data/repositories/blockRepository.js';
 import { weekTemplateRepository } from '../data/repositories/weekTemplateRepository.js';
 import { workoutTemplateRepository } from '../data/repositories/workoutTemplateRepository.js';
@@ -26,15 +26,23 @@ export function getWeekday(isoDate: string): Weekday {
 }
 
 export async function resolveToday(date: string): Promise<TodayResult> {
-  const weekTemplate = await weekTemplateRepository.getDefault();
+  const [weekTemplate, block] = await Promise.all([
+    weekTemplateRepository.getDefault(),
+    blockRepository.getActiveBlock(),
+  ]);
+
+  // Apply challenge path to get the effective day schedule for this block
+  const effectiveTemplate = (weekTemplate && block)
+    ? applyChallengePath(weekTemplate, block.challengePath)
+    : weekTemplate;
+
   const weekday = getWeekday(date);
-  const dayType = weekTemplate?.days[weekday] ?? 'rest';
+  const dayType = effectiveTemplate?.days[weekday] ?? 'rest';
 
   if (dayType !== 'kb') {
     return { dayType: dayType as 'rest' | 'free' | 'test' };
   }
 
-  const block = await blockRepository.getActiveBlock();
   const template = await workoutTemplateRepository.getById('dkbs');
 
   if (!block || !template) {

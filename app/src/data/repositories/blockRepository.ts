@@ -1,11 +1,12 @@
 import { db } from '../db/bellboundDb.js';
 import type { BlockRow } from '../db/bellboundDb.js';
-import type { Block, BlockStatus } from '@bellbound/engine';
+import type { Block, BlockStatus, ChallengePath } from '@bellbound/engine';
 
 function fromRow(row: BlockRow): Block {
   return {
     ...row,
     status: row.status as BlockStatus,
+    challengePath: (row.challengePath as ChallengePath) ?? null,
   };
 }
 
@@ -30,5 +31,9 @@ export const blockRepository = {
 
   async addBlock(block: Block): Promise<void> {
     await db.blocks.add({ ...block });
+  },
+
+  async setChallengePath(blockId: string, path: ChallengePath | null): Promise<void> {
+    await db.blocks.update(blockId, { challengePath: path });
   },
 };

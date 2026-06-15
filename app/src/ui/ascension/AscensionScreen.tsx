@@ -1,11 +1,17 @@
+import { useState } from 'react';
 import type { AscensionOutcome } from '../../services/ascensionService.js';
+import type { ChallengePath } from '@bellbound/engine';
+import { CHALLENGE_PATH_DEFINITIONS } from '@bellbound/engine';
 
 interface Props {
   outcome: AscensionOutcome;
-  onDismiss: () => void;
+  onComplete: (selectedPath: ChallengePath | null) => Promise<void>;
 }
 
-export default function AscensionScreen({ outcome, onDismiss }: Props) {
+export default function AscensionScreen({ outcome, onComplete }: Props) {
+  const [selectedPath, setSelectedPath] = useState<ChallengePath | null>(null);
+  const [completing, setCompleting] = useState(false);
+
   return (
     <div className="ascension-screen">
       {outcome.kind === 'guard_not_met' && (
@@ -33,10 +39,57 @@ export default function AscensionScreen({ outcome, onDismiss }: Props) {
           <p className="ascension-lesson-title">"{outcome.lesson.title}"</p>
           <p className="ascension-lesson-desc">{outcome.lesson.description}</p>
           <p className="ascension-note">Stats have been reset. The counter starts again.</p>
+          <section>
+            <p>Select a challenge path for the next block, or continue with the standard block.</p>
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  name="path"
+                  checked={selectedPath === null}
+                  onChange={() => setSelectedPath(null)}
+                />
+                {' '}No path — standard block
+              </label>
+              {CHALLENGE_PATH_DEFINITIONS.map(def => (
+                <label key={def.id}>
+                  <input
+                    type="radio"
+                    name="path"
+                    checked={selectedPath === def.id}
+                    onChange={() => setSelectedPath(def.id)}
+                  />
+                  {' '}{def.name} — {def.description}
+                </label>
+              ))}
+            </div>
+          </section>
         </div>
       )}
 
-      <button className="btn" onClick={onDismiss}>Continue</button>
+      {outcome.kind === 'ascended' ? (
+        <button
+          className="btn-primary"
+          disabled={completing}
+          onClick={async () => {
+            setCompleting(true);
+            await onComplete(selectedPath);
+          }}
+        >
+          {completing ? 'Saving…' : 'Begin next block'}
+        </button>
+      ) : (
+        <button
+          className="btn"
+          disabled={completing}
+          onClick={async () => {
+            setCompleting(true);
+            await onComplete(null);
+          }}
+        >
+          Continue
+        </button>
+      )}
     </div>
   );
 }

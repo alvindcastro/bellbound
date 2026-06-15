@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import type { Block, WorkoutLog, ResolvedWorkout, Recommendation, StatusEffect } from '@bellbound/engine';
-import { resolveWorkoutAtTier } from '@bellbound/engine';
+import type { Block, WorkoutLog, ResolvedWorkout, Recommendation, StatusEffect, ChallengePath } from '@bellbound/engine';
+import { resolveWorkoutAtTier, CHALLENGE_PATH_DEFINITIONS } from '@bellbound/engine';
 import { getRecommendationForTemplate } from './services/councilService.js';
 import { resolveToday } from './services/todayService.js';
 import type { TodayResult } from './services/todayService.js';
@@ -106,7 +106,14 @@ export default function App() {
       <AppShell nav={null}>
         <AscensionScreen
           outcome={ascensionOutcome}
-          onDismiss={() => {
+          onComplete={async (selectedPath: ChallengePath | null) => {
+            if (ascensionOutcome.kind === 'ascended' && selectedPath !== null) {
+              const newBlock = await blockRepository.getActiveBlock();
+              if (newBlock) {
+                await blockRepository.setChallengePath(newBlock.id, selectedPath);
+                setActiveBlock({ ...newBlock, challengePath: selectedPath });
+              }
+            }
             setAscensionOutcome(null);
             setView('today');
           }}
@@ -237,6 +244,11 @@ export default function App() {
         todayLog={todayLog}
         recommendation={recommendation}
         activeEffects={activeEffects}
+        challengePathName={
+          activeBlock?.challengePath
+            ? CHALLENGE_PATH_DEFINITIONS.find(d => d.id === activeBlock.challengePath)?.name
+            : undefined
+        }
         onLogWorkout={() => setView('log')}
         onLogActivity={() => setView('activity')}
         onAttemptTest={() => setView('test')}

@@ -28,6 +28,7 @@ export interface BlockRow {
   status: string;
   testGuardMinSessions: number;
   completedPlannedKbSessions: number;
+  challengePath?: string | null; // null or absent = default block
 }
 
 export interface WeekTemplateRow {

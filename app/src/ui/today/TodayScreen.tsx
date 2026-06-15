@@ -19,6 +19,7 @@ interface Props {
   todayLog: WorkoutLog | null;
   recommendation: Recommendation | null;
   activeEffects: StatusEffect[];
+  challengePathName?: string;
   onLogWorkout: () => void;
   onLogActivity?: () => void;
   onAttemptTest?: () => void;
@@ -50,7 +51,7 @@ const DAY_MESSAGE: Record<string, string> = {
   test: 'Test day — logging coming in a later phase.',
 };
 
-export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, onLogWorkout, onLogActivity, onAttemptTest }: Props) {
+export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, challengePathName, onLogWorkout, onLogActivity, onAttemptTest }: Props) {
   if (todayResult === null) {
     return <p className="loading">Loading…</p>;
   }
@@ -80,6 +81,9 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
   return (
     <div>
       <p className="day-meta">{formatDate(date)} · Kettlebell</p>
+      {challengePathName && (
+        <p className="path-label">Path: {challengePathName}</p>
+      )}
       {alreadyLogged && (
         <p className="log-status logged">Logged: {todayLog!.status} · {todayLog!.difficulty}</p>
       )}

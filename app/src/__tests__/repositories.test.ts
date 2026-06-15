@@ -259,6 +259,54 @@ describe('workoutLogRepository.listByTemplateId', () => {
   });
 });
 
+describe('blockRepository.setChallengePath', () => {
+  it('persists a challenge path on a block', async () => {
+    await db.blocks.add({
+      id: 'block-cp',
+      name: 'Test Block',
+      baselineTier: 1,
+      startDate: '2026-06-15',
+      status: 'active',
+      testGuardMinSessions: 6,
+      completedPlannedKbSessions: 0,
+    });
+    await blockRepository.setChallengePath('block-cp', 'minimalist');
+    const block = await blockRepository.getActiveBlock();
+    expect(block?.challengePath).toBe('minimalist');
+  });
+
+  it('persists null to clear a challenge path', async () => {
+    await db.blocks.add({
+      id: 'block-cp2',
+      name: 'Test Block 2',
+      baselineTier: 1,
+      startDate: '2026-06-15',
+      status: 'active',
+      testGuardMinSessions: 6,
+      completedPlannedKbSessions: 0,
+      challengePath: 'swing_marsh',
+    });
+    await blockRepository.setChallengePath('block-cp2', null);
+    const block = await blockRepository.getActiveBlock();
+    expect(block?.challengePath).toBeNull();
+  });
+
+  it('block with no challengePath field reads as null', async () => {
+    await db.blocks.add({
+      id: 'block-cp3',
+      name: 'Test Block 3',
+      baselineTier: 1,
+      startDate: '2026-06-15',
+      status: 'active',
+      testGuardMinSessions: 6,
+      completedPlannedKbSessions: 0,
+      // no challengePath field
+    });
+    const block = await blockRepository.getActiveBlock();
+    expect(block?.challengePath ?? null).toBeNull();
+  });
+});
+
 describe('characterRepository', () => {
   const sampleCharacterRow = {
     userId: 'player-1',

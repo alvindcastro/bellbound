@@ -51,4 +51,31 @@ describe('resolveToday', () => {
     const result = await resolveToday('2026-06-20'); // Saturday = free
     expect(result.dayType).toBe('free');
   });
+
+  // Challenge path tests
+  // Note: shouldIncrementCounter already handles day type at the engine level —
+  // a log from a KB day (Monday under Minimalist) has plannedDayType: 'kb' and increments;
+  // Tuesday is now rest so no KB log is expected and the counter is unaffected.
+
+  it('returns rest on Tuesday under Minimalist path', async () => {
+    await seed('2026-06-14');
+    // Manually set the challenge path on the seeded block
+    await db.blocks.update('block-1', { challengePath: 'minimalist' });
+    const result = await resolveToday('2026-06-16'); // Tuesday = normally KB
+    expect(result.dayType).toBe('rest'); // Minimalist makes Tuesday rest
+  });
+
+  it('still returns kb on Monday under Minimalist path', async () => {
+    await seed('2026-06-14');
+    await db.blocks.update('block-1', { challengePath: 'minimalist' });
+    const result = await resolveToday('2026-06-15'); // Monday = still KB under Minimalist
+    expect(result.dayType).toBe('kb');
+  });
+
+  it('returns kb on Tuesday with no challenge path', async () => {
+    await seed('2026-06-14');
+    // No challenge path set — default behavior
+    const result = await resolveToday('2026-06-16'); // Tuesday = KB (default)
+    expect(result.dayType).toBe('kb');
+  });
 });

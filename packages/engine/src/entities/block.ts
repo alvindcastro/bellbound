@@ -1,4 +1,4 @@
-import type { BlockStatus } from './enums.js';
+import type { BlockStatus, ChallengePath } from './enums.js';
 
 export interface Block {
   id: string;
@@ -8,4 +8,5 @@ export interface Block {
   status: BlockStatus;
   testGuardMinSessions: number;
   completedPlannedKbSessions: number;
+  challengePath?: ChallengePath | null;
 }
