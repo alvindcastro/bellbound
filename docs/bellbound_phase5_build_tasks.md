@@ -29,44 +29,44 @@ Most of Phase 5 is data (maps of strings) and JSX. Keep the few lookups pure and
 
 ## Section A: Zones
 
-- [ ] Create static zone data mapping each workout template to a zone name. Suggested: Double KB Strength → The Double-Bell Gate, Armor Building Complex → The Armor Foundry, Single KB Strength → The Single-Bell Outpost, Swings/Push-ups → The Swing Marsh, Recovery → The Recovery Inn, Burpee Conditioning → The Burpee Bog, Saturday Free Day → The Free Lands.
-- [ ] RED first: write a small test for the workout-to-zone lookup, including an unknown workout returning a sensible default or null. Then implement.
-- [ ] The zone name comes from the template's `zoneName` field (seeded in earlier phases) or a lookup; pick one source of truth and use it. Do not hardcode zone names in components.
+- [x] Create static zone data mapping each workout template to a zone name. Suggested: Double KB Strength → The Double-Bell Gate, Armor Building Complex → The Armor Foundry, Single KB Strength → The Single-Bell Outpost, Swings/Push-ups → The Swing Marsh, Recovery → The Recovery Inn, Burpee Conditioning → The Burpee Bog, Saturday Free Day → The Free Lands.
+- [x] RED first: write a small test for the workout-to-zone lookup, including an unknown workout returning a sensible default or null. Then implement.
+- [x] The zone name comes from the template's `zoneName` field (seeded in earlier phases) or a lookup; pick one source of truth and use it. Do not hardcode zone names in components.
 
 ## Section B: Encounter Text
 
-- [ ] Create static encounter text per movement (short, dry flavour lines). Examples from v4: Double Press → "You press the bells overhead. The ceiling remains unimpressed."; Front Squat → "You descend into the Squat Mines. The quads begin collective bargaining."; Rest → "You do nothing. Against all odds, this was productive."
-- [ ] RED first: write a test for the movement-to-encounter lookup, including a movement with no defined text returning a graceful default (empty or generic). Then implement.
-- [ ] Encounter text is decoration around the movement, never a replacement for it. The movement name, reps, load stay primary and fully visible.
+- [x] Create static encounter text per movement (short, dry flavour lines). Examples from v4: Double Press → "You press the bells overhead. The ceiling remains unimpressed."; Front Squat → "You descend into the Squat Mines. The quads begin collective bargaining."; Rest → "You do nothing. Against all odds, this was productive."
+- [x] RED first: write a test for the movement-to-encounter lookup, including a movement with no defined text returning a graceful default (empty or generic). Then implement.
+- [x] Encounter text is decoration around the movement, never a replacement for it. The movement name, reps, load stay primary and fully visible.
 
 ## Section C: Completion Messages
 
-- [ ] Create dry completion messages. Examples: "You completed the workout. The bells remain unemployed."; "You rested. This confused the goblins but pleased your joints."
-- [ ] If completion-message selection depends on status or day type (e.g. a different line for rest vs a completed KB session), RED first: write a test for the selection function. If it is a single constant per case, a test is optional but trivial.
-- [ ] Match the tone guide: dry, not motivational. No "Destroy your limits" energy anywhere. The app sounds like a strange training clerk.
+- [x] Create dry completion messages. Examples: "You completed the workout. The bells remain unemployed."; "You rested. This confused the goblins but pleased your joints."
+- [x] If completion-message selection depends on status or day type (e.g. a different line for rest vs a completed KB session), RED first: write a test for the selection function. If it is a single constant per case, a test is optional but trivial.
+- [x] Match the tone guide: dry, not motivational. No "Destroy your limits" energy anywhere. The app sounds like a strange training clerk.
 
 ## Section D: Character Classes
 
-- [ ] Add class selection (or a default class) to the Character. Classes: Bellbarian, Pressomancer, Squat Squire, Recovery Rogue, Program Warlock.
-- [ ] At this phase, classes are flavour only. No class bonuses, no mechanical effects. The class is a field on the Character with a display name and a flavour message.
-- [ ] If the user can pick a class, persist the choice to the Character via the repository. RED first: write a test that setting the class persists and reads back. Then implement.
-- [ ] Show the class and its flavour message on a character view. No stats yet (stats are Phase 8).
+- [x] Add class selection (or a default class) to the Character. Classes: Bellbarian, Pressomancer, Squat Squire, Recovery Rogue, Program Warlock.
+- [x] At this phase, classes are flavour only. No class bonuses, no mechanical effects. The class is a field on the Character with a display name and a flavour message.
+- [x] If the user can pick a class, persist the choice to the Character via the repository. RED first: write a test that setting the class persists and reads back. Then implement.
+- [x] Show the class and its flavour message on a character view. No stats yet (stats are Phase 8).
 
 ## Section E: Low-Fi Theme
 
-- [ ] Apply a low-fi, text-heavy theme: simple, readable, mobile-width friendly, minimal animation. Parchment optional. Small absurd item art is optional and can wait.
-- [ ] The workout table remains the primary, fully readable element. RPG flavour surrounds it; it never obscures sets, rounds, reps, load, or rest.
+- [x] Apply a low-fi, text-heavy theme: simple, readable, mobile-width friendly, minimal animation. Parchment optional. Small absurd item art is optional and can wait.
+- [x] The workout table remains the primary, fully readable element. RPG flavour surrounds it; it never obscures sets, rounds, reps, load, or rest.
 - [ ] Verify on a narrow phone-width viewport in dev tools device mode.
 
 ## Section F: Phase 5 Done When
 
-- [ ] Workouts display a zone name (from a single source, not hardcoded in components).
-- [ ] Exercises display encounter text, with graceful handling of movements that have none.
-- [ ] Completions show dry, on-tone messages.
-- [ ] The user has a character class (selected or default), persisted, shown with its flavour message.
-- [ ] The low-fi theme is applied and the workout table is never obscured.
-- [ ] The few lookups/selection functions are pure and tested; rendering verified manually.
-- [ ] No training rules changed: no progression, recovery, or numbers touched by any of this.
+- [x] Workouts display a zone name (from a single source, not hardcoded in components).
+- [x] Exercises display encounter text, with graceful handling of movements that have none.
+- [x] Completions show dry, on-tone messages.
+- [x] The user has a character class (selected or default), persisted, shown with its flavour message.
+- [x] The low-fi theme is applied and the workout table is never obscured.
+- [x] The few lookups/selection functions are pure and tested; rendering verified manually.
+- [x] No training rules changed: no progression, recovery, or numbers touched by any of this.
 - [ ] Works offline.
 - [ ] Committed on green, pushed, with a clear Phase 5 commit message.
 
