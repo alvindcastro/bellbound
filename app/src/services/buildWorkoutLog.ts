@@ -17,9 +17,26 @@ export interface WorkoutContext {
   templateName: string;
   category: string;
   source?: WorkoutSource;
+  // Swap support: when the user chooses a different KB workout on a planned KB day
+  actualTemplateId?: string;
+  actualTemplateName?: string;
+  swapReason?: string;
+  // Off-block-on-training-day: explicit planned workout when source is off_block
+  plannedTemplateId?: string;
+  plannedTemplateName?: string;
 }
 
 export function buildWorkoutLog(inputs: LogFormInputs, context: WorkoutContext): WorkoutLog {
+  const plannedTemplateId = context.plannedTemplateId ?? context.templateId;
+  const plannedTemplateName = context.plannedTemplateName ?? context.templateName;
+  const actualTemplateId = context.actualTemplateId ?? context.templateId;
+  const actualTemplateName = context.actualTemplateName ?? context.templateName;
+
+  const structuredNotes: Record<string, unknown> = { roundsCompleted: inputs.roundsCompleted };
+  if (context.swapReason !== undefined) {
+    structuredNotes['swapReason'] = context.swapReason;
+  }
+
   return {
     id: crypto.randomUUID(),
     date: context.date,
@@ -28,12 +45,12 @@ export function buildWorkoutLog(inputs: LogFormInputs, context: WorkoutContext):
     actualDayType: context.actualDayType,
     source: context.source ?? 'planned',
     category: context.category,
-    plannedWorkout: { templateId: context.templateId, name: context.templateName },
-    actualWorkout: { templateId: context.templateId, name: context.templateName },
+    plannedWorkout: { templateId: plannedTemplateId, name: plannedTemplateName },
+    actualWorkout: { templateId: actualTemplateId, name: actualTemplateName },
     status: inputs.status,
     difficulty: inputs.difficulty,
     signals: inputs.signals ?? { pressGrindy: false, breathless: false, gripCooked: false, legsSore: false },
     originalNote: inputs.note,
-    structuredNotes: { roundsCompleted: inputs.roundsCompleted },
+    structuredNotes,
   };
 }

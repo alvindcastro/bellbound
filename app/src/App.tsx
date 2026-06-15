@@ -13,6 +13,7 @@ import { applyStatGainsFromLog } from './services/statService.js';
 import { evaluateAndPersistQuests } from './services/questService.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
+import SwapPickerForm from './ui/log/SwapPickerForm.js';
 import TestWorkoutForm from './ui/log/TestWorkoutForm.js';
 import AscensionScreen from './ui/ascension/AscensionScreen.js';
 import FreeDayForm from './ui/log/FreeDayForm.js';
@@ -26,7 +27,7 @@ import { evaluateAndApplyAscension, type AscensionOutcome } from './services/asc
 import { generateAndStoreLore } from './services/loreService.js';
 import { getAiClient } from './data/ai/index.js';
 
-type AppView = 'today' | 'log' | 'test' | 'ascension' | 'activity' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
+type AppView = 'today' | 'log' | 'test' | 'ascension' | 'activity' | 'activity-from-kb' | 'swap' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
 
 function AppShell({ nav, children }: { nav: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -50,6 +51,8 @@ export default function App() {
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [activeEffects, setActiveEffects] = useState<StatusEffect[]>([]);
   const [ascensionOutcome, setAscensionOutcome] = useState<AscensionOutcome | null>(null);
+  const [swapWorkout, setSwapWorkout] = useState<ResolvedWorkout | null>(null);
+  const [swapReason, setSwapReason] = useState('');
 
   async function loadActiveEffects() {
     // UI shows stored effects; expiry evaluation is handled in councilService
@@ -124,14 +127,37 @@ export default function App() {
     );
   }
 
-  if (view === 'log' && resolvedWorkout && activeBlock && todayResult) {
+  if (view === 'swap' && resolvedWorkout && activeBlock) {
     return (
       <AppShell nav={<button onClick={() => setView('today')}>Cancel</button>}>
+        <SwapPickerForm
+          prescribedTemplateId={resolvedWorkout.templateId}
+          baselineTier={activeBlock.baselineTier}
+          onPick={(chosen, reason) => {
+            setSwapWorkout(chosen);
+            setSwapReason(reason);
+            setView('log');
+          }}
+          onCancel={() => setView('today')}
+        />
+      </AppShell>
+    );
+  }
+
+  if (view === 'log' && resolvedWorkout && activeBlock && todayResult) {
+    return (
+      <AppShell nav={<button onClick={() => {
+        setSwapWorkout(null);
+        setSwapReason('');
+        setView('today');
+      }}>Cancel</button>}>
         <LogForm
           date={today}
           blockId={activeBlock.id}
           workout={resolvedWorkout}
           plannedDayType={todayResult.dayType}
+          swapWorkout={swapWorkout ?? undefined}
+          swapReason={swapReason || undefined}
           onSave={async () => {
             const log = await workoutLogRepository.getByDate(today);
             setTodayLog(log);
@@ -145,6 +171,37 @@ export default function App() {
             if (resolvedWorkout) {
               const rec = await getRecommendationForTemplate(resolvedWorkout.templateId);
               setRecommendation(rec);
+            }
+            setSwapWorkout(null);
+            setSwapReason('');
+            setView('today');
+          }}
+          onCancel={() => {
+            setSwapWorkout(null);
+            setSwapReason('');
+            setView('today');
+          }}
+        />
+      </AppShell>
+    );
+  }
+
+  if (view === 'activity-from-kb' && resolvedWorkout) {
+    return (
+      <AppShell nav={<button onClick={() => setView('today')}>Cancel</button>}>
+        <FreeDayForm
+          date={today}
+          blockId={activeBlock?.id ?? 'no-block'}
+          plannedDayType="kb"
+          prescribedTemplateId={resolvedWorkout.templateId}
+          prescribedTemplateName={resolvedWorkout.name}
+          onSave={async () => {
+            const log = await workoutLogRepository.getByDate(today);
+            setTodayLog(log);
+            if (log) {
+              await createAndPersistEffectsFromLog(log);
+              await applyStatGainsFromLog(log);
+              await evaluateAndPersistQuests(today);
             }
             setView('today');
           }}
@@ -255,6 +312,8 @@ export default function App() {
         onLogWorkout={() => setView('log')}
         onLogActivity={() => setView('activity')}
         onAttemptTest={() => setView('test')}
+        onSwapWorkout={todayResult?.dayType === 'kb' ? () => setView('swap') : undefined}
+        onLogActivityFromKbDay={todayResult?.dayType === 'kb' ? () => setView('activity-from-kb') : undefined}
       />
     </AppShell>
   );

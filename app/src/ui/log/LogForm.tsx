@@ -13,6 +13,9 @@ interface Props {
   plannedDayType: DayType;
   onSave: () => void;
   onCancel: () => void;
+  // Swap support: when set, the user chose a different KB workout on a planned KB day
+  swapWorkout?: ResolvedWorkout;
+  swapReason?: string;
 }
 
 type Status = LogFormInputs['status'];
@@ -30,9 +33,10 @@ const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
   { value: 'failed', label: 'Failed' },
 ];
 
-export default function LogForm({ date, blockId, workout, plannedDayType, onSave, onCancel }: Props) {
+export default function LogForm({ date, blockId, workout, plannedDayType, onSave, onCancel, swapWorkout, swapReason }: Props) {
+  const displayWorkout = swapWorkout ?? workout;
   const [status, setStatus] = useState<Status>('completed');
-  const [rounds, setRounds] = useState(workout.rounds);
+  const [rounds, setRounds] = useState(displayWorkout.rounds);
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
@@ -54,6 +58,11 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
       templateId: workout.templateId,
       templateName: workout.name,
       category: workout.category,
+      ...(swapWorkout ? {
+        actualTemplateId: swapWorkout.templateId,
+        actualTemplateName: swapWorkout.name,
+        ...(swapReason ? { swapReason } : {}),
+      } : {}),
     };
 
     const inputs: LogFormInputs = {
@@ -94,7 +103,10 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2 className="section-title">{workout.name}</h2>
+      <h2 className="section-title">{displayWorkout.name}</h2>
+      {swapWorkout && (
+        <p className="form-hint">Swap from {workout.name} — counts toward your block.</p>
+      )}
 
       <div className="form-group">
         <label>Status</label>
@@ -116,7 +128,7 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
 
       {status !== 'skipped' && (
         <div className="form-group">
-          <label htmlFor="rounds">Rounds completed (planned: {workout.rounds})</label>
+          <label htmlFor="rounds">Rounds completed (planned: {displayWorkout.rounds})</label>
           <input
             id="rounds"
             type="number"

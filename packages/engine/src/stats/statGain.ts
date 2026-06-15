@@ -27,7 +27,13 @@ export function computeStatDeltas(log: WorkoutLog): StatDeltas {
     deltas.recovery = 1;
   }
 
-  if (active && log.difficulty === 'easy') {
+  const isKbSwapWithReason =
+    log.source === 'planned' &&
+    log.plannedDayType === 'kb' &&
+    typeof log.structuredNotes['swapReason'] === 'string' &&
+    (log.actualWorkout as Record<string, unknown>)['templateId'] !== (log.plannedWorkout as Record<string, unknown>)['templateId'];
+
+  if (active && (log.difficulty === 'easy' || isKbSwapWithReason)) {
     deltas.judgment = 1;
   }
 

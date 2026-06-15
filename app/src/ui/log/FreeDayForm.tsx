@@ -10,6 +10,9 @@ interface Props {
   blockId: string;
   onSave: () => void;
   onCancel: () => void;
+  plannedDayType?: 'kb' | 'free';
+  prescribedTemplateId?: string;
+  prescribedTemplateName?: string;
 }
 
 type ActivityKey = 'run' | 'hike' | 'pickleball' | 'barbell' | 'yoga' | 'walk' | 'reading' | 'cube';
@@ -50,7 +53,7 @@ const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
   { value: 'failed', label: 'Failed' },
 ];
 
-export default function FreeDayForm({ date, blockId, onSave, onCancel }: Props) {
+export default function FreeDayForm({ date, blockId, onSave, onCancel, plannedDayType = 'free', prescribedTemplateId, prescribedTemplateName }: Props) {
   const [activityType, setActivityType] = useState<ActivityKey>('run');
   const [source, setSource] = useState<WorkoutSource>(defaultSourceForActivity('run'));
   const [status, setStatus] = useState<Status>('completed');
@@ -72,12 +75,16 @@ export default function FreeDayForm({ date, blockId, onSave, onCancel }: Props) 
     const context: WorkoutContext = {
       date,
       blockId,
-      plannedDayType: 'free',
+      plannedDayType,
       actualDayType: 'free',
       templateId: activityType,
       templateName: ACTIVITY_LABEL[activityType],
       category: activityType,
       source,
+      ...(prescribedTemplateId ? {
+        plannedTemplateId: prescribedTemplateId,
+        plannedTemplateName: prescribedTemplateName ?? prescribedTemplateId,
+      } : {}),
     };
 
     const inputs: LogFormInputs = {

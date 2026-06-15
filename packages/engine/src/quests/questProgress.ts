@@ -9,7 +9,12 @@ export function evaluateQuestProgress(questId: string, logs: WorkoutLog[]): numb
     case 'wise_regression':
       return logs.filter(l => active(l) && l.actualDayType === 'kb' && l.difficulty === 'easy').length;
     case 'good_swap':
-      return logs.filter(l => active(l) && l.source === 'off_block').length;
+      return logs.filter(l => active(l) && (
+        l.source === 'off_block' ||
+        (l.source === 'planned' &&
+          typeof l.structuredNotes['swapReason'] === 'string' &&
+          (l.actualWorkout as Record<string, unknown>)['templateId'] !== (l.plannedWorkout as Record<string, unknown>)['templateId'])
+      )).length;
     default:
       return 0;
   }

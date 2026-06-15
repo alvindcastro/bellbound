@@ -23,6 +23,8 @@ interface Props {
   onLogWorkout: () => void;
   onLogActivity?: () => void;
   onAttemptTest?: () => void;
+  onSwapWorkout?: () => void;
+  onLogActivityFromKbDay?: () => void;
 }
 
 function formatReps(m: ResolvedMovement): string {
@@ -51,7 +53,7 @@ const DAY_MESSAGE: Record<string, string> = {
   test: 'Test day — logging coming in a later phase.',
 };
 
-export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, challengePathName, onLogWorkout, onLogActivity, onAttemptTest }: Props) {
+export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, challengePathName, onLogWorkout, onLogActivity, onAttemptTest, onSwapWorkout, onLogActivityFromKbDay }: Props) {
   if (todayResult === null) {
     return <p className="loading">Loading…</p>;
   }
@@ -138,7 +140,15 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
       {alreadyLogged ? (
         <button className="btn" onClick={onLogWorkout}>Edit log</button>
       ) : (
-        <button className="btn-primary" onClick={onLogWorkout}>Log this workout</button>
+        <>
+          <button className="btn-primary" onClick={onLogWorkout}>Log this workout</button>
+          {onSwapWorkout && (
+            <button className="btn" onClick={onSwapWorkout}>Swap workout</button>
+          )}
+          {onLogActivityFromKbDay && (
+            <button className="btn" onClick={onLogActivityFromKbDay}>Log an activity instead</button>
+          )}
+        </>
       )}
       {onAttemptTest && (
         <button className="btn" onClick={onAttemptTest}>Attempt test</button>

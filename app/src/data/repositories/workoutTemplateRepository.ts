@@ -11,4 +11,9 @@ export const workoutTemplateRepository = {
     const row = await db.workoutTemplates.get(id);
     return row ? fromRow(row) : null;
   },
+
+  async listKettlebell(): Promise<WorkoutTemplate[]> {
+    const rows = await db.workoutTemplates.toArray();
+    return rows.filter(r => r.category === 'kettlebell').map(fromRow);
+  },
 };
