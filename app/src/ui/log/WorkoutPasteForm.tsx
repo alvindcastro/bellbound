@@ -219,7 +219,7 @@ export default function WorkoutPasteForm({ onSave, onCancel }: Props) {
           </div>
 
           {saveError && (
-            <p className="form-hint" style={{ color: 'var(--danger, #e74c3c)' }}>{saveError}</p>
+            <p className="form-hint" style={{ color: 'var(--color-danger)' }}>{saveError}</p>
           )}
 
           <div className="form-actions">

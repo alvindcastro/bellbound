@@ -1,6 +1,7 @@
 import type { TodayResult } from '../../services/todayService.js';
 import type { ResolvedMovement, WorkoutLog, Recommendation, RecommendationKind, StatusEffect } from '@bellbound/engine';
 import { classifyDay, getEncounterText, getCompletionMessage } from '@bellbound/engine';
+import ArtSlot from '../common/ArtSlot.js';
 
 const RECOMMENDATION_LABEL: Record<RecommendationKind, string> = {
   reduce: 'Reduce',
@@ -41,6 +42,14 @@ function formatDate(iso: string): string {
   return new Date(iso + 'T00:00:00').toLocaleDateString(undefined, {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
+}
+
+function zoneSlotId(zoneName: string): string {
+  return 'zone:' + zoneName.toLowerCase().replace(/^the\s+/, '').replace(/\s+/g, '-');
+}
+
+function statusSlotId(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-');
 }
 
 const DAY_LABEL: Record<string, string> = {
@@ -98,7 +107,12 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
         <div className="active-effects">
           <p className="section-label">Recovery effects active:</p>
           <ul>
-            {activeEffects.map(e => <li key={e.id}>{e.name}</li>)}
+            {activeEffects.map(e => (
+              <li key={e.id} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <ArtSlot slotId={'status:' + statusSlotId(e.name)} width={20} height={20} alt={e.name} />
+                {e.name}
+              </li>
+            ))}
           </ul>
         </div>
       )}
@@ -108,6 +122,7 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
           <p className="council-explanation">{recommendation.explanation}</p>
         </div>
       )}
+      <ArtSlot slotId={zoneSlotId(workout.zoneName)} width={48} height={48} alt={workout.zoneName} />
       <p className="zone-title">{workout.zoneName}</p>
       <table className="workout-table">
         <thead>

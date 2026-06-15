@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { Character } from '@bellbound/engine';
 import { getCharacterClass, CHARACTER_CLASSES } from '@bellbound/engine';
 import { characterRepository } from '../../data/repositories/characterRepository.js';
+import ArtSlot from '../common/ArtSlot.js';
 
 export default function CharacterView() {
   const [character, setCharacter] = useState<Character | null>(null);
@@ -29,6 +30,7 @@ export default function CharacterView() {
   return (
     <div>
       <h2 className="section-title">{character.characterName}</h2>
+      <ArtSlot slotId="character:default" width={64} height={64} alt={character.characterName} />
       <p>
         <label>Class: </label>
         <select value={character.className} onChange={handleClassChange}>
