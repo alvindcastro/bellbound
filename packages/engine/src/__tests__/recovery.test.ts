@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createStatusEffectsFromSignals, createPoorSleepGoblin } from '../recovery/statusEffects.js';
 import { isExpired } from '../recovery/expiry.js';
 import { resolveActiveEffects } from '../recovery/stacking.js';
-import { SORENESS_EFFECT_DAYS, SLEEP_OK_HOURS } from '../config.js';
+import { SLEEP_OK_HOURS } from '../config.js';
 import type { StatusEffect } from '../entities/statusEffect.js';
 import type { WorkoutLog } from '../entities/workoutLog.js';
 
@@ -66,7 +66,7 @@ describe('createStatusEffectsFromSignals', () => {
     expect(e.id.length).toBeGreaterThan(0);
   });
 
-  it('returns [Breathless Fog] when only breathless is true, with expiryParam === SORENESS_EFFECT_DAYS.breathlessFog', () => {
+  it('returns [Breathless Fog] when only breathless is true, with expiryParam 3', () => {
     const signals = { pressGrindy: false, breathless: true, gripCooked: false, legsSore: false };
     const effects = createStatusEffectsFromSignals(signals, '2026-06-14');
     expect(effects).toHaveLength(1);
@@ -75,11 +75,11 @@ describe('createStatusEffectsFromSignals', () => {
     expect(e.source).toBe('breathless');
     expect(e.recommendationEffect).toBe('hold_conditioning');
     expect(e.expiryType).toBe('after_n_days');
-    expect(e.expiryParam).toBe(SORENESS_EFFECT_DAYS.breathlessFog);
+    expect(e.expiryParam).toBe(3);
     expect(e.createdDate).toBe('2026-06-14');
   });
 
-  it('returns [Grip Curse] when only gripCooked is true, with expiryParam === SORENESS_EFFECT_DAYS.gripCurse', () => {
+  it('returns [Grip Curse] when only gripCooked is true, with expiryParam 2', () => {
     const signals = { pressGrindy: false, breathless: false, gripCooked: true, legsSore: false };
     const effects = createStatusEffectsFromSignals(signals, '2026-06-14');
     expect(effects).toHaveLength(1);
@@ -88,11 +88,11 @@ describe('createStatusEffectsFromSignals', () => {
     expect(e.source).toBe('gripCooked');
     expect(e.recommendationEffect).toBe('hold_carry');
     expect(e.expiryType).toBe('after_n_days');
-    expect(e.expiryParam).toBe(SORENESS_EFFECT_DAYS.gripCurse);
+    expect(e.expiryParam).toBe(2);
     expect(e.createdDate).toBe('2026-06-14');
   });
 
-  it('returns [Squat Tax] when only legsSore is true, with expiryParam === SORENESS_EFFECT_DAYS.squatTax', () => {
+  it('returns [Squat Tax] when only legsSore is true, with expiryParam 3', () => {
     const signals = { pressGrindy: false, breathless: false, gripCooked: false, legsSore: true };
     const effects = createStatusEffectsFromSignals(signals, '2026-06-14');
     expect(effects).toHaveLength(1);
@@ -101,7 +101,7 @@ describe('createStatusEffectsFromSignals', () => {
     expect(e.source).toBe('legsSore');
     expect(e.recommendationEffect).toBe('hold_squat');
     expect(e.expiryType).toBe('after_n_days');
-    expect(e.expiryParam).toBe(SORENESS_EFFECT_DAYS.squatTax);
+    expect(e.expiryParam).toBe(3);
     expect(e.createdDate).toBe('2026-06-14');
   });
 

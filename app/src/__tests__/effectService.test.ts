@@ -22,7 +22,7 @@ const makeLog = (overrides: Partial<WorkoutLog['signals']> = {}): WorkoutLog => 
   category: 'kettlebell',
   plannedWorkout: {},
   actualWorkout: {},
-  status: 'done',
+  status: 'completed',
   difficulty: 'normal',
   signals: {
     pressGrindy: false,

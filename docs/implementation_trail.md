@@ -488,3 +488,58 @@ These fields/features exist in the schema/entities from Phase 0 but are not acti
 ---
 
 *Phase 0 complete. Next: Phase 1.*
+
+---
+
+## Phase 7 — DailyContext and Recovery Mechanics
+
+**Status: Complete — all tests green, pushed**
+
+### What was built
+
+| Path | Purpose |
+|------|---------|
+| `packages/engine/src/entities/statusEffect.ts` | Added `createdDate: string` field to `StatusEffect` |
+| `packages/engine/src/recovery/statusEffects.ts` | `createStatusEffectsFromSignals`, `createPoorSleepGoblin` — source-agnostic factory functions |
+| `packages/engine/src/recovery/expiry.ts` | `ExpiryContext` interface; `isExpired(effect, context)` for all 5 expiry types |
+| `packages/engine/src/recovery/stacking.ts` | `resolveActiveEffects(effects)` — most-conservative resolution with explicit priority array |
+| `packages/engine/src/council/council.ts` | Slot 2 filled: `activeEffects?: StatusEffect[]` param; calls `resolveActiveEffects` |
+| `packages/engine/src/__tests__/recovery.test.ts` | 40 tests covering all creation, expiry, and stacking behaviours |
+| `app/src/data/db/bellboundDb.ts` | `StatusEffectRow.createdDate: string` added |
+| `app/src/data/repositories/dailyContextRepository.ts` | `upsert`, `getByDate`, `listAfterDate`, `listAll` |
+| `app/src/data/repositories/statusEffectRepository.ts` | `add`, `listAll`, `deleteById` |
+| `app/src/services/effectService.ts` | `createAndPersistEffectsFromLog`, `createAndPersistPoorSleepGoblinIfNeeded` |
+| `app/src/services/councilService.ts` | Fetches stored effects, evaluates expiry with full context, feeds active effects to engine |
+| `app/src/ui/daily/DailyContextForm.tsx` | Sleep/bodyweight/notes form; triggers Poor Sleep Goblin on low sleep |
+| `app/src/ui/today/TodayScreen.tsx` | `activeEffects` prop; earthy, non-alarming effects display |
+| `app/src/App.tsx` | `'daily'` view; effects state; persists signal effects on log save |
+
+### Test results
+
+```
+packages/engine — 159 tests (40 new in Phase 7)  ✓ PASS
+app             — 112 tests (18 new in Phase 7)   ✓ PASS
+Total: 271 tests
+```
+
+### Key decisions
+
+- **`createdDate` on `StatusEffect`**: Added to the entity rather than inferring creation date from context. The expiry evaluation function receives the effect with its own `createdDate` — no external timestamp state needed.
+
+- **Poor Sleep Goblin expiry as source-check before type switch**: The goblin uses `expiryType: 'manual'` (which normally never expires) but the `isExpired` function checks `effect.source === 'poor_sleep'` first and applies the first-of logic (rest day OR good sleep). This avoids adding a bespoke `ExpiryType` variant for a single special case while keeping the check explicit and centrally located.
+
+- **`restDaysPassedSinceCreation: boolean` in `ExpiryContext`**: Rather than passing the week template into the pure engine function, the app layer computes this boolean before calling `isExpired`. Keeps the engine boundary clean — the engine receives a pre-computed fact, not a calendar lookup dependency.
+
+- **Stacking resolution via priority index, not conditionals**: `PRIORITY: RecommendationKind[]` orders effects from most to least conservative. The resolver finds the minimum index across all effects and reads the kind from the array. Adding a new kind requires only updating the array — no chain of if/else.
+
+- **Council slot 2 default parameter**: `getCouncilRecommendation(recentLogs, activeEffects = [])` — all 32 existing Phase 6 tests pass unchanged. The default empty array means no behaviour change when effects aren't provided.
+
+- **`councilService` evaluates expiry, not a separate expiry service**: The app service layer computes `ExpiryContext` per effect (logs after creation, sleep after creation, rest days since creation via `plannedDayType`) and filters to active effects before calling the engine. The engine function stays pure — it receives only pre-filtered data.
+
+- **UI shows stored effects without expiry evaluation**: `App.tsx` calls `statusEffectRepository.listAll()` for the `activeEffects` display prop — no expiry filtering in the UI. Expiry is evaluated in `councilService` for the recommendation, which is the authoritative consumer. The display is informational and slightly lax; the recommendation is precise.
+
+- **bodyweight and foodNote permanently excluded**: `effectService.ts` accepts only `log.signals` and `log.date` from workout logs; `createAndPersistPoorSleepGoblinIfNeeded` accepts only `date` and `hoursSlept`. TypeScript enforces the boundary; a comment at the function signature names the constraint. `DailyContextForm` stores both fields to Dexie but passes neither to any engine function.
+
+---
+
+*Phase 7 complete. Next: Phase 8 (Stats).*

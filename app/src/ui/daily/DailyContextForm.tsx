@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { SLEEP_OK_HOURS } from '@bellbound/engine';
 import { dailyContextRepository } from '../../data/repositories/dailyContextRepository.js';
 import { createAndPersistPoorSleepGoblinIfNeeded } from '../../services/effectService.js';
 
@@ -23,9 +22,7 @@ export default function DailyContextForm({ date, onSave, onCancel }: Props) {
     setSaving(true);
     try {
       await dailyContextRepository.upsert({ date, hoursSlept, bodyweight: bw, foodNote: fn });
-      if (hoursSlept < SLEEP_OK_HOURS) {
-        await createAndPersistPoorSleepGoblinIfNeeded(date, hoursSlept);
-      }
+      await createAndPersistPoorSleepGoblinIfNeeded(date, hoursSlept);
       onSave();
     } finally {
       setSaving(false);
@@ -64,9 +61,9 @@ export default function DailyContextForm({ date, onSave, onCancel }: Props) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="food-note">Notes (optional)</label>
+        <label htmlFor="notes">Notes (optional)</label>
         <textarea
-          id="food-note"
+          id="notes"
           value={foodNote}
           onChange={(e) => setFoodNote(e.target.value)}
         />

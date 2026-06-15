@@ -15,21 +15,15 @@ export function resolveActiveEffects(effects: StatusEffect[]): Recommendation {
     return { kind: 'maintain', explanation: 'No active status effects.' };
   }
 
-  let winnerKind: RecommendationKind = 'hold_squat';
-  let winnerPriority = PRIORITY.length; // starts at lowest
-
+  let bestIdx = PRIORITY.length;
   for (const effect of effects) {
-    const kind = effect.recommendationEffect as RecommendationKind;
-    const idx = PRIORITY.indexOf(kind);
-    if (idx !== -1 && idx < winnerPriority) {
-      winnerPriority = idx;
-      winnerKind = kind;
+    const idx = PRIORITY.indexOf(effect.recommendationEffect as RecommendationKind);
+    if (idx !== -1 && idx < bestIdx) {
+      bestIdx = idx;
     }
   }
 
+  const kind = bestIdx < PRIORITY.length ? PRIORITY[bestIdx]! : 'maintain';
   const names = effects.map(e => e.name).join(', ');
-  return {
-    kind: winnerKind,
-    explanation: `Active recovery effects: ${names}.`,
-  };
+  return { kind, explanation: `Active recovery effects: ${names}.` };
 }

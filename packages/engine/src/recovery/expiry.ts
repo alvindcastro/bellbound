@@ -40,7 +40,6 @@ export function isExpired(effect: StatusEffect, context: ExpiryContext): boolean
       return context.logsAfterCreation.some(log => log.difficulty === 'easy');
 
     case 'manual':
-    default:
       return false;
   }
 }
