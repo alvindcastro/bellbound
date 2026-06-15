@@ -50,53 +50,53 @@ Discipline unchanged. Commit on green.
 
 ## Section A: Same-Day Choice on the Today Screen
 
-- [ ] Add a choice affordance on any training day (KB or free): keep the prescribed workout, swap to another KB workout, or log an off-block activity. The prescribed workout remains the default and most prominent option; the alternatives are available but not pushed.
-- [ ] The Council does not nudge the user toward swapping or away from the prescribed workout. The choice is neutral. The prescribed workout is the default because the program is the source of truth, not because deviating is discouraged.
-- [ ] Keep the prescribed workout table fully visible (all movements, reps, load, rest) regardless of the choice UI, per the always-visible rule.
+- [x] Add a choice affordance on any training day (KB or free): keep the prescribed workout, swap to another KB workout, or log an off-block activity. The prescribed workout remains the default and most prominent option; the alternatives are available but not pushed.
+- [x] The Council does not nudge the user toward swapping or away from the prescribed workout. The choice is neutral. The prescribed workout is the default because the program is the source of truth, not because deviating is discouraged.
+- [x] Keep the prescribed workout table fully visible (all movements, reps, load, rest) regardless of the choice UI, per the always-visible rule.
 
 ## Section B: KB-for-KB Swap
 
-- [ ] Build a picker listing the other seeded KB workouts (Single KB Strength / The Single-Bell Outpost, Armor Building Complex, etc.), each resolved at the active block tier via the Phase 3 resolver so the swapped workout shows correct tier-appropriate sets/reps/load.
-- [ ] RED first: extend `buildWorkoutLog` and its tests for a swapped KB session: `plannedWorkout` = the prescribed workout, `actualWorkout` = the chosen KB workout, `plannedDayType` = `kb`, `actualDayType` = `kb`, `source` = `planned`, `category` = `kb`, status/difficulty/signals as normal. Then implement.
-- [ ] Optional swap reason: allow a short reason (fatigue, time, equipment, preference). Store it in `structuredNotes`. It is optional and never required; its absence is fine.
-- [ ] After the swap, show the chosen workout's table (resolved at tier) for logging, replacing the prescribed one for this session only. The template and schedule are unchanged for future days (no re-alignment, consistent with the calendar-anchored design).
+- [x] Build a picker listing the other seeded KB workouts (Single KB Strength / The Single-Bell Outpost, Armor Building Complex, etc.), each resolved at the active block tier via the Phase 3 resolver so the swapped workout shows correct tier-appropriate sets/reps/load.
+- [x] RED first: extend `buildWorkoutLog` and its tests for a swapped KB session: `plannedWorkout` = the prescribed workout, `actualWorkout` = the chosen KB workout, `plannedDayType` = `kb`, `actualDayType` = `kb`, `source` = `planned`, `category` = `kb`, status/difficulty/signals as normal. Then implement.
+- [x] Optional swap reason: allow a short reason (fatigue, time, equipment, preference). Store it in `structuredNotes`. It is optional and never required; its absence is fine.
+- [x] After the swap, show the chosen workout's table (resolved at tier) for logging, replacing the prescribed one for this session only. The template and schedule are unchanged for future days (no re-alignment, consistent with the calendar-anchored design).
 
 ## Section C: Guard Counting For Swaps
 
-- [ ] RED first: write a failing test that a completed (or modified, per the Phase 2 decision) KB-for-KB swap increments `completedPlannedKbSessions`, because it is a planned, completed KB session even though `actualWorkout != plannedWorkout`. Then confirm the Phase 2 increment rule already handles this, or adjust the rule to key on `category === 'kb' && plannedDayType === 'kb' && source === 'planned' && status completed/modified` rather than on the workout name. Update the Phase 2 increment logic if it was keyed on workout identity.
-- [ ] Test the boundary: an off-block run on a KB day does NOT increment the KB counter (it is `source: off_block`).
-- [ ] Re-confirm no double-count on edit (the Phase 11 guard depends on this counter being exact).
+- [x] RED first: write a failing test that a completed (or modified, per the Phase 2 decision) KB-for-KB swap increments `completedPlannedKbSessions`, because it is a planned, completed KB session even though `actualWorkout != plannedWorkout`. Then confirm the Phase 2 increment rule already handles this, or adjust the rule to key on `category === 'kb' && plannedDayType === 'kb' && source === 'planned' && status completed/modified` rather than on the workout name. Update the Phase 2 increment logic if it was keyed on workout identity. (Counter was already correctly keyed on plannedDayType/source/status — no change needed.)
+- [x] Test the boundary: an off-block run on a KB day does NOT increment the KB counter (it is `source: off_block`).
+- [x] Re-confirm no double-count on edit (the Phase 11 guard depends on this counter being exact).
 
 ## Section D: Off-Block Activity On A Training Day
 
-- [ ] Surface the Phase 10 off-block logging path from a training day, not only from free days. The user on a KB day can choose "log a run instead."
-- [ ] RED first: write a failing test that an off-block activity on a KB day logs with `plannedDayType: 'kb'`, `actualDayType` reflecting the activity, `source: 'off_block'`, the relevant `category` (e.g. cardio), and may carry signals (a hard run sets `breathless`). It does not count toward the KB guard. Then implement (reusing the Phase 10 routing; this is a new entry point, not new routing logic).
-- [ ] Confirm the Phase 2 classification treats this correctly: it is "trained on a training day" (not a miss, not a rest), but the work done was off-block. Adjust the classification test coverage if this combination was not already exercised.
-- [ ] The off-block run feeds Conditioning and the status engine exactly as in Phase 10. No new engine logic.
+- [x] Surface the Phase 10 off-block logging path from a training day, not only from free days. The user on a KB day can choose "log a run instead."
+- [x] RED first: write a failing test that an off-block activity on a KB day logs with `plannedDayType: 'kb'`, `actualDayType` reflecting the activity, `source: 'off_block'`, the relevant `category` (e.g. cardio), and may carry signals (a hard run sets `breathless`). It does not count toward the KB guard. Then implement (reusing the Phase 10 routing; this is a new entry point, not new routing logic).
+- [x] Confirm the Phase 2 classification treats this correctly: it is "trained on a training day" (not a miss, not a rest), but the work done was off-block. Adjust the classification test coverage if this combination was not already exercised.
+- [x] The off-block run feeds Conditioning and the status engine exactly as in Phase 10. No new engine logic.
 
 ## Section E: Judgment Reward For Swaps (Reuse, Do Not Invent)
 
-- [ ] A swap made with a reason can feed the existing Judgment stat and The Good Swap quest (Phase 8/9). Reuse those; do not create a new reward mechanism.
-- [ ] RED first: write a test that a logged swap with a reason contributes to the existing judgment reward path, and that a swap never produces guilt copy or a penalty. Then confirm via the existing reward functions.
-- [ ] A swap with no reason is still fine and neutral; it simply does not trigger the judgment reward. No nagging for a missing reason.
+- [x] A swap made with a reason can feed the existing Judgment stat and The Good Swap quest (Phase 8/9). Reuse those; do not create a new reward mechanism.
+- [x] RED first: write a test that a logged swap with a reason contributes to the existing judgment reward path, and that a swap never produces guilt copy or a penalty. Then confirm via the existing reward functions.
+- [x] A swap with no reason is still fine and neutral; it simply does not trigger the judgment reward. No nagging for a missing reason.
 
 ## Section F: Persistence and Offline
 
-- [ ] Confirm swapped sessions, off-block-on-training-day sessions, the counter behavior, and classifications persist and compute offline.
-- [ ] No network calls introduced in Phase 14.
+- [x] Confirm swapped sessions, off-block-on-training-day sessions, the counter behavior, and classifications persist and compute offline.
+- [x] No network calls introduced in Phase 14.
 
 ## Section G: Phase 14 Done When
 
-- [ ] On a training day the user can keep the prescribed workout, swap to another KB workout, or log an off-block activity instead.
-- [ ] A KB-for-KB swap logs with planned and actual workouts differing, counts toward the ascension guard, and shows the chosen workout resolved at the active tier.
-- [ ] An off-block activity on a training day logs via the existing Phase 10 path, feeds Conditioning and the status engine, and does NOT count toward the KB guard.
-- [ ] The guard counter keys on KB-session criteria, not workout identity, and does not double-count; proven by test (and the Phase 11 guard still reads it correctly).
-- [ ] Swaps can feed the existing judgment reward; no new reward mechanism; never any guilt.
-- [ ] The template does not re-align; a swap or off-block day changes only that day's log, not future scheduling.
-- [ ] The prescribed workout stays the neutral default and remains fully visible.
-- [ ] All logic test-first; engine pure; no new recommendation or routing logic (reuse Phase 3 resolver, Phase 10 routing, Phase 2 classification, Phase 8/9 rewards).
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 14 commit message.
+- [x] On a training day the user can keep the prescribed workout, swap to another KB workout, or log an off-block activity instead.
+- [x] A KB-for-KB swap logs with planned and actual workouts differing, counts toward the ascension guard, and shows the chosen workout resolved at the active tier.
+- [x] An off-block activity on a training day logs via the existing Phase 10 path, feeds Conditioning and the status engine, and does NOT count toward the KB guard.
+- [x] The guard counter keys on KB-session criteria, not workout identity, and does not double-count; proven by test (and the Phase 11 guard still reads it correctly).
+- [x] Swaps can feed the existing judgment reward; no new reward mechanism; never any guilt.
+- [x] The template does not re-align; a swap or off-block day changes only that day's log, not future scheduling.
+- [x] The prescribed workout stays the neutral default and remains fully visible.
+- [x] All logic test-first; engine pure; no new recommendation or routing logic (reuse Phase 3 resolver, Phase 10 routing, Phase 2 classification, Phase 8/9 rewards).
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 14 commit message.
 
 ---
 
