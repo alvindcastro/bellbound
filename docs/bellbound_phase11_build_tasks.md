@@ -32,68 +32,68 @@ Discipline: the engine decides (eligibility, next tier, lesson); the app perform
 
 ## Section A: Test Workout
 
-- [ ] Add a `test` day capability: the test workout is the current baseline workout done at test intensity (a heavier load or top effort of the same movements), invoked by the user in place of a KB day. It is not a separate prescribed workout and not a scheduled day.
-- [ ] RED first: write failing tests that a test log is recorded with `actualDayType: 'test'` and carries its result (completed/failed, the loads/reps achieved). Then implement the test-log path, reusing `buildWorkoutLog` extended for the test case.
-- [ ] The test is user-invoked. Build a clear "attempt test" action available on a KB day. Invoking it does not automatically ascend; it produces a test result that the guard then evaluates.
+- [x] Add a `test` day capability: the test workout is the current baseline workout done at test intensity (a heavier load or top effort of the same movements), invoked by the user in place of a KB day. It is not a separate prescribed workout and not a scheduled day.
+- [x] RED first: write failing tests that a test log is recorded with `actualDayType: 'test'` and carries its result (completed/failed, the loads/reps achieved). Then implement the test-log path, reusing `buildWorkoutLog` extended for the test case.
+- [x] The test is user-invoked. Build a clear "attempt test" action available on a KB day. Invoking it does not automatically ascend; it produces a test result that the guard then evaluates.
 
 ## Section B: Ascension Guard
 
-- [ ] RED first: write failing tests for the guard decision `isTestEligibleForAscension(block)` (name to taste): the test counts toward ascension only if `block.completedPlannedKbSessions >= block.testGuardMinSessions` (default 6). Then implement.
-- [ ] Test the decline case: invoking a test before the guard is met returns not-eligible; the Council declines; nothing changes (no block close, no tier bump, rotation continues).
-- [ ] Test the eligible case: guard met and the test was completed successfully → eligible to ascend.
-- [ ] Test that a failed test, even with the guard met, does not ascend (decide and document: a failed test holds the baseline; it does not bump).
-- [ ] The guard reads the counter maintained since Phase 2. If the counter is wrong, ascension is wrong; this is why Phase 2 emphasized counter correctness. Add a test that constructs a block with a known counter and asserts the guard result.
+- [x] RED first: write failing tests for the guard decision `isTestEligibleForAscension(block)` (name to taste): the test counts toward ascension only if `block.completedPlannedKbSessions >= block.testGuardMinSessions` (default 6). Then implement.
+- [x] Test the decline case: invoking a test before the guard is met returns not-eligible; the Council declines; nothing changes (no block close, no tier bump, rotation continues).
+- [x] Test the eligible case: guard met and the test was completed successfully → eligible to ascend.
+- [x] Test that a failed test, even with the guard met, does not ascend (decide and document: a failed test holds the baseline; it does not bump).
+- [x] The guard reads the counter maintained since Phase 2. If the counter is wrong, ascension is wrong; this is why Phase 2 emphasized counter correctness. Add a test that constructs a block with a known counter and asserts the guard result.
 
 ## Section C: Block Transition (Pure Computation)
 
-- [ ] RED first: write failing tests for a pure function that, given the closing block and the successful test, computes the next block: `baselineTier = closingBlock.baselineTier + 1`, a fresh `completedPlannedKbSessions = 0`, status active, a new start date, and the permanent lesson(s) banked from this block. Then implement.
-- [ ] The computation is pure: it returns the next-block spec and the lesson(s). It does not write to the DB.
-- [ ] Whole-baseline bump: the next block runs every workout one tier higher via the existing Phase 3 resolver. Confirm by test that resolving any template under the new block yields the N+1 definition (reuse the Phase 3 propagation test).
+- [x] RED first: write failing tests for a pure function that, given the closing block and the successful test, computes the next block: `baselineTier = closingBlock.baselineTier + 1`, a fresh `completedPlannedKbSessions = 0`, status active, a new start date, and the permanent lesson(s) banked from this block. Then implement.
+- [x] The computation is pure: it returns the next-block spec and the lesson(s). It does not write to the DB.
+- [x] Whole-baseline bump: the next block runs every workout one tier higher via the existing Phase 3 resolver. Confirm by test that resolving any template under the new block yields the N+1 definition (reuse the Phase 3 propagation test).
 
 ## Section D: Ascension Transaction (Persistence)
 
-- [ ] RED first: write failing tests (fake-indexeddb) for the full transaction performed by the app layer when a test is eligible and successful:
+- [x] RED first: write failing tests (fake-indexeddb) for the full transaction performed by the app layer when a test is eligible and successful:
     1. Close the current block (status completed).
     2. Reset the six stats to baseline (this is the reset deferred in Phase 8).
     3. Reset `completedPlannedKbSessions` to 0 (the reset deferred in Phase 2; it is part of opening the new block).
     4. Open the next block at tier N+1 (active).
     5. Persist the banked permanent lesson(s).
    Then implement. The transaction must be atomic in effect: a partial ascension (e.g. block opened but stats not reset) is a bug. Use a Dexie transaction so all writes commit together.
-- [ ] Test the post-state: after ascension, the active block is the new one at N+1, stats are at baseline, the counter is 0, and the lesson list grew by the banked lesson(s).
-- [ ] Test that ascension is not re-triggerable from the same test (idempotent): re-evaluating does not ascend again.
+- [x] Test the post-state: after ascension, the active block is the new one at N+1, stats are at baseline, the counter is 0, and the lesson list grew by the banked lesson(s).
+- [x] Test that ascension is not re-triggerable from the same test (idempotent): re-evaluating does not ascend again.
 
 ## Section E: Permanent Lessons
 
-- [ ] Add a permanent lessons store (Dexie table) that is NOT reset on ascension; lessons persist across blocks.
-- [ ] RED first: write failing tests that a banked lesson persists across the ascension transaction and into subsequent blocks. Then implement.
-- [ ] Lessons are user-specific training rules that carry across blocks (e.g. Press Before Squat, Repeat Before Increase, Sleep Is Real). Decide which lessons are banked by which behavior; for Phase 11, banking at least one lesson per ascension (themed to the block's notable behavior) is sufficient. The lesson's effect on future recommendations can be minimal at this phase (display and record); deeper lesson effects can be a refinement.
-- [ ] Confirm lessons never reset. The stat reset and counter reset must not touch the lessons table; test this explicitly.
+- [x] Add a permanent lessons store (Dexie table) that is NOT reset on ascension; lessons persist across blocks.
+- [x] RED first: write failing tests that a banked lesson persists across the ascension transaction and into subsequent blocks. Then implement.
+- [x] Lessons are user-specific training rules that carry across blocks (e.g. Press Before Squat, Repeat Before Increase, Sleep Is Real). Decide which lessons are banked by which behavior; for Phase 11, banking at least one lesson per ascension (themed to the block's notable behavior) is sufficient. The lesson's effect on future recommendations can be minimal at this phase (display and record); deeper lesson effects can be a refinement.
+- [x] Confirm lessons never reset. The stat reset and counter reset must not touch the lessons table; test this explicitly.
 
 ## Section F: UI
 
-- [ ] Build the test-workout invocation flow on a KB day (attempt test → log result).
-- [ ] Build the ascension outcome screen: on eligible success, show the dry celebration, the banked lesson(s), and that the next block begins one tier heavier (mirror the v4 example tone). On decline (guard not met) or failure, state it neutrally; nothing changes.
-- [ ] No guilt copy on a declined or failed test. "The baseline is not yet consolidated" is neutral, not a scold.
-- [ ] Verify rendering manually.
+- [x] Build the test-workout invocation flow on a KB day (attempt test → log result).
+- [x] Build the ascension outcome screen: on eligible success, show the dry celebration, the banked lesson(s), and that the next block begins one tier heavier (mirror the v4 example tone). On decline (guard not met) or failure, state it neutrally; nothing changes.
+- [x] No guilt copy on a declined or failed test. "The baseline is not yet consolidated" is neutral, not a scold.
+- [x] Verify rendering manually.
 
 ## Section G: Persistence and Offline
 
-- [ ] Confirm the entire ascension transaction works offline and persists across reload.
-- [ ] No network calls introduced in Phase 11.
+- [x] Confirm the entire ascension transaction works offline and persists across reload.
+- [x] No network calls introduced in Phase 11.
 
 ## Section H: Phase 11 Done When
 
-- [ ] A user-invoked test workout (current baseline at test intensity) can be attempted on a KB day.
-- [ ] The ascension guard reads `completedPlannedKbSessions` against `testGuardMinSessions`; a test before the guard declines and changes nothing.
-- [ ] A successful, guarded test closes the block, resets stats, resets the counter, opens the next block at tier N+1, and banks a permanent lesson, all in one atomic transaction.
-- [ ] A failed test does not ascend; the baseline holds.
-- [ ] Permanent lessons persist across blocks and are never reset; tested explicitly.
-- [ ] The tier bump propagates to all workouts via the existing resolver (no per-workout edits).
-- [ ] Ascension is idempotent; the same test cannot ascend twice.
-- [ ] No guilt copy on decline or failure.
-- [ ] Engine decides (guard, next tier, lesson); app performs the atomic persistence; all test-first; engine pure.
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 11 commit message.
+- [x] A user-invoked test workout (current baseline at test intensity) can be attempted on a KB day.
+- [x] The ascension guard reads `completedPlannedKbSessions` against `testGuardMinSessions`; a test before the guard declines and changes nothing.
+- [x] A successful, guarded test closes the block, resets stats, resets the counter, opens the next block at tier N+1, and banks a permanent lesson, all in one atomic transaction.
+- [x] A failed test does not ascend; the baseline holds.
+- [x] Permanent lessons persist across blocks and are never reset; tested explicitly.
+- [x] The tier bump propagates to all workouts via the existing resolver (no per-workout edits).
+- [x] Ascension is idempotent; the same test cannot ascend twice.
+- [x] No guilt copy on decline or failure.
+- [x] Engine decides (guard, next tier, lesson); app performs the atomic persistence; all test-first; engine pure.
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 11 commit message.
 
 ---
 

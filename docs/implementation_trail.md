@@ -706,3 +706,58 @@ Total: 341 tests
 - **Determinism proof in test**: `computeActivityStatDeltas` is called twice with the same log object; both calls return equal results. This rules out hidden randomness or mutation.
 
 *Phase 10 complete. Next: Phase 11.*
+
+---
+
+## Phase 11 — Test Workout and Ascension (2026-06-15)
+
+**Status: Complete — all tests green, pushed**
+
+### What was built
+
+| Path | Purpose |
+|------|---------|
+| `packages/engine/src/entities/lesson.ts` | `PermanentLesson { id, title, description, earnedDate, blockId }` |
+| `packages/engine/src/ascension/ascensionGuard.ts` | `isTestEligibleForAscension(block, testLog)` — counter guard + completed-test check |
+| `packages/engine/src/ascension/blockTransition.ts` | `computeBlockTransition(closingBlock, testLog, newBlockId, startDate)` — pure, returns `{ nextBlock, lesson }` |
+| `packages/engine/src/counter/shouldIncrementCounter.ts` | Fixed: added `actualDayType !== 'test'` guard so test workouts on KB days don't inflate the counter |
+| `packages/engine/src/__tests__/ascensionGuard.test.ts` | 10 tests: guard met/not-met, failed test, skipped, modified, various counter thresholds |
+| `packages/engine/src/__tests__/blockTransition.test.ts` | 15 tests: tier bump, counter reset, status, guard min, lesson selection, wrap-around |
+| `app/src/data/db/bellboundDb.ts` | `LessonRow`; `lessons!: Table<LessonRow, string>`; version(3) with `lessons: 'id'` |
+| `app/src/data/repositories/lessonRepository.ts` | `add(lesson)`, `listAll()` |
+| `app/src/data/repositories/blockRepository.ts` | Added `closeBlock(blockId)`, `addBlock(block)` |
+| `app/src/data/repositories/characterRepository.ts` | Added `resetStats(userId)` — zeroes all six stats |
+| `app/src/services/ascensionService.ts` | `evaluateAndApplyAscension(closingBlock, testLog, today)` — guard check, idempotency check, atomic Dexie transaction |
+| `app/src/__tests__/ascension.test.ts` | 8 tests: guard enforcement, successful ascension, stat reset, lesson banked, lesson persistence, idempotency, lessons survive reset |
+| `app/src/ui/log/TestWorkoutForm.tsx` | Test workout form: completed/failed status, difficulty, signals, guard display |
+| `app/src/ui/ascension/AscensionScreen.tsx` | Dry outcome screen: guard_not_met, test_failed, ascended (with lesson and tier) |
+| `app/src/ui/today/TodayScreen.tsx` | Added optional `onAttemptTest` prop; "Attempt test" button on KB days |
+| `app/src/App.tsx` | `'test' | 'ascension'` views; `ascensionOutcome` state; block/workout reload after ascension |
+
+### Test results
+
+```
+packages/engine — 233 tests (25 new in Phase 11)   ✓ PASS
+app             — 149 tests (17 new in Phase 11)    ✓ PASS
+Total: 382 tests
+```
+
+### Key decisions
+
+- **`shouldIncrementCounter` fix for test workouts**: A test attempted on a KB day has `plannedDayType: 'kb'` but `actualDayType: 'test'`. The counter previously would have incremented it (checking only `plannedDayType`). Added `log.actualDayType !== 'test'` as a condition so the counter tracks only regular KB sessions. Test added first (RED), then fixed (GREEN).
+
+- **Guard checks both counter and test result**: `isTestEligibleForAscension(block, testLog)` returns true only when `completedPlannedKbSessions >= testGuardMinSessions` AND `actualDayType === 'test'` AND `status === 'completed'`. A failed test with guard met → `test_failed`; an early test → `guard_not_met`. Neither ascends.
+
+- **Block transition is deterministic, not random**: `computeBlockTransition` uses a deterministic lesson ID (`lesson-${closingBlock.id}-${closingBlock.baselineTier}`) and cycles through 3 lesson templates by `(tier - 1) % 3`. No `crypto.randomUUID()` in the pure function — the new block ID is passed in by the caller.
+
+- **Atomic Dexie transaction**: `evaluateAndApplyAscension` wraps all four writes (close block, reset stats, open next block, bank lesson) in a single `db.transaction('rw', ...)`. A partial apply is impossible — either all commit or none.
+
+- **Idempotency via DB check**: Before transacting, the service calls `blockRepository.getActiveBlock()` and verifies the closing block is still active. If it's already 'completed', the function returns `guard_not_met` without retrying. This prevents double-ascension even if the UI calls the function twice.
+
+- **Lessons survive ascension explicitly**: The transaction touches `db.blocks`, `db.characters`, and `db.lessons` (append only) — never deletes or modifies existing lessons. Tested explicitly: a pre-existing lesson survives a full ascension transaction.
+
+- **Stat reset is surgical**: Only `db.characters.update('player-1', { stats: zeroed })` runs during ascension. The lessons table is not touched. Tested by seeding a lesson before ascension and confirming it persists after.
+
+- **AscensionScreen has no nav header**: The ascension outcome is a terminal screen — only the "Continue" button exits. No back button prevents the user from navigating away before seeing the result.
+
+*Phase 11 complete. Next: Phase 12.*
