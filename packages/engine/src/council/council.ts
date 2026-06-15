@@ -1,8 +1,13 @@
 import type { WorkoutLog } from '../entities/workoutLog.js';
 import type { Recommendation } from '../entities/recommendation.js';
+import type { StatusEffect } from '../entities/statusEffect.js';
 import { isProgressionEligible } from './eligibility.js';
+import { resolveActiveEffects } from '../recovery/stacking.js';
 
-export function getCouncilRecommendation(recentLogs: WorkoutLog[]): Recommendation {
+export function getCouncilRecommendation(
+  recentLogs: WorkoutLog[],
+  activeEffects: StatusEffect[] = [],
+): Recommendation {
   if (recentLogs.length === 0) {
     return { kind: 'maintain', explanation: 'No sessions logged yet. Keep training.' };
   }
@@ -18,7 +23,10 @@ export function getCouncilRecommendation(recentLogs: WorkoutLog[]): Recommendati
     return { kind: 'reduce', explanation: reason };
   }
 
-  // PRIORITY 2: Active recovery blocker — STUBBED; Phase 7 drops status effects here
+  // PRIORITY 2: Active recovery blocker (status effects)
+  if (activeEffects.length > 0) {
+    return resolveActiveEffects(activeEffects);
+  }
 
   // PRIORITY 3: Movement-specific blocking signal (from most recent session)
   const { signals } = mostRecent;

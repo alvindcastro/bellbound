@@ -7,4 +7,5 @@ export interface StatusEffect {
   recommendationEffect: string;
   expiryType: ExpiryType;
   expiryParam: number | null;
+  createdDate: string;
 }

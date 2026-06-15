@@ -11,3 +11,6 @@ export * from './flavour/completionMessages.js';
 export * from './flavour/characterClasses.js';
 export * from './council/eligibility.js';
 export * from './council/council.js';
+export * from './recovery/statusEffects.js';
+export * from './recovery/expiry.js';
+export * from './recovery/stacking.js';

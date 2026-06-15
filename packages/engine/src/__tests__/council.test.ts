@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { isProgressionEligible, isMovementProgressionEligible } from '../council/eligibility.js';
 import { getCouncilRecommendation } from '../council/council.js';
+import { createPoorSleepGoblin, createStatusEffectsFromSignals } from '../recovery/statusEffects.js';
 import type { WorkoutLog } from '../entities/workoutLog.js';
+import type { StatusEffect } from '../entities/statusEffect.js';
 import type { Difficulty } from '../entities/enums.js';
 
 function makeLog(
@@ -196,5 +198,51 @@ describe('getCouncilRecommendation', () => {
   it('explanation for progress contains "Two normal" or "two normal"', () => {
     const result = getCouncilRecommendation([makeLog('normal'), makeLog('normal')]);
     expect(result.explanation.toLowerCase()).toContain('two normal');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getCouncilRecommendation — Priority 2: active status effects (slot 2)
+// ---------------------------------------------------------------------------
+describe('getCouncilRecommendation — slot 2 active effects', () => {
+  it('Active Poor Sleep Goblin → returns repeat even with 2 normal/easy logs (slot 2 beats slot 5/6)', () => {
+    const effects = [createPoorSleepGoblin('2026-06-01')];
+    const logs = [makeLog('normal'), makeLog('easy')];
+    expect(getCouncilRecommendation(logs, effects)).toMatchObject({ kind: 'repeat' });
+  });
+
+  it('Active Press Gremlin → returns hold_pressing (slot 2 beats slot 3 signal check)', () => {
+    const effects = createStatusEffectsFromSignals(
+      { pressGrindy: true, breathless: false, gripCooked: false, legsSore: false },
+      '2026-06-01',
+    );
+    const logs = [makeLog('normal')];
+    expect(getCouncilRecommendation(logs, effects)).toMatchObject({ kind: 'hold_pressing' });
+  });
+
+  it('Multiple effects (Poor Sleep Goblin + Press Gremlin) → returns repeat', () => {
+    const effects: StatusEffect[] = [
+      createPoorSleepGoblin('2026-06-01'),
+      ...createStatusEffectsFromSignals(
+        { pressGrindy: true, breathless: false, gripCooked: false, legsSore: false },
+        '2026-06-01',
+      ),
+    ];
+    const logs = [makeLog('normal')];
+    expect(getCouncilRecommendation(logs, effects)).toMatchObject({ kind: 'repeat' });
+  });
+
+  it('Active effect beats hard difficulty (slot 2 > slot 4): Breathless Fog + hard last session → hold_conditioning', () => {
+    const effects = createStatusEffectsFromSignals(
+      { pressGrindy: false, breathless: true, gripCooked: false, legsSore: false },
+      '2026-06-01',
+    );
+    const logs = [makeLog('hard')];
+    expect(getCouncilRecommendation(logs, effects)).toMatchObject({ kind: 'hold_conditioning' });
+  });
+
+  it('No active effects (default []) → existing behavior unchanged', () => {
+    // Two normal logs with no signals → progress (slot 5/6)
+    expect(getCouncilRecommendation([makeLog('normal'), makeLog('normal')])).toMatchObject({ kind: 'progress' });
   });
 });
