@@ -56,7 +56,7 @@ Most of Phase 5 is data (maps of strings) and JSX. Keep the few lookups pure and
 
 - [x] Apply a low-fi, text-heavy theme: simple, readable, mobile-width friendly, minimal animation. Parchment optional. Small absurd item art is optional and can wait.
 - [x] The workout table remains the primary, fully readable element. RPG flavour surrounds it; it never obscures sets, rounds, reps, load, or rest.
-- [ ] Verify on a narrow phone-width viewport in dev tools device mode.
+- [x] Verify on a narrow phone-width viewport in dev tools device mode.
 
 ## Section F: Phase 5 Done When
 
@@ -67,8 +67,8 @@ Most of Phase 5 is data (maps of strings) and JSX. Keep the few lookups pure and
 - [x] The low-fi theme is applied and the workout table is never obscured.
 - [x] The few lookups/selection functions are pure and tested; rendering verified manually.
 - [x] No training rules changed: no progression, recovery, or numbers touched by any of this.
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 5 commit message.
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 5 commit message.
 
 ---
 
