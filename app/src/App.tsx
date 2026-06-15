@@ -13,6 +13,7 @@ import { applyStatGainsFromLog } from './services/statService.js';
 import { evaluateAndPersistQuests } from './services/questService.js';
 import TodayScreen from './ui/today/TodayScreen.js';
 import LogForm from './ui/log/LogForm.js';
+import FreeDayForm from './ui/log/FreeDayForm.js';
 import RecentLogs from './ui/log/RecentLogs.js';
 import WeeklyHistory from './ui/history/WeeklyHistory.js';
 import WeeklyReportScreen from './ui/review/WeeklyReportScreen.js';
@@ -20,7 +21,7 @@ import CharacterView from './ui/character/CharacterView.js';
 import DailyContextForm from './ui/daily/DailyContextForm.js';
 import QuestsView from './ui/quests/QuestsView.js';
 
-type AppView = 'today' | 'log' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
+type AppView = 'today' | 'log' | 'activity' | 'recent' | 'history' | 'review' | 'character' | 'daily' | 'quests';
 
 function AppShell({ nav, children }: { nav: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -88,6 +89,28 @@ export default function App() {
             if (resolvedWorkout) {
               const rec = await getRecommendationForTemplate(resolvedWorkout.templateId);
               setRecommendation(rec);
+            }
+            setView('today');
+          }}
+          onCancel={() => setView('today')}
+        />
+      </AppShell>
+    );
+  }
+
+  if (view === 'activity') {
+    return (
+      <AppShell nav={<button onClick={() => setView('today')}>Cancel</button>}>
+        <FreeDayForm
+          date={today}
+          blockId={activeBlock?.id ?? 'no-block'}
+          onSave={async () => {
+            const log = await workoutLogRepository.getByDate(today);
+            setTodayLog(log);
+            if (log) {
+              await createAndPersistEffectsFromLog(log);
+              await applyStatGainsFromLog(log);
+              await evaluateAndPersistQuests(today);
             }
             setView('today');
           }}
@@ -169,6 +192,7 @@ export default function App() {
         recommendation={recommendation}
         activeEffects={activeEffects}
         onLogWorkout={() => setView('log')}
+        onLogActivity={() => setView('activity')}
       />
     </AppShell>
   );

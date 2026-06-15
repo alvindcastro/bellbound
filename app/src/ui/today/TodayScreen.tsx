@@ -20,6 +20,7 @@ interface Props {
   recommendation: Recommendation | null;
   activeEffects: StatusEffect[];
   onLogWorkout: () => void;
+  onLogActivity?: () => void;
 }
 
 function formatReps(m: ResolvedMovement): string {
@@ -44,11 +45,11 @@ const DAY_LABEL: Record<string, string> = {
 
 const DAY_MESSAGE: Record<string, string> = {
   rest: 'Rest day. Recover well.',
-  free: 'Free day. Move how you feel.',
+  free: 'Free day. Log an activity or rest — up to you.',
   test: 'Test day — logging coming in a later phase.',
 };
 
-export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, onLogWorkout }: Props) {
+export default function TodayScreen({ date, todayResult, todayLog, recommendation, activeEffects, onLogWorkout, onLogActivity }: Props) {
   if (todayResult === null) {
     return <p className="loading">Loading…</p>;
   }
@@ -62,7 +63,11 @@ export default function TodayScreen({ date, todayResult, todayLog, recommendatio
         {todayLog !== null && classification === 'trained_on_rest_day' && (
           <p className="log-status extra">Extra session logged</p>
         )}
-        <button className="btn" onClick={onLogWorkout}>Log a workout anyway</button>
+        {todayResult.dayType === 'free' && onLogActivity != null ? (
+          <button className="btn" onClick={onLogActivity}>Log an activity</button>
+        ) : (
+          <button className="btn" onClick={onLogWorkout}>Log a workout anyway</button>
+        )}
       </div>
     );
   }

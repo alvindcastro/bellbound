@@ -1,5 +1,4 @@
 import { QUEST_DEFINITIONS, evaluateQuestProgress, shouldGrantReward } from '@bellbound/engine';
-import type { WorkoutLog } from '@bellbound/engine';
 import { questRepository } from '../data/repositories/questRepository.js';
 import { rewardRepository } from '../data/repositories/rewardRepository.js';
 import { workoutLogRepository } from '../data/repositories/workoutLogRepository.js';

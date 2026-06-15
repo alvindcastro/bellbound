@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { db } from '../data/db/bellboundDb.js';
 import { statusEffectRepository } from '../data/repositories/statusEffectRepository.js';
 import { createAndPersistEffectsFromLog, createAndPersistPoorSleepGoblinIfNeeded } from '../services/effectService.js';
+import { createStatusEffectsFromSignals } from '@bellbound/engine';
 import type { WorkoutLog } from '@bellbound/engine';
 
 beforeEach(async () => {
@@ -72,5 +73,14 @@ describe('createAndPersistPoorSleepGoblinIfNeeded', () => {
     await createAndPersistPoorSleepGoblinIfNeeded('2026-06-14', 7);
     const effects = await statusEffectRepository.listAll();
     expect(effects).toHaveLength(0);
+  });
+});
+
+describe('createStatusEffectsFromSignals (source-agnostic)', () => {
+  it('produces status effects from off_block log signals the same as planned', () => {
+    const signals = { pressGrindy: false, breathless: true, gripCooked: false, legsSore: false };
+    const effects = createStatusEffectsFromSignals(signals, '2026-06-15');
+    expect(effects).toHaveLength(1);
+    expect(effects[0]?.source).toBe('breathless');
   });
 });

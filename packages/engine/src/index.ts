@@ -18,3 +18,6 @@ export * from './stats/statGain.js';
 export * from './quests/questDefinitions.js';
 export * from './quests/questProgress.js';
 export * from './quests/questUnlock.js';
+export { defaultSourceForActivity } from './activities/activitySource.js';
+export type { ActivityType } from './activities/activitySource.js';
+export { computeActivityStatDeltas } from './activities/activityStatMap.js';

@@ -113,4 +113,21 @@ describe('buildWorkoutLog', () => {
     const log = buildWorkoutLog(inputs, context);
     expect((log.actualWorkout as any).name).toBe('Double KB Strength');
   });
+
+  it('defaults source to planned when not provided', () => {
+    const log = buildWorkoutLog(inputs, context); // existing context has no source
+    expect(log.source).toBe('planned');
+  });
+
+  it('uses provided source off_block when set', () => {
+    const activityContext = { ...context, source: 'off_block' as const };
+    const log = buildWorkoutLog(inputs, activityContext);
+    expect(log.source).toBe('off_block');
+  });
+
+  it('uses provided source recovery_skill when set', () => {
+    const activityContext = { ...context, source: 'recovery_skill' as const };
+    const log = buildWorkoutLog(inputs, activityContext);
+    expect(log.source).toBe('recovery_skill');
+  });
 });
