@@ -1,6 +1,6 @@
 import type { TodayResult } from '../../services/todayService.js';
 import type { ResolvedMovement, WorkoutLog } from '@bellbound/engine';
-import { classifyDay } from '@bellbound/engine';
+import { classifyDay, getEncounterText, getCompletionMessage } from '@bellbound/engine';
 
 interface Props {
   date: string;
@@ -64,6 +64,11 @@ export default function TodayScreen({ date, todayResult, todayLog, onLogWorkout 
       {alreadyLogged && (
         <p className="log-status logged">Logged: {todayLog!.status} · {todayLog!.difficulty}</p>
       )}
+      {alreadyLogged && (
+        <p className="completion-message">
+          {getCompletionMessage('kb', todayLog!.status)}
+        </p>
+      )}
       <p className="zone-title">{workout.zoneName}</p>
       <table className="workout-table">
         <thead>
@@ -76,7 +81,12 @@ export default function TodayScreen({ date, todayResult, todayLog, onLogWorkout 
         <tbody>
           {workout.movements.map((m) => (
             <tr key={m.name}>
-              <td>{m.name}</td>
+              <td>
+                {m.name}
+                {getEncounterText(m.name) && (
+                  <span className="encounter-text">{getEncounterText(m.name)}</span>
+                )}
+              </td>
               <td>{formatReps(m)}</td>
               <td>{formatLoad(m)}</td>
             </tr>

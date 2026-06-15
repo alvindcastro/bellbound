@@ -11,8 +11,9 @@ import LogForm from './ui/log/LogForm.js';
 import RecentLogs from './ui/log/RecentLogs.js';
 import WeeklyHistory from './ui/history/WeeklyHistory.js';
 import WeeklyReportScreen from './ui/review/WeeklyReportScreen.js';
+import CharacterView from './ui/character/CharacterView.js';
 
-type AppView = 'today' | 'log' | 'recent' | 'history' | 'review';
+type AppView = 'today' | 'log' | 'recent' | 'history' | 'review' | 'character';
 
 export default function App() {
   const today = new Date().toISOString().slice(0, 10);
@@ -58,6 +59,20 @@ export default function App() {
             }}
             onCancel={() => setView('today')}
           />
+        </main>
+      </div>
+    );
+  }
+
+  if (view === 'character') {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <span className="app-title">Bellbound</span>
+          <button onClick={() => setView('today')}>← Today</button>
+        </header>
+        <main>
+          <CharacterView />
         </main>
       </div>
     );
@@ -113,6 +128,7 @@ export default function App() {
         <button onClick={() => setView('recent')}>Log History</button>
         <button onClick={() => setView('history')}>Week</button>
         <button onClick={() => setView('review')}>Report</button>
+        <button onClick={() => setView('character')}>Character</button>
       </header>
       <main>
         <TodayScreen

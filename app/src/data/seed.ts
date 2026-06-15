@@ -10,7 +10,7 @@ export async function seed(today = new Date().toISOString().slice(0, 10)): Promi
     await db.characters.add({
       userId: 'player-1',
       characterName: 'Adventurer',
-      className: 'Kettlebell Practitioner',
+      className: 'bellbarian',
       level: 1,
       stats: {
         strength: 0,
@@ -48,7 +48,7 @@ export async function seed(today = new Date().toISOString().slice(0, 10)): Promi
     await db.workoutTemplates.add({
       id: 'dkbs',
       name: 'Double KB Strength',
-      zoneName: 'Strength Zone',
+      zoneName: 'The Double-Bell Gate',
       category: 'kettlebell',
       defaultRest: 90,
       tierStep: '+1 round per tier',
@@ -69,7 +69,7 @@ export async function seed(today = new Date().toISOString().slice(0, 10)): Promi
     await db.workoutTemplates.add({
       id: 'abc',
       name: 'Armor Building Complex',
-      zoneName: 'Strength-Conditioning Zone',
+      zoneName: 'The Armor Foundry',
       category: 'kettlebell',
       defaultRest: 60,
       tierStep: '+2 sets per tier',
@@ -89,7 +89,7 @@ export async function seed(today = new Date().toISOString().slice(0, 10)): Promi
     await db.workoutTemplates.add({
       id: 'skbs',
       name: 'Single KB Strength',
-      zoneName: 'Strength Zone',
+      zoneName: 'The Single-Bell Outpost',
       category: 'kettlebell',
       defaultRest: 90,
       tierStep: '+1 round per tier',
@@ -109,7 +109,7 @@ export async function seed(today = new Date().toISOString().slice(0, 10)): Promi
     await db.workoutTemplates.add({
       id: 'swing-conditioning',
       name: 'Swing / Push-up Conditioning',
-      zoneName: 'Conditioning Zone',
+      zoneName: 'The Swing Marsh',
       category: 'kettlebell',
       defaultRest: 30,
       tierStep: '+1 set per tier',
@@ -128,7 +128,7 @@ export async function seed(today = new Date().toISOString().slice(0, 10)): Promi
     await db.workoutTemplates.add({
       id: 'recovery',
       name: 'Rest / Recovery',
-      zoneName: 'Recovery',
+      zoneName: 'The Recovery Inn',
       category: 'recovery',
       defaultRest: 0,
       tierStep: 'no progression',

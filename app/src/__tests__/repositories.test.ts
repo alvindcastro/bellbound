@@ -4,6 +4,7 @@ import { blockRepository } from '../data/repositories/blockRepository.js';
 import { workoutTemplateRepository } from '../data/repositories/workoutTemplateRepository.js';
 import { weekTemplateRepository } from '../data/repositories/weekTemplateRepository.js';
 import { workoutLogRepository } from '../data/repositories/workoutLogRepository.js';
+import { characterRepository } from '../data/repositories/characterRepository.js';
 
 beforeEach(async () => {
   await db.open();
@@ -165,5 +166,39 @@ describe('workoutLogRepository', () => {
     expect(rows[0]?.source).toBe('planned');
     expect(rows[0]?.plannedDayType).toBe('kb');
     expect(rows[0]?.signals.pressGrindy).toBe(false);
+  });
+});
+
+describe('characterRepository', () => {
+  const sampleCharacterRow = {
+    userId: 'player-1',
+    className: 'bellbarian',
+    level: 1,
+    characterName: 'Adventurer',
+    stats: { strength: 0, conditioning: 0, control: 0, consistency: 0, recovery: 0, judgment: 0 },
+  };
+
+  it('getPlayer returns null when no character exists', async () => {
+    const character = await characterRepository.getPlayer();
+    expect(character).toBeNull();
+  });
+
+  it('getPlayer returns the character mapped correctly when a character row exists', async () => {
+    await db.characters.add(sampleCharacterRow);
+    const character = await characterRepository.getPlayer();
+    expect(character).not.toBeNull();
+    expect(character?.userId).toBe('player-1');
+    expect(character?.className).toBe('bellbarian');
+    expect(character?.level).toBe(1);
+    expect(character?.characterName).toBe('Adventurer');
+    expect(character?.stats.strength).toBe(0);
+    expect(character?.stats.judgment).toBe(0);
+  });
+
+  it('updateClass changes the className field', async () => {
+    await db.characters.add(sampleCharacterRow);
+    await characterRepository.updateClass('player-1', 'pressomancer');
+    const character = await characterRepository.getPlayer();
+    expect(character?.className).toBe('pressomancer');
   });
 });

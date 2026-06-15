@@ -1,10 +1,10 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: Georgia, 'Times New Roman', serif, system-ui, -apple-system, sans-serif;
   margin: 0;
   padding: 0;
-  background: #fff;
+  background: #f9f7f2;
   color: #111;
   line-height: 1.5;
 }
@@ -66,7 +66,8 @@ body {
 .zone-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #555;
+  font-style: italic;
+  color: #444;
   margin: 0 0 16px;
 }
 
@@ -163,3 +164,24 @@ body {
 .loading { color: #888; padding: 24px 0; }
 .empty-state { color: #888; padding: 24px 0; }
 .section-title { font-size: 1rem; font-weight: 700; margin: 0 0 16px; }
+
+.encounter-text {
+  display: block;
+  font-size: 0.78rem;
+  color: #888;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.completion-message {
+  font-style: italic;
+  color: #555;
+  font-size: 0.9rem;
+  margin: 8px 0;
+}
+
+.flavour-message {
+  font-style: italic;
+  color: #666;
+  font-size: 0.9rem;
+}
