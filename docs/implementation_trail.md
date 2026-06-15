@@ -565,3 +565,47 @@ Total: 271 tests
 - **`recovery.test.ts` split into 3 focused files**: Each file maps to one source file (`statusEffects.ts`, `expiry.ts`, `stacking.ts`). Same 40 tests; no test was added or removed, just reorganised. The split makes failure location obvious and keeps each file under 230 lines.
 
 - **`AppShell` as a local function component**: `function AppShell({ nav, children })` — a render helper, not an abstraction. It removes the 7× repetition of `<div className="app"><header className="app-header">...</header><main>...</main></div>` without introducing a new file or exported component. The `nav` prop carries per-view nav buttons; `children` carries the view body.
+
+---
+
+## Phase 8 — Campaign Stats (2026-06-15)
+
+**Status: Complete — all tests green, pushed**
+
+### What was built
+
+| Path | Purpose |
+|------|---------|
+| `packages/engine/src/stats/statGain.ts` | `StatDeltas` type; `computeStatDeltas(log): StatDeltas` — pure mapping from WorkoutLog to stat increments |
+| `packages/engine/src/__tests__/statGain.test.ts` | 10 tests: per-stat rules, grindy case, rest day, skipped, independence assertion |
+| `app/src/data/repositories/characterRepository.ts` | Added `applyStatDeltas(userId, deltas)` — reads row, sums each field, writes back |
+| `app/src/__tests__/repositories.test.ts` | 3 new tests: additive deltas, multi-call accumulation, missing userId no-op |
+| `app/src/services/statService.ts` | Thin coordinator: `applyStatGainsFromLog(log)` calls engine then repo |
+| `app/src/App.tsx` | Calls `applyStatGainsFromLog(log)` after logging, after `createAndPersistEffectsFromLog` |
+| `app/src/ui/character/CharacterView.tsx` | Stats section: `<ul>` listing all six stats with current values |
+
+### Test results
+
+```
+packages/engine — 169 tests (10 new in Phase 8)   ✓ PASS
+app             — 116 tests (3 new in Phase 8)     ✓ PASS
+Total: 285 tests
+```
+
+### Key decisions
+
+- **Stat gain rules mapped to WorkoutLog fields without exercise-level granularity**: The engine doesn't yet have structured exercise data (actualWorkout is opaque). Rules are mapped to `actualDayType`, `status`, `source`, `difficulty`, and `signals`. Strength + Conditioning co-grant on KB sessions because DKBS always involves both. This mapping can be refined when exercise structure is introduced.
+
+- **Consistency scoped to non-rest days**: `planned + non-rest + completed/modified` grants Consistency. A planned rest day grants Recovery instead — both honor the plan but via different stats. If both were granted from a rest day it would double-reward the same behavior.
+
+- **Independence is structural, not behavioral**: `computeStatDeltas(log: WorkoutLog): StatDeltas` takes no eligibility input; `isProgressionEligible(logs: WorkoutLog[]): boolean` takes no stats input. The test at `statGain.test.ts` quotes the design principle directly: "You gained Strength because you trained. You did not unlock progression because the presses were grindy."
+
+- **Accumulation window marker in test file**: A comment in `statGain.test.ts` notes that stats accumulate without reset until ascension, which is expected and intentional — not an inflation bug. The reset path belongs to the ascension flow.
+
+- **`applyStatDeltas` uses `db.characters.update`, not `db.characters.put`**: `update` only modifies supplied fields; `put` would overwrite. Using `update` with the fully recomputed stats object is safe and explicit.
+
+- **statService is untested directly**: It's a two-line coordinator — `computeStatDeltas` is tested in the engine; `applyStatDeltas` is tested in the repository. Adding an integration test for statService would just duplicate those two suites through fake-indexeddb overhead with no new behavioral coverage.
+
+---
+
+*Phase 8 complete. Next: Phase 9 (Quests and Items).*

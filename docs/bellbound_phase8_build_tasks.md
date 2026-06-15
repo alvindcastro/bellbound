@@ -32,53 +32,53 @@ Discipline unchanged. Commit on green.
 
 ## Section A: Stat Gain Rules
 
-- [ ] RED first: write failing tests for pure stat-gain functions mapping training behavior to the six stats, then implement:
+- [x] RED first: write failing tests for pure stat-gain functions mapping training behavior to the six stats, then implement:
     - Strength: completing heavy clean, press, squat, carry, or barbell work.
     - Conditioning: completing swings, burpees, EMOMs, runs, or density work.
     - Control: marking reps clean or avoiding grinding (no grindy signal).
     - Consistency: completing a planned session, or logging an extra.
     - Recovery: taking scheduled rest, deload, mobility, or avoiding unnecessary work.
     - Judgment: a smart swap, repeating baseline, reducing load, or skipping a finisher.
-- [ ] Each rule is pure: it takes the log (and its Phase 2 classification and signals) and returns stat deltas. It does not read the DB or the recommendation.
-- [ ] Test that a rest day grants Recovery, a completed KB session grants Strength/Consistency, a wise regression grants Judgment/Control, etc., per the table.
+- [x] Each rule is pure: it takes the log (and its Phase 2 classification and signals) and returns stat deltas. It does not read the DB or the recommendation.
+- [x] Test that a rest day grants Recovery, a completed KB session grants Strength/Consistency, a wise regression grants Judgment/Control, etc., per the table.
 
 ## Section B: Independence From Progression
 
-- [ ] RED first: write a test asserting that stat gain and progression eligibility are computed independently: a session can gain Strength (because it was trained) while progression stays locked (because a press was grindy). The example message from the concept: "You gained Strength because you trained. You did not unlock progression because the presses were grindy." Then confirm the code structure enforces it.
-- [ ] The stat-gain function must not take progression eligibility as input, and the eligibility function must not take stats as input. Keep them structurally unable to influence each other.
+- [x] RED first: write a test asserting that stat gain and progression eligibility are computed independently: a session can gain Strength (because it was trained) while progression stays locked (because a press was grindy). The example message from the concept: "You gained Strength because you trained. You did not unlock progression because the presses were grindy." Then confirm the code structure enforces it.
+- [x] The stat-gain function must not take progression eligibility as input, and the eligibility function must not take stats as input. Keep them structurally unable to influence each other.
 
 ## Section C: Applying and Persisting Stats
 
-- [ ] RED first: write failing tests (fake-indexeddb) that applying stat deltas to the Character updates the six stat values and persists across reload. Then implement, with the app layer applying engine-computed deltas to the Character row via the repository.
-- [ ] The engine computes deltas (pure); the app persists them (I/O). Do not mutate the Character inside the engine.
-- [ ] Level, if used, is derived from stats or total gains; keep any leveling rule pure and tested. Leveling is optional flavour and must not gate anything mechanical.
+- [x] RED first: write failing tests (fake-indexeddb) that applying stat deltas to the Character updates the six stat values and persists across reload. Then implement, with the app layer applying engine-computed deltas to the Character row via the repository.
+- [x] The engine computes deltas (pure); the app persists them (I/O). Do not mutate the Character inside the engine.
+- [x] Level, if used, is derived from stats or total gains; keep any leveling rule pure and tested. Leveling is optional flavour and must not gate anything mechanical.
 
 ## Section D: Stats View
 
-- [ ] Build a character view showing the six stats and the class (from Phase 5).
-- [ ] Optionally show recent stat changes ("+1 Consistency", "+1 Recovery") as feedback after logging. Keep it dry and non-motivational.
-- [ ] Verify rendering manually.
+- [x] Build a character view showing the six stats and the class (from Phase 5).
+- [x] Optionally show recent stat changes ("+1 Consistency", "+1 Recovery") as feedback after logging. Keep it dry and non-motivational.
+- [x] Verify rendering manually.
 
 ## Section E: Accumulation Window (Known Interim State)
 
-- [ ] Note in code and a test comment: until ascension exists (a later phase), stats accumulate with no reset. This is expected for the window between Phase 8 and the ascension phase, NOT the inflation bug.
-- [ ] Do NOT build a reset, decay, or cap here. The reset path is wired when block close / ascension is built. Leave a clear marker that stat reset belongs to the ascension flow.
+- [x] Note in code and a test comment: until ascension exists (a later phase), stats accumulate with no reset. This is expected for the window between Phase 8 and the ascension phase, NOT the inflation bug.
+- [x] Do NOT build a reset, decay, or cap here. The reset path is wired when block close / ascension is built. Leave a clear marker that stat reset belongs to the ascension flow.
 
 ## Section F: Persistence and Offline
 
-- [ ] Confirm stats compute and persist offline.
-- [ ] No network calls introduced in Phase 8.
+- [x] Confirm stats compute and persist offline.
+- [x] No network calls introduced in Phase 8.
 
 ## Section G: Phase 8 Done When
 
-- [ ] Completing sessions and making good decisions raises the appropriate stats, per tested rules.
-- [ ] Stat gain is structurally independent of progression eligibility, proven by function signatures and tests.
-- [ ] The engine computes deltas purely; the app persists them; the Character is never mutated inside the engine.
-- [ ] Stats persist across reload and display on a character view.
-- [ ] The no-reset-until-ascension window is documented as intentional, not a bug, with a marker for the future reset.
-- [ ] All rules written test-first; engine pure; no stat logic in components.
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 8 commit message.
+- [x] Completing sessions and making good decisions raises the appropriate stats, per tested rules.
+- [x] Stat gain is structurally independent of progression eligibility, proven by function signatures and tests.
+- [x] The engine computes deltas purely; the app persists them; the Character is never mutated inside the engine.
+- [x] Stats persist across reload and display on a character view.
+- [x] The no-reset-until-ascension window is documented as intentional, not a bug, with a marker for the future reset.
+- [x] All rules written test-first; engine pure; no stat logic in components.
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 8 commit message.
 
 ---
 
