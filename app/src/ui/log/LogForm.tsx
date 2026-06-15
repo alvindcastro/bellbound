@@ -34,6 +34,10 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
   const [difficulty, setDifficulty] = useState<Difficulty>('normal');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
+  const [pressGrindy, setPressGrindy] = useState(false);
+  const [breathless, setBreathless] = useState(false);
+  const [gripCooked, setGripCooked] = useState(false);
+  const [legsSore, setLegsSore] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,7 +53,13 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
       category: workout.category,
     };
 
-    const inputs: LogFormInputs = { status, roundsCompleted: rounds, difficulty, note };
+    const inputs: LogFormInputs = {
+      status,
+      roundsCompleted: rounds,
+      difficulty,
+      note,
+      signals: { pressGrindy, breathless, gripCooked, legsSore },
+    };
 
     setSaving(true);
     try {
@@ -112,6 +122,30 @@ export default function LogForm({ date, blockId, workout, plannedDayType, onSave
                 {opt.label}
               </label>
             ))}
+          </div>
+        </div>
+      )}
+
+      {status !== 'skipped' && (
+        <div className="form-group">
+          <label>Signal flags (optional)</label>
+          <div className="checkbox-group">
+            <label>
+              <input type="checkbox" checked={pressGrindy} onChange={e => setPressGrindy(e.target.checked)} />
+              {' '}Presses felt grindy
+            </label>
+            <label>
+              <input type="checkbox" checked={breathless} onChange={e => setBreathless(e.target.checked)} />
+              {' '}Out of breath / conditioning too hard
+            </label>
+            <label>
+              <input type="checkbox" checked={gripCooked} onChange={e => setGripCooked(e.target.checked)} />
+              {' '}Grip cooked
+            </label>
+            <label>
+              <input type="checkbox" checked={legsSore} onChange={e => setLegsSore(e.target.checked)} />
+              {' '}Legs sore
+            </label>
           </div>
         </div>
       )}

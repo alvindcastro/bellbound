@@ -1,11 +1,23 @@
 import type { TodayResult } from '../../services/todayService.js';
-import type { ResolvedMovement, WorkoutLog } from '@bellbound/engine';
+import type { ResolvedMovement, WorkoutLog, Recommendation, RecommendationKind } from '@bellbound/engine';
 import { classifyDay, getEncounterText, getCompletionMessage } from '@bellbound/engine';
+
+const RECOMMENDATION_LABEL: Record<RecommendationKind, string> = {
+  reduce: 'Reduce',
+  repeat: 'Repeat baseline',
+  hold_pressing: 'Hold pressing',
+  hold_conditioning: 'Hold conditioning',
+  hold_carry: 'Hold carry',
+  hold_squat: 'Hold squat',
+  progress: 'Progression eligible',
+  maintain: 'Maintain',
+};
 
 interface Props {
   date: string;
   todayResult: TodayResult | null;
   todayLog: WorkoutLog | null;
+  recommendation: Recommendation | null;
   onLogWorkout: () => void;
 }
 
@@ -35,7 +47,7 @@ const DAY_MESSAGE: Record<string, string> = {
   test: 'Test day — logging coming in a later phase.',
 };
 
-export default function TodayScreen({ date, todayResult, todayLog, onLogWorkout }: Props) {
+export default function TodayScreen({ date, todayResult, todayLog, recommendation, onLogWorkout }: Props) {
   if (todayResult === null) {
     return <p className="loading">Loading…</p>;
   }
@@ -68,6 +80,12 @@ export default function TodayScreen({ date, todayResult, todayLog, onLogWorkout 
         <p className="completion-message">
           {getCompletionMessage('kb', todayLog!.status)}
         </p>
+      )}
+      {alreadyLogged && recommendation && (
+        <div className="council-recommendation">
+          <p className="council-kind">{RECOMMENDATION_LABEL[recommendation.kind]}</p>
+          <p className="council-explanation">{recommendation.explanation}</p>
+        </div>
       )}
       <p className="zone-title">{workout.zoneName}</p>
       <table className="workout-table">

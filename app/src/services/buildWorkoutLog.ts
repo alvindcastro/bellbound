@@ -1,10 +1,11 @@
-import type { DayType, Difficulty, WorkoutLog } from '@bellbound/engine';
+import type { DayType, Difficulty, Signals, WorkoutLog } from '@bellbound/engine';
 
 export interface LogFormInputs {
   status: 'completed' | 'skipped' | 'modified';
   roundsCompleted: number;
   difficulty: Difficulty;
   note: string;
+  signals?: Signals;
 }
 
 export interface WorkoutContext {
@@ -30,7 +31,7 @@ export function buildWorkoutLog(inputs: LogFormInputs, context: WorkoutContext):
     actualWorkout: { templateId: context.templateId, name: context.templateName },
     status: inputs.status,
     difficulty: inputs.difficulty,
-    signals: { pressGrindy: false, breathless: false, gripCooked: false, legsSore: false },
+    signals: inputs.signals ?? { pressGrindy: false, breathless: false, gripCooked: false, legsSore: false },
     originalNote: inputs.note,
     structuredNotes: { roundsCompleted: inputs.roundsCompleted },
   };

@@ -185,3 +185,30 @@ body {
   color: #666;
   font-size: 0.9rem;
 }
+
+.council-recommendation {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-left: 3px solid #999;
+  background: #f3f1eb;
+}
+
+.council-kind {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0 0 4px;
+}
+
+.council-explanation {
+  font-size: 0.85rem;
+  color: #555;
+  font-style: italic;
+  margin: 0;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+}

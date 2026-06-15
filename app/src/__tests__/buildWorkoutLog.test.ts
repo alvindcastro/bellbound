@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildWorkoutLog, type LogFormInputs, type WorkoutContext } from '../services/buildWorkoutLog.js';
+import type { Signals } from '@bellbound/engine';
 
 const context: WorkoutContext = {
   date: '2026-06-15',
@@ -61,6 +62,21 @@ describe('buildWorkoutLog', () => {
       gripCooked: false,
       legsSore: false,
     });
+  });
+
+  it('uses provided signals when given', () => {
+    const withSignals = {
+      ...inputs,
+      signals: { pressGrindy: true, breathless: false, gripCooked: false, legsSore: false } as Signals,
+    };
+    const log = buildWorkoutLog(withSignals, context);
+    expect(log.signals.pressGrindy).toBe(true);
+    expect(log.signals.breathless).toBe(false);
+  });
+
+  it('defaults all signals to false when signals not provided', () => {
+    const log = buildWorkoutLog(inputs, context); // inputs has no signals field
+    expect(log.signals).toEqual({ pressGrindy: false, breathless: false, gripCooked: false, legsSore: false });
   });
 
   it('sets difficulty from inputs', () => {

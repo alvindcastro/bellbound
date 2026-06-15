@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import type { Block, WorkoutLog, ResolvedWorkout } from '@bellbound/engine';
+import type { Block, WorkoutLog, ResolvedWorkout, Recommendation } from '@bellbound/engine';
 import { resolveWorkoutAtTier } from '@bellbound/engine';
+import { getRecommendationForTemplate } from './services/councilService.js';
 import { resolveToday } from './services/todayService.js';
 import type { TodayResult } from './services/todayService.js';
 import { blockRepository } from './data/repositories/blockRepository.js';
@@ -22,6 +23,7 @@ export default function App() {
   const [activeBlock, setActiveBlock] = useState<Block | null>(null);
   const [resolvedWorkout, setResolvedWorkout] = useState<ResolvedWorkout | null>(null);
   const [todayLog, setTodayLog] = useState<WorkoutLog | null>(null);
+  const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -55,6 +57,10 @@ export default function App() {
             onSave={async () => {
               const log = await workoutLogRepository.getByDate(today);
               setTodayLog(log);
+              if (resolvedWorkout) {
+                const rec = await getRecommendationForTemplate(resolvedWorkout.templateId);
+                setRecommendation(rec);
+              }
               setView('today');
             }}
             onCancel={() => setView('today')}
@@ -135,6 +141,7 @@ export default function App() {
           date={today}
           todayResult={todayResult}
           todayLog={todayLog}
+          recommendation={recommendation}
           onLogWorkout={() => setView('log')}
         />
       </main>

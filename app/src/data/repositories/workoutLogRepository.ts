@@ -40,4 +40,12 @@ export const workoutLogRepository = {
       .toArray();
     return rows.map(fromRow);
   },
+
+  async listByTemplateId(templateId: string, limit: number): Promise<WorkoutLog[]> {
+    const rows = await db.workoutLogs.orderBy('date').reverse().toArray();
+    return rows
+      .filter(r => (r.plannedWorkout as Record<string, unknown>)['templateId'] === templateId)
+      .slice(0, limit)
+      .map(fromRow);
+  },
 };

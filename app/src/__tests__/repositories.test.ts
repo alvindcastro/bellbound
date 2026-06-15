@@ -5,6 +5,7 @@ import { workoutTemplateRepository } from '../data/repositories/workoutTemplateR
 import { weekTemplateRepository } from '../data/repositories/weekTemplateRepository.js';
 import { workoutLogRepository } from '../data/repositories/workoutLogRepository.js';
 import { characterRepository } from '../data/repositories/characterRepository.js';
+import { buildWorkoutLog } from '../services/buildWorkoutLog.js';
 
 beforeEach(async () => {
   await db.open();
@@ -166,6 +167,60 @@ describe('workoutLogRepository', () => {
     expect(rows[0]?.source).toBe('planned');
     expect(rows[0]?.plannedDayType).toBe('kb');
     expect(rows[0]?.signals.pressGrindy).toBe(false);
+  });
+});
+
+describe('workoutLogRepository.listByTemplateId', () => {
+  const context = {
+    date: '2026-06-15',
+    blockId: 'block-1',
+    plannedDayType: 'kb' as const,
+    actualDayType: 'kb' as const,
+    templateId: 'dkbs',
+    templateName: 'Double KB Strength',
+    category: 'kettlebell',
+  };
+
+  const inputs = {
+    status: 'completed' as const,
+    roundsCompleted: 4,
+    difficulty: 'normal' as const,
+    note: '',
+  };
+
+  it('returns empty array when no logs exist', async () => {
+    const logs = await workoutLogRepository.listByTemplateId('dkbs', 5);
+    expect(logs).toHaveLength(0);
+  });
+
+  it('returns only logs for the given templateId', async () => {
+    const dkbsLog = buildWorkoutLog(inputs, { ...context, templateId: 'dkbs', date: '2026-06-15' });
+    const abcLog = buildWorkoutLog(inputs, { ...context, templateId: 'abc', templateName: 'ABC', date: '2026-06-16' });
+    await workoutLogRepository.add(dkbsLog);
+    await workoutLogRepository.add(abcLog);
+    const logs = await workoutLogRepository.listByTemplateId('dkbs', 10);
+    expect(logs).toHaveLength(1);
+    expect((logs[0]!.plannedWorkout as Record<string, unknown>)['templateId']).toBe('dkbs');
+  });
+
+  it('returns logs most-recent-first', async () => {
+    const older = buildWorkoutLog(inputs, { ...context, date: '2026-06-10' });
+    const newer = buildWorkoutLog(inputs, { ...context, date: '2026-06-15' });
+    await workoutLogRepository.add(older);
+    await workoutLogRepository.add(newer);
+    const logs = await workoutLogRepository.listByTemplateId('dkbs', 10);
+    expect(logs).toHaveLength(2);
+    expect(logs[0]!.date).toBe('2026-06-15');
+    expect(logs[1]!.date).toBe('2026-06-10');
+  });
+
+  it('respects the limit parameter', async () => {
+    for (let i = 1; i <= 4; i++) {
+      const log = buildWorkoutLog(inputs, { ...context, date: `2026-06-1${i}` });
+      await workoutLogRepository.add(log);
+    }
+    const logs = await workoutLogRepository.listByTemplateId('dkbs', 2);
+    expect(logs).toHaveLength(2);
   });
 });
 
