@@ -33,64 +33,64 @@ Discipline unchanged: pure logic in the engine, I/O in the app layer, components
 
 ## Section A: Tier Model in the Engine
 
-- [ ] RED first: write failing tests for a pure function `resolveWorkoutAtTier(template, tier)` in the engine (e.g. `packages/engine/src/progression/resolveWorkoutAtTier.ts`) that returns the concrete workout for that tier: each movement with its resolved rounds/sets, reps or duration, and load.
-- [ ] Define the resolved-workout return type in the engine entities (e.g. `ResolvedWorkout` with a list of resolved movements, plus the rest prescription). Keep it a plain type.
-- [ ] Implement `resolveWorkoutAtTier` to read the template's `tiers` map for the given tier and combine it with the template's `movements`.
-- [ ] If Phase 1 already produced a tier-resolution function in the app layer, move it into the engine here as `resolveWorkoutAtTier`, port its tests, delete the app-layer copy, and have the app call the engine version. There must be exactly one tier resolver and it lives in the engine.
+- [x] RED first: write failing tests for a pure function `resolveWorkoutAtTier(template, tier)` in the engine (e.g. `packages/engine/src/progression/resolveWorkoutAtTier.ts`) that returns the concrete workout for that tier: each movement with its resolved rounds/sets, reps or duration, and load.
+- [x] Define the resolved-workout return type in the engine entities (e.g. `ResolvedWorkout` with a list of resolved movements, plus the rest prescription). Keep it a plain type.
+- [x] Implement `resolveWorkoutAtTier` to read the template's `tiers` map for the given tier and combine it with the template's `movements`.
+- [x] If Phase 1 already produced a tier-resolution function in the app layer, move it into the engine here as `resolveWorkoutAtTier`, port its tests, delete the app-layer copy, and have the app call the engine version. There must be exactly one tier resolver and it lives in the engine.
 
 ## Section B: Per-Template Tier Semantics
 
 The whole-baseline bump applies one tier up to everything, but each template expresses its tier differently. Encode that the tier step is a property of the template, not a global rule.
 
-- [ ] RED first: write failing tests for Double KB Strength: tier 1 = 4 rounds, tier 2 = 5 rounds, tier 3 = 6 rounds, with reps and load constant across tiers. Confirm `resolveWorkoutAtTier` returns the right round count per tier. Then confirm it passes (the resolver from Section A should already handle this if the template encodes rounds per tier).
-- [ ] RED first: write failing tests for Armor Building Complex: tiers map to sets (10, 12, 15, 20). Confirm resolution returns the right set count per tier.
-- [ ] RED first: write failing tests for a conditioning/swing template where the tier step is total reps or density. Confirm resolution returns the right volume per tier.
-- [ ] Confirm the `tierStep` field on each template is descriptive (human-readable, e.g. "add one round") and the `tiers` map is the machine-readable source the resolver uses. The resolver reads `tiers`, not `tierStep`.
+- [x] RED first: write failing tests for Double KB Strength: tier 1 = 4 rounds, tier 2 = 5 rounds, tier 3 = 6 rounds, with reps and load constant across tiers. Confirm `resolveWorkoutAtTier` returns the right round count per tier. Then confirm it passes (the resolver from Section A should already handle this if the template encodes rounds per tier).
+- [x] RED first: write failing tests for Armor Building Complex: tiers map to sets (10, 12, 15, 20). Confirm resolution returns the right set count per tier.
+- [x] RED first: write failing tests for a conditioning/swing template where the tier step is total reps or density. Confirm resolution returns the right volume per tier.
+- [x] Confirm the `tierStep` field on each template is descriptive (human-readable, e.g. "add one round") and the `tiers` map is the machine-readable source the resolver uses. The resolver reads `tiers`, not `tierStep`.
 
 ## Section C: Initial Template Set
 
 Build a small set of templates with tier definitions. Seed them (extend the Phase 0 seed).
 
-- [ ] Confirm/extend the seed to include these templates with tier definitions and movements:
+- [x] Confirm/extend the seed to include these templates with tier definitions and movements:
     1. Double KB Strength (tiers by rounds)
     2. Armor Building Complex (tiers by sets)
     3. Single KB Strength (tiers by round, reps, or load per its own rule)
     4. Swing / Push-up Conditioning (tiers by total reps or density)
     5. Rest / Recovery (no tier progression; a marker template)
-- [ ] RED first: write failing seed tests (fake-indexeddb) asserting each new template seeds with its tiers and movements, and that re-seeding does not duplicate. Then implement the seed additions.
-- [ ] Keep each template's tier definitions explicit and small. Do not over-build tiers beyond what is needed (3 to 4 tiers per template is plenty for now).
+- [x] RED first: write failing seed tests (fake-indexeddb) asserting each new template seeds with its tiers and movements, and that re-seeding does not duplicate. Then implement the seed additions.
+- [x] Keep each template's tier definitions explicit and small. Do not over-build tiers beyond what is needed (3 to 4 tiers per template is plenty for now).
 
 ## Section D: Today's Workout From the Active Tier
 
-- [ ] RED first: write a failing test (fake-indexeddb) for the app-layer flow: given an active block at tier N and a KB day resolving to Double KB Strength, the service returns the resolved workout at tier N. Then implement, having the service fetch the block and template from the repos and call `resolveWorkoutAtTier`.
-- [ ] Update `todayService` (from Phase 2) to use the engine resolver for the displayed workout, replacing any interim resolution.
-- [ ] Confirm the Today screen renders the resolved workout for the active tier with all movements, reps/duration, load, and rest visible (no regression from Phase 1 visibility rules).
+- [x] RED first: write a failing test (fake-indexeddb) for the app-layer flow: given an active block at tier N and a KB day resolving to Double KB Strength, the service returns the resolved workout at tier N. Then implement, having the service fetch the block and template from the repos and call `resolveWorkoutAtTier`.
+- [x] Update `todayService` (from Phase 2) to use the engine resolver for the displayed workout, replacing any interim resolution.
+- [x] Confirm the Today screen renders the resolved workout for the active tier with all movements, reps/duration, load, and rest visible (no regression from Phase 1 visibility rules).
 
 ## Section E: Tier Bump Readiness (no automation yet)
 
 The tier bump itself (on a successful test) is a later phase. Phase 3 only proves that a bump would propagate correctly.
 
-- [ ] RED first: write a test demonstrating that changing the active block's `baselineTier` from N to N+1 causes every template to resolve to its N+1 definition, with no per-day editing. This is a test of `resolveWorkoutAtTier` plus the service reading the block tier; it proves propagation.
-- [ ] Do NOT build the bump trigger, the test workout, ascension, or the counter reset. Those belong to the ascension phase. Phase 3 only proves the tier drives resolution.
-- [ ] Leave a clear marker (comment or pending test) noting that the bump flow is owned by the ascension phase and will set `baselineTier` and reset the counter.
+- [x] RED first: write a test demonstrating that changing the active block's `baselineTier` from N to N+1 causes every template to resolve to its N+1 definition, with no per-day editing. This is a test of `resolveWorkoutAtTier` plus the service reading the block tier; it proves propagation.
+- [x] Do NOT build the bump trigger, the test workout, ascension, or the counter reset. Those belong to the ascension phase. Phase 3 only proves the tier drives resolution.
+- [x] Leave a clear marker (comment or pending test) noting that the bump flow is owned by the ascension phase and will set `baselineTier` and reset the counter.
 
 ## Section F: Persistence and Offline
 
 - [ ] Confirm the seeded templates and their tiers persist and load offline.
 - [ ] Confirm today's workout resolves correctly offline from the local block tier and template.
-- [ ] No network calls introduced in Phase 3.
+- [x] No network calls introduced in Phase 3.
 
 ## Section G: Phase 3 Done When
 
-- [ ] Today's workout is generated from the active block's tier via the single engine resolver `resolveWorkoutAtTier`.
-- [ ] There is exactly one tier resolver and it lives in the engine; any Phase 1 app-layer copy has been removed.
-- [ ] Each template controls its own tier expression (rounds, sets, or volume), and the resolver reads the machine-readable `tiers` map.
-- [ ] The initial template set is seeded with tiers and movements, with no duplication on re-seed.
-- [ ] A change to the block's `baselineTier` propagates to all workouts with no per-day editing, proven by test.
-- [ ] All tier logic written test-first; the engine stayed pure; I/O stayed in the app layer.
+- [x] Today's workout is generated from the active block's tier via the single engine resolver `resolveWorkoutAtTier`.
+- [x] There is exactly one tier resolver and it lives in the engine; any Phase 1 app-layer copy has been removed.
+- [x] Each template controls its own tier expression (rounds, sets, or volume), and the resolver reads the machine-readable `tiers` map.
+- [x] The initial template set is seeded with tiers and movements, with no duplication on re-seed.
+- [x] A change to the block's `baselineTier` propagates to all workouts with no per-day editing, proven by test.
+- [x] All tier logic written test-first; the engine stayed pure; I/O stayed in the app layer.
 - [ ] Everything works offline.
-- [ ] The bump/ascension flow is documented as deferred, not built.
-- [ ] Committed on green, pushed, with a clear Phase 3 commit message.
+- [x] The bump/ascension flow is documented as deferred, not built.
+- [x] Committed on green, pushed, with a clear Phase 3 commit message.
 
 ---
 
