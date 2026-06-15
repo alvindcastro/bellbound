@@ -85,11 +85,11 @@ This is the heart of Phase 6: when multiple signals fire, the most conservative 
 
 - [x] After a workout is logged, show the Council recommendation on the Today screen (or a results view): the recommendation kind, the affected movement, and the plain explanation.
 - [x] The recommendation is advisory. The app does not auto-change the program. It suggests; the user decides. Tier bumps remain manual and gated (the ascension phase).
-- [ ] Verify rendering manually. No recommendation logic in the component; it calls the engine and displays the result.
+- [x] Verify rendering manually. No recommendation logic in the component; it calls the engine and displays the result.
 
 ## Section G: Persistence and Offline
 
-- [ ] Confirm recommendations compute offline from local logs.
+- [x] Confirm recommendations compute offline from local logs.
 - [x] No network calls introduced in Phase 6.
 
 ## Section H: Phase 6 Done When
@@ -102,8 +102,8 @@ This is the heart of Phase 6: when multiple signals fire, the most conservative 
 - [x] Every recommendation carries a data-derived explanation; no fake-certainty or AI-attributed copy.
 - [x] The recommendation is advisory; the app does not auto-progress.
 - [x] All rules and priority interactions written test-first with high coverage; engine stayed pure; no recommendation logic in components.
-- [ ] Works offline.
-- [ ] Committed on green, pushed, with a clear Phase 6 commit message.
+- [x] Works offline.
+- [x] Committed on green, pushed, with a clear Phase 6 commit message.
 
 ---
 
